@@ -9,7 +9,6 @@ export default {
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
   ],
-  prefix: "",
   theme: {
     container: {
       center: true,
@@ -95,5 +94,11 @@ export default {
       }
     }
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require("daisyui")
+  ],
+  daisyui: {
+    themes: ["blue", "dark", "cyberpunk"],
+  },
 } satisfies Config;

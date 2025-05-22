@@ -12,3 +12,12 @@ export interface Message {
   content: string;
   timestamp: Date;
 }
+
+export interface Group {
+  id: string;
+  name: string;
+  avatar: string;
+  members: string[]; // Array of user IDs
+  createdBy: string; // User ID of creator
+  createdAt: Date;
+}

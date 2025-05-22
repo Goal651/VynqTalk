@@ -1,32 +1,50 @@
 
-import { Message, User } from "../types";
 import { formatDistanceToNow } from "date-fns";
+import { Message, User } from "../types";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface MessageBubbleProps {
   message: Message;
   user: User;
+  onUserAvatarClick?: () => void;
 }
 
-export const MessageBubble = ({ message, user }: MessageBubbleProps) => {
+export const MessageBubble = ({ message, user, onUserAvatarClick }: MessageBubbleProps) => {
+  const isCurrentUser = user.id === "current-user";
+  const formattedTime = formatDistanceToNow(new Date(message.timestamp), {
+    addSuffix: true,
+  });
+
   return (
-    <div className="flex items-start space-x-3 animate-fade-in">
-      <div className="relative flex-shrink-0">
-        <img 
-          src={user.avatar} 
-          alt={user.name} 
-          className="w-10 h-10 rounded-full"
-        />
-        <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 border-2 border-background rounded-full ${user.isOnline ? 'bg-green-500' : 'bg-gray-500'}`}></span>
-      </div>
-      <div className="flex-1">
-        <div className="flex items-center space-x-2">
-          <span className="font-semibold text-sm">{user.name}</span>
-          <span className="text-xs text-muted-foreground">
-            {formatDistanceToNow(new Date(message.timestamp), { addSuffix: true })}
-          </span>
-        </div>
-        <div className="mt-1 p-3 bg-secondary rounded-lg text-sm">
-          {message.content}
+    <div
+      className={`flex items-start gap-2 ${
+        isCurrentUser ? "flex-row-reverse" : "flex-row"
+      }`}
+    >
+      <Avatar 
+        className={`cursor-pointer ${user.isOnline ? "ring-2 ring-green-500" : ""}`}
+        onClick={onUserAvatarClick}
+      >
+        <AvatarImage src={user.avatar} alt={user.name} />
+        <AvatarFallback>{user.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+      </Avatar>
+      <div
+        className={`rounded-lg p-3 max-w-[80%] ${
+          isCurrentUser
+            ? "bg-primary text-primary-foreground"
+            : "bg-muted text-foreground"
+        }`}
+      >
+        {!isCurrentUser && (
+          <div className="font-semibold text-sm mb-1">{user.name}</div>
+        )}
+        <div className="break-words">{message.content}</div>
+        <div
+          className={`text-xs mt-1 ${
+            isCurrentUser ? "text-primary-foreground/70" : "text-muted-foreground"
+          }`}
+        >
+          {formattedTime}
         </div>
       </div>
     </div>
