@@ -4,6 +4,9 @@ export interface User {
   name: string;
   avatar: string;
   isOnline: boolean;
+  status?: string;
+  lastSeen?: Date;
+  email?: string;
 }
 
 export interface Message {
@@ -11,6 +14,14 @@ export interface Message {
   userId: string;
   content: string;
   timestamp: Date;
+  isEdited?: boolean;
+  attachments?: string[];
+  reactions?: Reaction[];
+}
+
+export interface Reaction {
+  userId: string;
+  emoji: string;
 }
 
 export interface Group {
@@ -20,4 +31,5 @@ export interface Group {
   members: string[]; // Array of user IDs
   createdBy: string; // User ID of creator
   createdAt: Date;
+  description?: string;
 }

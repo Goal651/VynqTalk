@@ -7,9 +7,17 @@ interface MessageListProps {
   messages: Message[];
   users: User[];
   onUserAvatarClick?: (user: User) => void;
+  onDeleteMessage?: (messageId: string) => void;
+  onEditMessage?: (message: Message) => void;
 }
 
-export const MessageList = ({ messages, users, onUserAvatarClick }: MessageListProps) => {
+export const MessageList = ({ 
+  messages, 
+  users, 
+  onUserAvatarClick,
+  onDeleteMessage,
+  onEditMessage
+}: MessageListProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -17,7 +25,7 @@ export const MessageList = ({ messages, users, onUserAvatarClick }: MessageListP
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-background/80 to-background">
       {messages.map((message) => {
         const user = users.find((u) => u.id === message.userId);
         return user ? (
@@ -26,6 +34,8 @@ export const MessageList = ({ messages, users, onUserAvatarClick }: MessageListP
             message={message} 
             user={user} 
             onUserAvatarClick={onUserAvatarClick ? () => onUserAvatarClick(user) : undefined}
+            onDeleteMessage={onDeleteMessage ? () => onDeleteMessage(message.id) : undefined}
+            onEditMessage={onEditMessage ? () => onEditMessage(message) : undefined}
           />
         ) : null;
       })}
