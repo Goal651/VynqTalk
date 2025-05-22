@@ -33,3 +33,8 @@ export interface Group {
   createdAt: Date;
   description?: string;
 }
+
+export interface AuthUser {
+  email: string;
+  password: string;
+}

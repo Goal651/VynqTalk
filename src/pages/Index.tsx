@@ -5,10 +5,13 @@ import { ChatView } from "../components/ChatView";
 import { ThemeProvider } from "../contexts/ThemeContext";
 import { useToast } from "@/hooks/use-toast";
 import { Message } from "@/types";
+import { useAuth } from "@/contexts/AuthContext";
+import { LineWave } from "@/components/LineWave";
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<"chat" | "group" | "settings" | "notifications">("chat");
   const { toast } = useToast();
+  const { user, logout } = useAuth();
 
   const handleMessageDeleted = (messageId: string) => {
     toast({
@@ -24,11 +27,21 @@ const Index = () => {
     });
   };
 
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
     <ThemeProvider>
       <div className="flex flex-col h-screen bg-background">
-        <Navbar currentView={currentView} onViewChange={setCurrentView} />
-        <main className="flex-1 overflow-hidden">
+        <Navbar 
+          currentView={currentView} 
+          onViewChange={setCurrentView} 
+          onLogout={handleLogout}
+          user={user}
+        />
+        <main className="flex-1 overflow-hidden relative">
+          <LineWave className="absolute inset-0 opacity-5" />
           {currentView === "chat" && (
             <ChatView 
               onMessageDelete={handleMessageDeleted} 
