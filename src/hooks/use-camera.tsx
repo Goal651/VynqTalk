@@ -1,14 +1,14 @@
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Camera } from "lucide-react";
 
-export function useState() {
+export function useCamera() {
   const [isOpen, setIsOpen] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const videoRef = useCallback<React.RefObject<HTMLVideoElement>>(React.createRef(), []);
-  const canvasRef = useCallback<React.RefObject<HTMLCanvasElement>>(React.createRef(), []);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const openCamera = useCallback(() => {
     setIsOpen(true);

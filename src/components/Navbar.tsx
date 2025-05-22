@@ -1,14 +1,17 @@
 
-import { Home, Users, Settings, Bell, Moon, Sun, Laptop } from "lucide-react";
+import { Home, Users, Settings, Bell, Moon, Sun, Laptop, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "../contexts/ThemeContext";
+import { User } from "@/types";
 
 interface NavbarProps {
   currentView: "chat" | "group" | "settings" | "notifications";
   onViewChange: (view: "chat" | "group" | "settings" | "notifications") => void;
+  onLogout?: () => void;
+  user?: User;
 }
 
-export const Navbar = ({ currentView, onViewChange }: NavbarProps) => {
+export const Navbar = ({ currentView, onViewChange, onLogout, user }: NavbarProps) => {
   const { theme, setTheme } = useTheme();
 
   const navItems = [
@@ -40,6 +43,12 @@ export const Navbar = ({ currentView, onViewChange }: NavbarProps) => {
         </div>
 
         <div className="flex items-center gap-2">
+          {user && (
+            <div className="text-sm text-muted-foreground mr-2">
+              Hi, {user.name}
+            </div>
+          )}
+          
           <div className="flex border border-border rounded-md">
             <Button
               variant="ghost"
@@ -69,6 +78,18 @@ export const Navbar = ({ currentView, onViewChange }: NavbarProps) => {
               <Sun className="h-4 w-4" />
             </Button>
           </div>
+          
+          {onLogout && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onLogout}
+              className="h-8 w-8"
+              title="Logout"
+            >
+              <LogOut className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       </div>
       
