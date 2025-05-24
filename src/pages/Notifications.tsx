@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDistanceToNow } from "date-fns";
-import { Bell, MessageCircle, Users, UserPlus, Settings, Trash2, MarkAsUnread } from "lucide-react";
+import { Bell, MessageCircle, Users, UserPlus, Settings, Trash2, Check } from "lucide-react";
 
 interface Notification {
   id: string;
@@ -200,7 +199,7 @@ export const Notifications = () => {
                               variant="outline"
                               onClick={() => markAsRead(notification.id)}
                             >
-                              <MarkAsUnread className="h-3 w-3 mr-1" />
+                              <Check className="h-3 w-3 mr-1" />
                               Mark as read
                             </Button>
                           )}

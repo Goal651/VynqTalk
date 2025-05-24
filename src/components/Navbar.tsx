@@ -1,12 +1,12 @@
 
-import { Home, Users, Settings, Bell, Moon, Sun, Laptop, LogOut } from "lucide-react";
+import { Home, Users, Settings, Bell, Moon, Sun, Laptop, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "../contexts/ThemeContext";
 import { User } from "@/types";
 
 interface NavbarProps {
-  currentView: "chat" | "group" | "settings" | "notifications";
-  onViewChange: (view: "chat" | "group" | "settings" | "notifications") => void;
+  currentView: "chat" | "group" | "settings" | "notifications" | "admin";
+  onViewChange: (view: "chat" | "group" | "settings" | "notifications" | "admin") => void;
   onLogout?: () => void;
   user?: User;
 }
@@ -19,6 +19,7 @@ export const Navbar = ({ currentView, onViewChange, onLogout, user }: NavbarProp
     { id: "group", label: "Groups", icon: Users },
     { id: "settings", label: "Settings", icon: Settings },
     { id: "notifications", label: "Notifications", icon: Bell },
+    { id: "admin", label: "Admin", icon: Shield },
   ] as const;
 
   return (
