@@ -21,7 +21,8 @@ export interface Group {
   name: string;
   description: string;
   avatar: string;
-  members: User[];
+  members: string[]; // Changed from User[] to string[] to store user IDs
+  createdBy: string; // Added to track who created the group
   createdAt: Date;
-  isPrivate: boolean;
+  isPrivate?: boolean; // Made optional since it's not used in Groups.tsx
 }
