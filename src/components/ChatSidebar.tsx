@@ -10,9 +10,10 @@ import { CallPreview } from "./CallPreview";
 interface ChatSidebarProps {
   users: User[];
   onUserClick: (user: User) => void;
+  activeChat?: User | null;
 }
 
-export const ChatSidebar = ({ users, onUserClick }: ChatSidebarProps) => {
+export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [callType, setCallType] = useState<"audio" | "video" | null>(null);
   const [callingUser, setCallingUser] = useState<User | null>(null);
@@ -50,7 +51,9 @@ export const ChatSidebar = ({ users, onUserClick }: ChatSidebarProps) => {
         {filteredUsers.map((user) => (
           <div
             key={user.id}
-            className="flex items-center p-3 hover:bg-muted/50 cursor-pointer border-b border-border"
+            className={`flex items-center p-3 hover:bg-muted/50 cursor-pointer border-b border-border group ${
+              activeChat?.id === user.id ? "bg-muted/50 border-l-4 border-l-primary" : ""
+            }`}
             onClick={() => onUserClick(user)}
           >
             <div className="relative">
@@ -65,7 +68,7 @@ export const ChatSidebar = ({ users, onUserClick }: ChatSidebarProps) => {
             <div className="ml-3 flex-1 overflow-hidden">
               <div className="font-medium">{user.name}</div>
               <div className="text-xs text-muted-foreground truncate">
-                {user.isOnline ? "Online" : "Offline"}
+                {activeChat?.id === user.id ? "Active chat" : user.isOnline ? "Online" : "Offline"}
               </div>
             </div>
             <div className="flex space-x-1">

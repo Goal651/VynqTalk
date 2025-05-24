@@ -27,21 +27,28 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
   const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
   const [messageToEdit, setMessageToEdit] = useState<Message | null>(null);
   const [editedContent, setEditedContent] = useState("");
+  const [activeChat, setActiveChat] = useState<User | null>(null);
 
   const handleSendMessage = (content: string) => {
-    if (!user) return;
+    if (!user || !activeChat) return;
     
     const newMessage: Message = {
       id: `m${Date.now()}`,
       userId: user.id,
       content: content,
       timestamp: new Date(),
+      chatWithUserId: activeChat.id,
     };
     setMessages([...messages, newMessage]);
   };
 
-  const handleUserClick = (user: User) => {
-    setSelectedUser(user);
+  const handleUserClick = (clickedUser: User) => {
+    setActiveChat(clickedUser);
+    setShowUserInfo(false);
+  };
+
+  const handleUserAvatarClick = (clickedUser: User) => {
+    setSelectedUser(clickedUser);
     setShowUserInfo(true);
   };
 
@@ -78,21 +85,60 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
     }
   };
 
+  // Filter messages for the active chat
+  const filteredMessages = activeChat 
+    ? messages.filter(message => 
+        (message.userId === user?.id && message.chatWithUserId === activeChat.id) ||
+        (message.userId === activeChat.id && (!message.chatWithUserId || message.chatWithUserId === user?.id))
+      )
+    : [];
+
   return (
     <div className="flex h-full relative">
       <LineWave className="absolute inset-0 opacity-10" />
-      <ChatSidebar users={users} onUserClick={handleUserClick} />
+      <ChatSidebar 
+        users={users} 
+        onUserClick={handleUserClick}
+        activeChat={activeChat}
+      />
       <div className="flex-1 flex flex-col h-full border-l border-r border-border/30 bg-background/80 backdrop-blur-sm relative z-10">
-        <div className="flex-1 overflow-y-auto">
-          <MessageList 
-            messages={messages} 
-            users={users} 
-            onUserAvatarClick={handleUserClick}
-            onDeleteMessage={handleDeleteMessage}
-            onEditMessage={handleEditMessage}
-          />
-        </div>
-        <MessageInput onSendMessage={handleSendMessage} currentUser={user || undefined} />
+        {activeChat ? (
+          <>
+            <div className="p-4 border-b border-border bg-card/50 backdrop-blur">
+              <div className="flex items-center gap-3">
+                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                  <span className="text-sm font-medium">{activeChat.name.substring(0, 2).toUpperCase()}</span>
+                </div>
+                <div>
+                  <h2 className="font-semibold">{activeChat.name}</h2>
+                  <p className="text-xs text-muted-foreground">
+                    {activeChat.isOnline ? "Online" : "Offline"}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              <MessageList 
+                messages={filteredMessages} 
+                users={users} 
+                onUserAvatarClick={handleUserAvatarClick}
+                onDeleteMessage={handleDeleteMessage}
+                onEditMessage={handleEditMessage}
+              />
+            </div>
+            <MessageInput onSendMessage={handleSendMessage} currentUser={user || undefined} />
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="h-12 w-12 rounded-full bg-muted mx-auto mb-4 flex items-center justify-center">
+                <span className="text-muted-foreground">💬</span>
+              </div>
+              <h3 className="font-semibold mb-2">No conversation selected</h3>
+              <p className="text-muted-foreground">Choose a user from the sidebar to start chatting</p>
+            </div>
+          </div>
+        )}
       </div>
       
       {showUserInfo && selectedUser && (

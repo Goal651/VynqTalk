@@ -2,11 +2,9 @@
 export interface User {
   id: string;
   name: string;
+  email?: string;
   avatar: string;
   isOnline: boolean;
-  status?: string;
-  lastSeen?: Date;
-  email?: string;
 }
 
 export interface Message {
@@ -15,26 +13,15 @@ export interface Message {
   content: string;
   timestamp: Date;
   isEdited?: boolean;
-  attachments?: string[];
-  reactions?: Reaction[];
-}
-
-export interface Reaction {
-  userId: string;
-  emoji: string;
+  chatWithUserId?: string; // Added to track which user this message is for
 }
 
 export interface Group {
   id: string;
   name: string;
+  description: string;
   avatar: string;
-  members: string[]; // Array of user IDs
-  createdBy: string; // User ID of creator
+  members: User[];
   createdAt: Date;
-  description?: string;
-}
-
-export interface AuthUser {
-  email: string;
-  password: string;
+  isPrivate: boolean;
 }
