@@ -14,7 +14,6 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarC
 export const AdminPanel = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
-  const [activeTab, setActiveTab] = useState("dashboard");
 
   // Mock data for charts
   const userActivityData = [
@@ -103,7 +102,7 @@ export const AdminPanel = () => {
         </Select>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs defaultValue="dashboard" className="w-full">
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="dashboard" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
