@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -11,7 +10,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { LineWave } from "@/components/LineWave";
 import { Camera } from "lucide-react";
-import { useState as useHookState } from "@/hooks/use-camera";
+import { useCamera } from "@/hooks/use-camera";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
@@ -27,7 +26,7 @@ const Signup = () => {
   const { signup } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const { openCamera, capturedImage } = useHookState();
+  const { openCamera, capturedImage, CameraDialog } = useCamera();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -147,6 +146,8 @@ const Signup = () => {
           </div>
         </CardFooter>
       </Card>
+      
+      {CameraDialog}
     </div>
   );
 };
