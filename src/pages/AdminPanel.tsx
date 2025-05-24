@@ -14,6 +14,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarC
 export const AdminPanel = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   // Mock data for charts
   const userActivityData = [
@@ -102,35 +103,35 @@ export const AdminPanel = () => {
         </Select>
       </div>
 
-      <Tabs defaultValue="dashboard" className="w-full">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="dashboard">
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Dashboard
+          <TabsTrigger value="dashboard" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            <span className="hidden sm:inline">Dashboard</span>
           </TabsTrigger>
-          <TabsTrigger value="users">
-            <Users className="h-4 w-4 mr-2" />
-            Users
+          <TabsTrigger value="users" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            <span className="hidden sm:inline">Users</span>
           </TabsTrigger>
-          <TabsTrigger value="groups">
-            <Users className="h-4 w-4 mr-2" />
-            Groups
+          <TabsTrigger value="groups" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            <span className="hidden sm:inline">Groups</span>
           </TabsTrigger>
-          <TabsTrigger value="content">
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Content
+          <TabsTrigger value="content" className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            <span className="hidden sm:inline">Content</span>
           </TabsTrigger>
-          <TabsTrigger value="analytics">
-            <TrendingUp className="h-4 w-4 mr-2" />
-            Analytics
+          <TabsTrigger value="analytics" className="flex items-center gap-2">
+            <TrendingUp className="h-4 w-4" />
+            <span className="hidden sm:inline">Analytics</span>
           </TabsTrigger>
-          <TabsTrigger value="system">
-            <Server className="h-4 w-4 mr-2" />
-            System
+          <TabsTrigger value="system" className="flex items-center gap-2">
+            <Server className="h-4 w-4" />
+            <span className="hidden sm:inline">System</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="dashboard" className="space-y-6">
+        <TabsContent value="dashboard" className="space-y-6 mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -223,7 +224,157 @@ export const AdminPanel = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="analytics" className="space-y-6">
+        <TabsContent value="users" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>User Management</CardTitle>
+              <CardDescription>Manage user accounts and permissions</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Join Date</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {mockUsers.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell className="flex items-center space-x-2">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} />
+                          <AvatarFallback>{user.name.substring(0, 2)}</AvatarFallback>
+                        </Avatar>
+                        <span>{user.name}</span>
+                      </TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        <Badge variant={user.status === "active" ? "default" : "destructive"}>
+                          {user.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{user.joinDate}</TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button size="sm" variant="outline">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="outline">
+                            <Ban className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="groups" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Group Management</CardTitle>
+              <CardDescription>Manage chat groups and their settings</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Group Name</TableHead>
+                    <TableHead>Members</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {mockGroups.map((group) => (
+                    <TableRow key={group.id}>
+                      <TableCell className="flex items-center space-x-2">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={`https://api.dicebear.com/7.x/shapes/svg?seed=${group.name}`} />
+                          <AvatarFallback>{group.name.substring(0, 2)}</AvatarFallback>
+                        </Avatar>
+                        <span>{group.name}</span>
+                      </TableCell>
+                      <TableCell>{group.members}</TableCell>
+                      <TableCell>{group.created}</TableCell>
+                      <TableCell>
+                        <Badge variant={group.status === "active" ? "default" : "destructive"}>
+                          {group.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button size="sm" variant="outline">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="outline">
+                            <Ban className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="content" className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Content Moderation</CardTitle>
+              <CardDescription>Review and moderate user-generated content</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Content</TableHead>
+                    <TableHead>Timestamp</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {mockMessages.map((message) => (
+                    <TableRow key={message.id}>
+                      <TableCell>{message.user}</TableCell>
+                      <TableCell className="max-w-xs truncate">{message.content}</TableCell>
+                      <TableCell>{message.timestamp}</TableCell>
+                      <TableCell>
+                        <Badge variant={message.status === "approved" ? "default" : "destructive"}>
+                          {message.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex space-x-2">
+                          <Button size="sm" variant="outline">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="outline">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="analytics" className="space-y-6 mt-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
@@ -356,7 +507,7 @@ export const AdminPanel = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="system">
+        <TabsContent value="system" className="mt-6">
           <Card>
             <CardHeader>
               <CardTitle>System Metrics</CardTitle>
@@ -381,157 +532,6 @@ export const AdminPanel = () => {
                   </Card>
                 ))}
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* ... keep existing code (users, groups, content tabs) */}
-        <TabsContent value="users">
-          <Card>
-            <CardHeader>
-              <CardTitle>User Management</CardTitle>
-              <CardDescription>Manage user accounts and permissions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Join Date</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockUsers.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell className="flex items-center space-x-2">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} />
-                          <AvatarFallback>{user.name.substring(0, 2)}</AvatarFallback>
-                        </Avatar>
-                        <span>{user.name}</span>
-                      </TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>
-                        <Badge variant={user.status === "active" ? "default" : "destructive"}>
-                          {user.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{user.joinDate}</TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button size="sm" variant="outline">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="outline">
-                            <Ban className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="groups">
-          <Card>
-            <CardHeader>
-              <CardTitle>Group Management</CardTitle>
-              <CardDescription>Manage chat groups and their settings</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Group Name</TableHead>
-                    <TableHead>Members</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockGroups.map((group) => (
-                    <TableRow key={group.id}>
-                      <TableCell className="flex items-center space-x-2">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={`https://api.dicebear.com/7.x/shapes/svg?seed=${group.name}`} />
-                          <AvatarFallback>{group.name.substring(0, 2)}</AvatarFallback>
-                        </Avatar>
-                        <span>{group.name}</span>
-                      </TableCell>
-                      <TableCell>{group.members}</TableCell>
-                      <TableCell>{group.created}</TableCell>
-                      <TableCell>
-                        <Badge variant={group.status === "active" ? "default" : "destructive"}>
-                          {group.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button size="sm" variant="outline">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="outline">
-                            <Ban className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="content">
-          <Card>
-            <CardHeader>
-              <CardTitle>Content Moderation</CardTitle>
-              <CardDescription>Review and moderate user-generated content</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Content</TableHead>
-                    <TableHead>Timestamp</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockMessages.map((message) => (
-                    <TableRow key={message.id}>
-                      <TableCell>{message.user}</TableCell>
-                      <TableCell className="max-w-xs truncate">{message.content}</TableCell>
-                      <TableCell>{message.timestamp}</TableCell>
-                      <TableCell>
-                        <Badge variant={message.status === "approved" ? "default" : "destructive"}>
-                          {message.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button size="sm" variant="outline">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button size="sm" variant="outline">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
             </CardContent>
           </Card>
         </TabsContent>
