@@ -27,7 +27,7 @@ export const Navbar = ({ currentView, onViewChange, onLogout, user }: NavbarProp
     onViewChange(viewId);
   };
 
-  const handleThemeChange = (newTheme: string) => {
+  const handleThemeChange = (newTheme: "blue" | "dark" | "cyberpunk") => {
     console.log("Theme changed:", newTheme);
     setTheme(newTheme);
   };
