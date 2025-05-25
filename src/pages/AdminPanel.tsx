@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarC
 export const AdminPanel = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   // Mock data for charts
   const userActivityData = [
@@ -67,6 +69,27 @@ export const AdminPanel = () => {
     { id: "3", name: "Random", members: 75, created: "2024-01-10", status: "suspended" },
   ];
 
+  const handleTabChange = (value: string) => {
+    console.log("Admin tab changed to:", value);
+    setActiveTab(value);
+  };
+
+  const handleUserAction = (action: string, userId: string) => {
+    console.log(`User action: ${action} for user ${userId}`);
+  };
+
+  const handleGroupAction = (action: string, groupId: string) => {
+    console.log(`Group action: ${action} for group ${groupId}`);
+  };
+
+  const handleContentAction = (action: string, messageId: string) => {
+    console.log(`Content action: ${action} for message ${messageId}`);
+  };
+
+  const handleQuickAction = (action: string) => {
+    console.log("Quick action:", action);
+  };
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -102,29 +125,29 @@ export const AdminPanel = () => {
         </Select>
       </div>
 
-      <Tabs defaultValue="dashboard" className="w-full">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="dashboard" className="flex items-center gap-2">
+          <TabsTrigger value="dashboard" className="flex items-center gap-2 cursor-pointer">
             <BarChart3 className="h-4 w-4" />
             <span className="hidden sm:inline">Dashboard</span>
           </TabsTrigger>
-          <TabsTrigger value="users" className="flex items-center gap-2">
+          <TabsTrigger value="users" className="flex items-center gap-2 cursor-pointer">
             <Users className="h-4 w-4" />
             <span className="hidden sm:inline">Users</span>
           </TabsTrigger>
-          <TabsTrigger value="groups" className="flex items-center gap-2">
+          <TabsTrigger value="groups" className="flex items-center gap-2 cursor-pointer">
             <Users className="h-4 w-4" />
             <span className="hidden sm:inline">Groups</span>
           </TabsTrigger>
-          <TabsTrigger value="content" className="flex items-center gap-2">
+          <TabsTrigger value="content" className="flex items-center gap-2 cursor-pointer">
             <MessageSquare className="h-4 w-4" />
             <span className="hidden sm:inline">Content</span>
           </TabsTrigger>
-          <TabsTrigger value="analytics" className="flex items-center gap-2">
+          <TabsTrigger value="analytics" className="flex items-center gap-2 cursor-pointer">
             <TrendingUp className="h-4 w-4" />
             <span className="hidden sm:inline">Analytics</span>
           </TabsTrigger>
-          <TabsTrigger value="system" className="flex items-center gap-2">
+          <TabsTrigger value="system" className="flex items-center gap-2 cursor-pointer">
             <Server className="h-4 w-4" />
             <span className="hidden sm:inline">System</span>
           </TabsTrigger>
@@ -132,7 +155,7 @@ export const AdminPanel = () => {
 
         <TabsContent value="dashboard" className="space-y-6 mt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
+            <Card className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Users</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
@@ -142,7 +165,7 @@ export const AdminPanel = () => {
                 <p className="text-xs text-muted-foreground">+12% from last month</p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Active Groups</CardTitle>
                 <MessageCircle className="h-4 w-4 text-muted-foreground" />
@@ -152,7 +175,7 @@ export const AdminPanel = () => {
                 <p className="text-xs text-muted-foreground">+3 new this week</p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Messages Today</CardTitle>
                 <MessageSquare className="h-4 w-4 text-muted-foreground" />
@@ -162,7 +185,7 @@ export const AdminPanel = () => {
                 <p className="text-xs text-muted-foreground">+8% from yesterday</p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">System Health</CardTitle>
                 <Activity className="h-4 w-4 text-muted-foreground" />
@@ -182,7 +205,7 @@ export const AdminPanel = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 {recentAlerts.map((alert) => (
-                  <div key={alert.id} className="flex items-center gap-3 p-3 border rounded-lg">
+                  <div key={alert.id} className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-accent transition-colors">
                     <AlertTriangle className={`h-4 w-4 ${
                       alert.type === "error" ? "text-red-500" : 
                       alert.type === "warning" ? "text-yellow-500" : "text-blue-500"
@@ -202,19 +225,35 @@ export const AdminPanel = () => {
                 <CardDescription>Common administrative tasks</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  className="w-full justify-start cursor-pointer" 
+                  variant="outline"
+                  onClick={() => handleQuickAction("bulk-user-actions")}
+                >
                   <UserCheck className="h-4 w-4 mr-2" />
                   Bulk User Actions
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  className="w-full justify-start cursor-pointer" 
+                  variant="outline"
+                  onClick={() => handleQuickAction("content-moderation")}
+                >
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Content Moderation Queue
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  className="w-full justify-start cursor-pointer" 
+                  variant="outline"
+                  onClick={() => handleQuickAction("system-maintenance")}
+                >
                   <Server className="h-4 w-4 mr-2" />
                   System Maintenance
                 </Button>
-                <Button className="w-full justify-start" variant="outline">
+                <Button 
+                  className="w-full justify-start cursor-pointer" 
+                  variant="outline"
+                  onClick={() => handleQuickAction("generate-reports")}
+                >
                   <BarChart3 className="h-4 w-4 mr-2" />
                   Generate Reports
                 </Button>
@@ -242,7 +281,7 @@ export const AdminPanel = () => {
                 </TableHeader>
                 <TableBody>
                   {mockUsers.map((user) => (
-                    <TableRow key={user.id}>
+                    <TableRow key={user.id} className="cursor-pointer hover:bg-accent">
                       <TableCell className="flex items-center space-x-2">
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} />
@@ -259,10 +298,20 @@ export const AdminPanel = () => {
                       <TableCell>{user.joinDate}</TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
-                          <Button size="sm" variant="outline">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleUserAction("view", user.id)}
+                            className="cursor-pointer"
+                          >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button size="sm" variant="outline">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleUserAction("ban", user.id)}
+                            className="cursor-pointer"
+                          >
                             <Ban className="h-4 w-4" />
                           </Button>
                         </div>
@@ -294,7 +343,7 @@ export const AdminPanel = () => {
                 </TableHeader>
                 <TableBody>
                   {mockGroups.map((group) => (
-                    <TableRow key={group.id}>
+                    <TableRow key={group.id} className="cursor-pointer hover:bg-accent">
                       <TableCell className="flex items-center space-x-2">
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={`https://api.dicebear.com/7.x/shapes/svg?seed=${group.name}`} />
@@ -311,10 +360,20 @@ export const AdminPanel = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
-                          <Button size="sm" variant="outline">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleGroupAction("view", group.id)}
+                            className="cursor-pointer"
+                          >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button size="sm" variant="outline">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleGroupAction("suspend", group.id)}
+                            className="cursor-pointer"
+                          >
                             <Ban className="h-4 w-4" />
                           </Button>
                         </div>
@@ -346,7 +405,7 @@ export const AdminPanel = () => {
                 </TableHeader>
                 <TableBody>
                   {mockMessages.map((message) => (
-                    <TableRow key={message.id}>
+                    <TableRow key={message.id} className="cursor-pointer hover:bg-accent">
                       <TableCell>{message.user}</TableCell>
                       <TableCell className="max-w-xs truncate">{message.content}</TableCell>
                       <TableCell>{message.timestamp}</TableCell>
@@ -357,10 +416,20 @@ export const AdminPanel = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
-                          <Button size="sm" variant="outline">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleContentAction("view", message.id)}
+                            className="cursor-pointer"
+                          >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button size="sm" variant="outline">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => handleContentAction("delete", message.id)}
+                            className="cursor-pointer"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -375,7 +444,7 @@ export const AdminPanel = () => {
 
         <TabsContent value="analytics" className="space-y-6 mt-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
+            <Card className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader>
                 <CardTitle>User Activity Trends</CardTitle>
                 <CardDescription>Daily active users and new registrations</CardDescription>
@@ -408,7 +477,7 @@ export const AdminPanel = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader>
                 <CardTitle>Content Moderation</CardTitle>
                 <CardDescription>Distribution of content status</CardDescription>
@@ -445,7 +514,7 @@ export const AdminPanel = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader>
                 <CardTitle>Message Volume</CardTitle>
                 <CardDescription>Daily message activity</CardDescription>
@@ -473,7 +542,7 @@ export const AdminPanel = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="cursor-pointer hover:shadow-md transition-shadow">
               <CardHeader>
                 <CardTitle>Growth Metrics</CardTitle>
                 <CardDescription>User growth over time</CardDescription>
@@ -515,7 +584,7 @@ export const AdminPanel = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {systemMetrics.map((metric, index) => (
-                  <Card key={index}>
+                  <Card key={index} className="cursor-pointer hover:shadow-md transition-shadow">
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
                         <div>
