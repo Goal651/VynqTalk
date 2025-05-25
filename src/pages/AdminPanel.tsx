@@ -256,7 +256,7 @@ export const AdminPanel = () => {
                 <CardDescription>Common administrative tasks</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button 
+                <Button type="button" 
                   className="w-full justify-start cursor-pointer hover:bg-accent transition-colors" 
                   variant="outline"
                   onClick={() => handleQuickAction("bulk-user-actions")}
@@ -264,7 +264,7 @@ export const AdminPanel = () => {
                   <UserCheck className="h-4 w-4 mr-2" />
                   Bulk User Actions
                 </Button>
-                <Button 
+                <Button type="button" 
                   className="w-full justify-start cursor-pointer hover:bg-accent transition-colors" 
                   variant="outline"
                   onClick={() => handleQuickAction("content-moderation")}
@@ -272,7 +272,7 @@ export const AdminPanel = () => {
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Content Moderation Queue
                 </Button>
-                <Button 
+                <Button type="button" 
                   className="w-full justify-start cursor-pointer hover:bg-accent transition-colors" 
                   variant="outline"
                   onClick={() => handleQuickAction("system-maintenance")}
@@ -280,7 +280,7 @@ export const AdminPanel = () => {
                   <Server className="h-4 w-4 mr-2" />
                   System Maintenance
                 </Button>
-                <Button 
+                <Button type="button" 
                   className="w-full justify-start cursor-pointer hover:bg-accent transition-colors" 
                   variant="outline"
                   onClick={() => handleQuickAction("generate-reports")}
@@ -329,7 +329,7 @@ export const AdminPanel = () => {
                       <TableCell>{user.joinDate}</TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
-                          <Button 
+                          <Button type="button" 
                             size="sm" 
                             variant="outline"
                             onClick={(e) => {
@@ -340,7 +340,7 @@ export const AdminPanel = () => {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button 
+                          <Button type="button" 
                             size="sm" 
                             variant="outline"
                             onClick={(e) => {
@@ -397,7 +397,7 @@ export const AdminPanel = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
-                          <Button 
+                          <Button type="button" 
                             size="sm" 
                             variant="outline"
                             onClick={(e) => {
@@ -408,7 +408,7 @@ export const AdminPanel = () => {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button 
+                          <Button type="button" 
                             size="sm" 
                             variant="outline"
                             onClick={(e) => {
@@ -459,7 +459,7 @@ export const AdminPanel = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
-                          <Button 
+                          <Button type="button" 
                             size="sm" 
                             variant="outline"
                             onClick={(e) => {
@@ -470,7 +470,7 @@ export const AdminPanel = () => {
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button 
+                          <Button type="button" 
                             size="sm" 
                             variant="outline"
                             onClick={(e) => {

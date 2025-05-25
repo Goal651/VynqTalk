@@ -49,7 +49,7 @@ export const CallPreview = ({ user, type, isOutgoing, onAccept, onDecline }: Cal
           <div className="flex justify-center space-x-4 w-full">
             {!isOutgoing ? (
               <>
-                <Button 
+                <Button type="button" 
                   size="lg" 
                   variant="destructive" 
                   className="rounded-full h-12 w-12"
@@ -57,7 +57,7 @@ export const CallPreview = ({ user, type, isOutgoing, onAccept, onDecline }: Cal
                 >
                   <X className="h-6 w-6" />
                 </Button>
-                <Button 
+                <Button type="button" 
                   size="lg" 
                   variant="default" 
                   className="rounded-full h-12 w-12 bg-green-500 hover:bg-green-600"
@@ -73,7 +73,7 @@ export const CallPreview = ({ user, type, isOutgoing, onAccept, onDecline }: Cal
             ) : (
               <>
                 {type === "video" && (
-                  <Button 
+                  <Button type="button" 
                     size="lg" 
                     variant={isVideoOff ? "default" : "outline"} 
                     className="rounded-full h-12 w-12"
@@ -86,7 +86,7 @@ export const CallPreview = ({ user, type, isOutgoing, onAccept, onDecline }: Cal
                     )}
                   </Button>
                 )}
-                <Button 
+                <Button type="button" 
                   size="lg" 
                   variant={isMuted ? "default" : "outline"} 
                   className="rounded-full h-12 w-12"
@@ -98,7 +98,7 @@ export const CallPreview = ({ user, type, isOutgoing, onAccept, onDecline }: Cal
                     <Mic className="h-6 w-6" />
                   )}
                 </Button>
-                <Button 
+                <Button type="button" 
                   size="lg" 
                   variant="destructive" 
                   className="rounded-full h-12 w-12"

@@ -103,7 +103,7 @@ export const AudioRecorder = ({ onComplete, onCancel }: AudioRecorderProps) => {
         
         <div className="flex space-x-2">
           {recording ? (
-            <Button size="sm" variant="destructive" onClick={stopRecording}>
+            <Button type="button" size="sm"  variant="destructive" onClick={stopRecording}>
               <Square className="h-4 w-4 mr-1" />
               Stop
             </Button>
@@ -112,13 +112,13 @@ export const AudioRecorder = ({ onComplete, onCancel }: AudioRecorderProps) => {
               {audioURL && (
                 <audio controls src={audioURL} className="h-8 w-32 rounded" />
               )}
-              <Button size="sm" variant="default" onClick={handleSend}>
+              <Button type="button" size="sm" variant="default" onClick={handleSend}>
                 <Send className="h-4 w-4 mr-1" />
                 Send
               </Button>
             </>
           )}
-          <Button size="icon" variant="ghost" className="h-8 w-8" onClick={onCancel}>
+          <Button type="button" size="icon" variant="ghost" className="h-8 w-8" onClick={onCancel}>
             <X className="h-4 w-4" />
           </Button>
         </div>

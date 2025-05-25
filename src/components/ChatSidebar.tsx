@@ -58,7 +58,7 @@ export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps
       <div className="p-4 border-b border-border bg-background/80">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Chats</h2>
-          <Button 
+          <Button type="button" 
             size="icon" 
             variant="ghost" 
             onClick={handleNewChat}
@@ -106,7 +106,7 @@ export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps
               </div>
             </div>
             <div className="flex space-x-1">
-              <Button 
+              <Button type="button" 
                 size="icon" 
                 variant="ghost" 
                 className="h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-green-100 hover:text-green-600"
@@ -119,7 +119,7 @@ export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps
               >
                 <Phone className="h-4 w-4" />
               </Button>
-              <Button 
+              <Button type="button" 
                 size="icon" 
                 variant="ghost" 
                 className="h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-blue-100 hover:text-blue-600"

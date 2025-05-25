@@ -46,13 +46,12 @@ export const Navbar = ({ currentView, onViewChange, onLogout, user }: NavbarProp
           <h1 className="text-2xl font-bold text-primary mr-6 cursor-pointer select-none">Lavable</h1>
           <nav className="hidden md:flex space-x-1">
             {navItems.map((item) => (
-              <Button
+              <Button type="button"
                 key={item.id}
                 variant={currentView === item.id ? "default" : "ghost"}
                 size="sm"
                 onClick={() => handleNavClick(item.id)}
                 className="flex items-center gap-2 cursor-pointer hover:bg-accent transition-colors"
-                type="button"
               >
                 <item.icon className="h-4 w-4" />
                 <span>{item.label}</span>
@@ -69,46 +68,42 @@ export const Navbar = ({ currentView, onViewChange, onLogout, user }: NavbarProp
           )}
           
           <div className="flex border border-border rounded-md bg-background">
-            <Button
+            <Button type="button"
               variant="ghost"
               size="icon"
               className={`h-8 w-8 cursor-pointer transition-colors ${theme === "blue" ? "bg-primary/20" : "hover:bg-accent"}`}
               onClick={() => handleThemeChange("blue")}
               title="Blue theme"
-              type="button"
             >
               <Laptop className="h-4 w-4" />
             </Button>
-            <Button
+            <Button type="button"
               variant="ghost"
               size="icon"
               className={`h-8 w-8 cursor-pointer transition-colors ${theme === "dark" ? "bg-primary/20" : "hover:bg-accent"}`}
               onClick={() => handleThemeChange("dark")}
               title="Dark theme"
-              type="button"
             >
               <Moon className="h-4 w-4" />
             </Button>
-            <Button
+            <Button type="button"
               variant="ghost"
               size="icon"
               className={`h-8 w-8 cursor-pointer transition-colors ${theme === "cyberpunk" ? "bg-primary/20" : "hover:bg-accent"}`}
               onClick={() => handleThemeChange("cyberpunk")}
               title="Cyberpunk theme"
-              type="button"
             >
               <Sun className="h-4 w-4" />
             </Button>
           </div>
           
           {onLogout && (
-            <Button
+            <Button type="button"
               variant="ghost"
               size="icon"
               onClick={handleLogout}
               className="h-8 w-8 cursor-pointer hover:bg-accent transition-colors"
               title="Logout"
-              type="button"
             >
               <LogOut className="h-4 w-4" />
             </Button>
@@ -119,7 +114,7 @@ export const Navbar = ({ currentView, onViewChange, onLogout, user }: NavbarProp
       {/* Mobile navigation */}
       <nav className="md:hidden flex justify-around pt-2 bg-background/80">
         {navItems.map((item) => (
-          <Button
+          <Button type="button"
             key={item.id}
             variant="ghost"
             size="sm"
@@ -127,7 +122,6 @@ export const Navbar = ({ currentView, onViewChange, onLogout, user }: NavbarProp
             className={`flex flex-col items-center py-2 cursor-pointer transition-colors ${
               currentView === item.id ? "text-primary bg-accent/50" : "text-muted-foreground hover:text-foreground hover:bg-accent/30"
             }`}
-            type="button"
           >
             <item.icon className="h-5 w-5 mb-1" />
             <span className="text-xs">{item.label}</span>

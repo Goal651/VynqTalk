@@ -44,7 +44,7 @@ export const Groups = () => {
     }
   ]);
   
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(true);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [currentView, setCurrentView] = useState<"list" | "chat" | "settings">("list");
   const [searchQuery, setSearchQuery] = useState("");
@@ -131,7 +131,7 @@ export const Groups = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 z-20">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">Groups</h1>
@@ -139,7 +139,7 @@ export const Groups = () => {
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button className="cursor-pointer" onClick={handleCreateGroupClick}>
+            <Button type="button" className="cursor-wait hover:bg-red-500" onClick={handleCreateGroupClick}>
               <Plus className="h-4 w-4 mr-2" />
               Create Group
             </Button>
@@ -191,15 +191,14 @@ export const Groups = () => {
                   )}
                 />
                 <div className="flex justify-end space-x-2">
-                  <Button 
-                    type="button" 
+                  <Button type="button" 
                     variant="outline" 
                     onClick={handleCancelCreate}
                     className="cursor-pointer"
                   >
                     Cancel
                   </Button>
-                  <Button type="submit" className="cursor-pointer">Create Group</Button>
+                  <Button type="button" className="cursor-pointer">Create Group</Button>
                 </div>
               </form>
             </Form>
@@ -244,7 +243,7 @@ export const Groups = () => {
                   <Badge variant="secondary">{group.members.length} members</Badge>
                 </div>
                 <div className="flex space-x-1">
-                  <Button 
+                  <Button type="button" 
                     size="sm" 
                     variant="outline"
                     onClick={(e) => {
@@ -255,7 +254,7 @@ export const Groups = () => {
                   >
                     <MessageCircle className="h-4 w-4" />
                   </Button>
-                  <Button 
+                  <Button type="button" 
                     size="sm" 
                     variant="outline"
                     onClick={(e) => {

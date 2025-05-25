@@ -113,7 +113,7 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Button 
+              <Button type="button" 
                 variant="ghost" 
                 size="icon"
                 onClick={() => {
@@ -134,7 +134,7 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
               </div>
             </div>
             <div className="flex space-x-2">
-              <Button 
+              <Button type="button" 
                 variant="ghost" 
                 size="icon"
                 onClick={handleVoiceCall}
@@ -142,7 +142,7 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
               >
                 <Phone className="h-4 w-4" />
               </Button>
-              <Button 
+              <Button type="button" 
                 variant="ghost" 
                 size="icon"
                 onClick={handleVideoCall}
@@ -150,7 +150,7 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
               >
                 <Video className="h-4 w-4" />
               </Button>
-              <Button 
+              <Button type="button" 
                 variant="ghost" 
                 size="icon"
                 onClick={handleMoreOptions}
@@ -193,7 +193,7 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
       <Card className="border-t rounded-none">
         <CardContent className="p-4">
           <div className="flex items-center space-x-2">
-            <Button 
+            <Button type="button" 
               variant="ghost" 
               size="icon"
               onClick={handleAttachFile}
@@ -208,7 +208,7 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
               onKeyPress={handleKeyPress}
               className="flex-1 cursor-text"
             />
-            <Button 
+            <Button type="button" 
               variant="ghost" 
               size="icon"
               onClick={handleEmojiPicker}
@@ -216,7 +216,7 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
             >
               <Smile className="h-4 w-4" />
             </Button>
-            <Button 
+            <Button type="button" 
               onClick={handleSendMessage}
               disabled={!newMessage.trim()}
               className="cursor-pointer"

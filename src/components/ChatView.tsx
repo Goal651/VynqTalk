@@ -11,7 +11,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
-import { LineWave } from "./LineWave";
 import { useToast } from "@/hooks/use-toast";
 
 interface ChatViewProps {
@@ -133,7 +132,6 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
 
   return (
     <div className="flex h-full relative">
-      <LineWave className="absolute inset-0 opacity-10" />
       <ChatSidebar 
         users={users} 
         onUserClick={handleUserClick}
@@ -144,7 +142,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
           <>
             <div className="p-4 border-b border-border bg-card/50 backdrop-blur">
               <div className="flex items-center gap-3">
-                <button 
+                <button type="button" 
                   className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors cursor-pointer"
                   onClick={() => handleUserAvatarClick(activeChat)}
                 >
@@ -226,7 +224,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
             placeholder="Edit your message..."
           />
           <DialogFooter>
-            <Button 
+            <Button type="button" 
               variant="outline" 
               onClick={() => {
                 console.log("Edit cancelled");
@@ -235,7 +233,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
             >
               Cancel
             </Button>
-            <Button 
+            <Button type="button" 
               onClick={confirmEditMessage}
               disabled={!editedContent.trim()}
             >

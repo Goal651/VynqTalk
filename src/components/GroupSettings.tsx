@@ -114,7 +114,7 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-6">
       <div className="flex items-center space-x-4">
-        <Button 
+        <Button type="button" 
           variant="ghost" 
           size="icon"
           onClick={() => {
@@ -144,7 +144,7 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
                 <AvatarImage src={groupData.avatar} alt={groupData.name} />
                 <AvatarFallback>{groupData.name.substring(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
-              <Button
+              <Button type="button"
                 size="sm"
                 variant="outline"
                 className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0 cursor-pointer"
@@ -175,7 +175,7 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
               </div>
             </div>
           </div>
-          <Button onClick={handleSave} className="cursor-pointer">
+          <Button type="button" onClick={handleSave} className="cursor-pointer">
             Save Changes
           </Button>
         </CardContent>
@@ -242,7 +242,7 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
               <CardTitle>Members ({mockMembers.length})</CardTitle>
               <CardDescription>Manage group members and their roles</CardDescription>
             </div>
-            <Button className="cursor-pointer" onClick={handleAddMember}>
+            <Button type="button" className="cursor-pointer" onClick={handleAddMember}>
               <UserPlus className="h-4 w-4 mr-2" />
               Add Member
             </Button>
@@ -268,7 +268,7 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
                   </div>
                 </div>
                 <div className="flex space-x-2">
-                  <Button 
+                  <Button type="button" 
                     size="sm" 
                     variant="outline"
                     onClick={() => handleMemberAction("promote", member.id, member.name)}
@@ -276,7 +276,7 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
                   >
                     <Shield className="h-4 w-4" />
                   </Button>
-                  <Button 
+                  <Button type="button" 
                     size="sm" 
                     variant="outline"
                     onClick={() => handleMemberAction("remove", member.id, member.name)}
@@ -298,7 +298,7 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
           <CardDescription>Irreversible actions for this group</CardDescription>
         </CardHeader>
         <CardContent>
-          <Button 
+          <Button type="button" 
             variant="destructive" 
             onClick={handleDeleteGroup}
             className="cursor-pointer"

@@ -123,7 +123,7 @@ export const Notifications = () => {
           <p className="text-muted-foreground">Stay updated with your latest activity</p>
         </div>
         {unreadCount > 0 && (
-          <Button onClick={markAllAsRead} variant="outline">
+          <Button type="button" onClick={markAllAsRead} variant="outline">
             Mark all as read
           </Button>
         )}
@@ -194,7 +194,7 @@ export const Notifications = () => {
                         
                         <div className="flex items-center space-x-2 pt-2">
                           {!notification.read && (
-                            <Button
+                            <Button type="button"
                               size="sm"
                               variant="outline"
                               onClick={() => markAsRead(notification.id)}
@@ -203,7 +203,7 @@ export const Notifications = () => {
                               Mark as read
                             </Button>
                           )}
-                          <Button
+                          <Button type="button"
                             size="sm"
                             variant="ghost"
                             onClick={() => deleteNotification(notification.id)}

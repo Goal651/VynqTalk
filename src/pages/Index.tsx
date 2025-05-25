@@ -10,7 +10,6 @@ import { ThemeProvider } from "../contexts/ThemeContext";
 import { useToast } from "@/hooks/use-toast";
 import { Message } from "@/types";
 import { useAuth } from "@/contexts/AuthContext";
-import { LineWave } from "@/components/LineWave";
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<"chat" | "group" | "settings" | "notifications" | "admin">("chat");
@@ -72,7 +71,6 @@ const Index = () => {
           user={user}
         />
         <main className="flex-1 overflow-hidden relative">
-          <LineWave className="absolute inset-0 opacity-5" />
           {renderCurrentView()}
         </main>
       </div>

@@ -27,7 +27,7 @@ const Signup = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { openCamera, capturedImage, CameraDialog } = useCamera();
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,7 +42,7 @@ const Signup = () => {
     setIsLoading(true);
     const success = await signup(values.email, values.password, values.name);
     setIsLoading(false);
-    
+
     if (success) {
       navigate("/");
     }
@@ -51,7 +51,7 @@ const Signup = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4 relative overflow-hidden">
       <LineWave className="absolute inset-0" />
-      
+
       <Card className="w-full max-w-md bg-background/80 backdrop-blur-sm border-border/30 animate-fade-in">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-3xl font-bold tracking-tight">Create an account</CardTitle>
@@ -69,8 +69,7 @@ const Signup = () => {
                       <span className="text-muted-foreground">Photo</span>
                     </div>
                   )}
-                  <button 
-                    type="button" 
+                  <button type="button"
                     onClick={openCamera}
                     className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
@@ -146,7 +145,7 @@ const Signup = () => {
           </div>
         </CardFooter>
       </Card>
-      
+
       {CameraDialog}
     </div>
   );

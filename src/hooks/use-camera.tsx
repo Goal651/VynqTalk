@@ -71,7 +71,7 @@ export function useCamera() {
             <video ref={videoRef} className="w-full h-full object-cover" />
           </div>
           <div className="flex justify-center">
-            <Button 
+            <Button type="button" 
               variant="default" 
               onClick={takePhoto}
               className="rounded-full w-16 h-16 p-0 flex items-center justify-center"

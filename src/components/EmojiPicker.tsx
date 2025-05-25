@@ -31,7 +31,7 @@ export const EmojiPicker = ({ onEmojiSelect }: EmojiPickerProps) => {
     <div className="bg-popover border border-border rounded-md shadow-lg p-2 w-64">
       <div className="flex justify-between border-b border-border pb-2 mb-2">
         {categories.map((cat) => (
-          <button
+          <button type="button"
             key={cat.id}
             className={`p-1 rounded-md ${
               category === cat.id ? "bg-primary/20" : "hover:bg-secondary"
@@ -45,7 +45,7 @@ export const EmojiPicker = ({ onEmojiSelect }: EmojiPickerProps) => {
       
       <div className="grid grid-cols-7 gap-1">
         {emojis[category as keyof typeof emojis].map((emoji, index) => (
-          <button
+          <button type="button"
             key={index}
             className="h-8 w-8 flex items-center justify-center rounded hover:bg-secondary"
             onClick={() => onEmojiSelect(emoji)}

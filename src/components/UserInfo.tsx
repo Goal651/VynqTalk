@@ -39,7 +39,7 @@ export const UserInfo = ({ user, onClose }: UserInfoProps) => {
     <div className="w-80 border-l border-border bg-card h-full flex flex-col">
       <div className="p-4 border-b border-border flex items-center justify-between">
         <h2 className="text-lg font-semibold">User Info</h2>
-        <Button size="icon" variant="ghost" onClick={onClose}>
+        <Button type="button" size="icon" variant="ghost" onClick={onClose}>
           <X className="h-5 w-5" />
         </Button>
       </div>
@@ -55,7 +55,7 @@ export const UserInfo = ({ user, onClose }: UserInfoProps) => {
         </p>
 
         <div className="w-full space-y-3 mt-6">
-          <Button 
+          <Button type="button" 
             variant={isBlocked ? "default" : "outline"} 
             className="w-full justify-start"
             onClick={handleBlockUser}
@@ -64,7 +64,7 @@ export const UserInfo = ({ user, onClose }: UserInfoProps) => {
             {isBlocked ? "Unblock User" : "Block User"}
           </Button>
           
-          <Button 
+          <Button type="button" 
             variant={isHidden ? "default" : "outline"} 
             className="w-full justify-start"
             onClick={handleHideUser}

@@ -15,7 +15,7 @@ export const FilePreview = ({ files, onRemove }: FilePreviewProps) => {
     return (
       <div key={index} className="relative group bg-muted rounded-md overflow-hidden border border-border">
         <div className="absolute top-1 right-1 z-10">
-          <Button
+          <Button type="button"
             size="icon"
             variant="destructive"
             className="h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"

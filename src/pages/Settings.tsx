@@ -158,7 +158,7 @@ export const Settings = () => {
                 <AvatarImage src={capturedImage || user?.avatar} alt={user?.name} />
                 <AvatarFallback>{user?.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
               </Avatar>
-              <Button
+              <Button type="button"
                 size="sm"
                 variant="outline"
                 className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0 cursor-pointer hover:bg-accent"
@@ -208,7 +208,7 @@ export const Settings = () => {
               </div>
             </div>
           </div>
-          <Button onClick={handleProfileSave} className="cursor-pointer">
+          <Button type="button" onClick={handleProfileSave} className="cursor-pointer">
             <Save className="h-4 w-4 mr-2" />
             Save Changes
           </Button>
@@ -418,7 +418,7 @@ export const Settings = () => {
           <CardDescription>Manage your data and account</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Button 
+          <Button type="button" 
             variant="outline" 
             onClick={handleDataExport}
             className="w-full cursor-pointer hover:bg-accent"
@@ -426,7 +426,7 @@ export const Settings = () => {
             <Download className="h-4 w-4 mr-2" />
             Export My Data
           </Button>
-          <Button 
+          <Button type="button" 
             variant="outline" 
             onClick={() => console.log("Import data clicked")}
             className="w-full cursor-pointer hover:bg-accent"
@@ -435,7 +435,7 @@ export const Settings = () => {
             Import Data
           </Button>
           <Separator />
-          <Button 
+          <Button type="button" 
             variant="destructive" 
             onClick={handleAccountDelete}
             className="w-full cursor-pointer"
