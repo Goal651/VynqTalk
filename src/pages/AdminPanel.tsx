@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,11 +10,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Shield, Users, MessageSquare, Search, Ban, Trash2, Eye, BarChart3, Activity, Server, AlertTriangle, TrendingUp, UserCheck, MessageCircle, Clock } from "lucide-react";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, LineChart, Line } from "recharts";
+import { useToast } from "@/hooks/use-toast";
 
 export const AdminPanel = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [activeTab, setActiveTab] = useState("dashboard");
+  const { toast } = useToast();
 
   // Mock data for charts
   const userActivityData = [
@@ -76,18 +77,44 @@ export const AdminPanel = () => {
 
   const handleUserAction = (action: string, userId: string) => {
     console.log(`User action: ${action} for user ${userId}`);
+    toast({
+      title: "User Action",
+      description: `Successfully performed ${action} action on user ${userId}`,
+    });
   };
 
   const handleGroupAction = (action: string, groupId: string) => {
     console.log(`Group action: ${action} for group ${groupId}`);
+    toast({
+      title: "Group Action",
+      description: `Successfully performed ${action} action on group ${groupId}`,
+    });
   };
 
   const handleContentAction = (action: string, messageId: string) => {
     console.log(`Content action: ${action} for message ${messageId}`);
+    toast({
+      title: "Content Action",
+      description: `Successfully performed ${action} action on message ${messageId}`,
+    });
   };
 
   const handleQuickAction = (action: string) => {
     console.log("Quick action:", action);
+    toast({
+      title: "Quick Action",
+      description: `${action} has been initiated`,
+    });
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("Search query changed:", e.target.value);
+    setSearchQuery(e.target.value);
+  };
+
+  const handleFilterChange = (value: string) => {
+    console.log("Filter changed:", value);
+    setSelectedFilter(value);
   };
 
   return (
@@ -108,12 +135,12 @@ export const AdminPanel = () => {
           <Input
             placeholder="Search users, groups, or content..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-8"
+            onChange={handleSearchChange}
+            className="pl-8 cursor-text"
           />
         </div>
-        <Select value={selectedFilter} onValueChange={setSelectedFilter}>
-          <SelectTrigger className="w-40">
+        <Select value={selectedFilter} onValueChange={handleFilterChange}>
+          <SelectTrigger className="w-40 cursor-pointer">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -127,27 +154,27 @@ export const AdminPanel = () => {
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="grid w-full grid-cols-6">
-          <TabsTrigger value="dashboard" className="flex items-center gap-2 cursor-pointer">
+          <TabsTrigger value="dashboard" className="flex items-center gap-2 cursor-pointer hover:bg-accent transition-colors">
             <BarChart3 className="h-4 w-4" />
             <span className="hidden sm:inline">Dashboard</span>
           </TabsTrigger>
-          <TabsTrigger value="users" className="flex items-center gap-2 cursor-pointer">
+          <TabsTrigger value="users" className="flex items-center gap-2 cursor-pointer hover:bg-accent transition-colors">
             <Users className="h-4 w-4" />
             <span className="hidden sm:inline">Users</span>
           </TabsTrigger>
-          <TabsTrigger value="groups" className="flex items-center gap-2 cursor-pointer">
+          <TabsTrigger value="groups" className="flex items-center gap-2 cursor-pointer hover:bg-accent transition-colors">
             <Users className="h-4 w-4" />
             <span className="hidden sm:inline">Groups</span>
           </TabsTrigger>
-          <TabsTrigger value="content" className="flex items-center gap-2 cursor-pointer">
+          <TabsTrigger value="content" className="flex items-center gap-2 cursor-pointer hover:bg-accent transition-colors">
             <MessageSquare className="h-4 w-4" />
             <span className="hidden sm:inline">Content</span>
           </TabsTrigger>
-          <TabsTrigger value="analytics" className="flex items-center gap-2 cursor-pointer">
+          <TabsTrigger value="analytics" className="flex items-center gap-2 cursor-pointer hover:bg-accent transition-colors">
             <TrendingUp className="h-4 w-4" />
             <span className="hidden sm:inline">Analytics</span>
           </TabsTrigger>
-          <TabsTrigger value="system" className="flex items-center gap-2 cursor-pointer">
+          <TabsTrigger value="system" className="flex items-center gap-2 cursor-pointer hover:bg-accent transition-colors">
             <Server className="h-4 w-4" />
             <span className="hidden sm:inline">System</span>
           </TabsTrigger>
@@ -205,7 +232,11 @@ export const AdminPanel = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 {recentAlerts.map((alert) => (
-                  <div key={alert.id} className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-accent transition-colors">
+                  <div 
+                    key={alert.id} 
+                    className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-accent transition-colors"
+                    onClick={() => console.log("Alert clicked:", alert.id)}
+                  >
                     <AlertTriangle className={`h-4 w-4 ${
                       alert.type === "error" ? "text-red-500" : 
                       alert.type === "warning" ? "text-yellow-500" : "text-blue-500"
@@ -226,7 +257,7 @@ export const AdminPanel = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 <Button 
-                  className="w-full justify-start cursor-pointer" 
+                  className="w-full justify-start cursor-pointer hover:bg-accent transition-colors" 
                   variant="outline"
                   onClick={() => handleQuickAction("bulk-user-actions")}
                 >
@@ -234,7 +265,7 @@ export const AdminPanel = () => {
                   Bulk User Actions
                 </Button>
                 <Button 
-                  className="w-full justify-start cursor-pointer" 
+                  className="w-full justify-start cursor-pointer hover:bg-accent transition-colors" 
                   variant="outline"
                   onClick={() => handleQuickAction("content-moderation")}
                 >
@@ -242,7 +273,7 @@ export const AdminPanel = () => {
                   Content Moderation Queue
                 </Button>
                 <Button 
-                  className="w-full justify-start cursor-pointer" 
+                  className="w-full justify-start cursor-pointer hover:bg-accent transition-colors" 
                   variant="outline"
                   onClick={() => handleQuickAction("system-maintenance")}
                 >
@@ -250,7 +281,7 @@ export const AdminPanel = () => {
                   System Maintenance
                 </Button>
                 <Button 
-                  className="w-full justify-start cursor-pointer" 
+                  className="w-full justify-start cursor-pointer hover:bg-accent transition-colors" 
                   variant="outline"
                   onClick={() => handleQuickAction("generate-reports")}
                 >
@@ -281,7 +312,7 @@ export const AdminPanel = () => {
                 </TableHeader>
                 <TableBody>
                   {mockUsers.map((user) => (
-                    <TableRow key={user.id} className="cursor-pointer hover:bg-accent">
+                    <TableRow key={user.id} className="cursor-pointer hover:bg-accent transition-colors">
                       <TableCell className="flex items-center space-x-2">
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} />
@@ -301,16 +332,22 @@ export const AdminPanel = () => {
                           <Button 
                             size="sm" 
                             variant="outline"
-                            onClick={() => handleUserAction("view", user.id)}
-                            className="cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUserAction("view", user.id);
+                            }}
+                            className="cursor-pointer hover:bg-accent transition-colors"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
                           <Button 
                             size="sm" 
                             variant="outline"
-                            onClick={() => handleUserAction("ban", user.id)}
-                            className="cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUserAction("ban", user.id);
+                            }}
+                            className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors"
                           >
                             <Ban className="h-4 w-4" />
                           </Button>
@@ -343,7 +380,7 @@ export const AdminPanel = () => {
                 </TableHeader>
                 <TableBody>
                   {mockGroups.map((group) => (
-                    <TableRow key={group.id} className="cursor-pointer hover:bg-accent">
+                    <TableRow key={group.id} className="cursor-pointer hover:bg-accent transition-colors">
                       <TableCell className="flex items-center space-x-2">
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={`https://api.dicebear.com/7.x/shapes/svg?seed=${group.name}`} />
@@ -363,16 +400,22 @@ export const AdminPanel = () => {
                           <Button 
                             size="sm" 
                             variant="outline"
-                            onClick={() => handleGroupAction("view", group.id)}
-                            className="cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleGroupAction("view", group.id);
+                            }}
+                            className="cursor-pointer hover:bg-accent transition-colors"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
                           <Button 
                             size="sm" 
                             variant="outline"
-                            onClick={() => handleGroupAction("suspend", group.id)}
-                            className="cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleGroupAction("suspend", group.id);
+                            }}
+                            className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors"
                           >
                             <Ban className="h-4 w-4" />
                           </Button>
@@ -405,7 +448,7 @@ export const AdminPanel = () => {
                 </TableHeader>
                 <TableBody>
                   {mockMessages.map((message) => (
-                    <TableRow key={message.id} className="cursor-pointer hover:bg-accent">
+                    <TableRow key={message.id} className="cursor-pointer hover:bg-accent transition-colors">
                       <TableCell>{message.user}</TableCell>
                       <TableCell className="max-w-xs truncate">{message.content}</TableCell>
                       <TableCell>{message.timestamp}</TableCell>
@@ -419,16 +462,22 @@ export const AdminPanel = () => {
                           <Button 
                             size="sm" 
                             variant="outline"
-                            onClick={() => handleContentAction("view", message.id)}
-                            className="cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleContentAction("view", message.id);
+                            }}
+                            className="cursor-pointer hover:bg-accent transition-colors"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
                           <Button 
                             size="sm" 
                             variant="outline"
-                            onClick={() => handleContentAction("delete", message.id)}
-                            className="cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleContentAction("delete", message.id);
+                            }}
+                            className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground transition-colors"
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -584,7 +633,11 @@ export const AdminPanel = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {systemMetrics.map((metric, index) => (
-                  <Card key={index} className="cursor-pointer hover:shadow-md transition-shadow">
+                  <Card 
+                    key={index} 
+                    className="cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => console.log("System metric clicked:", metric.metric)}
+                  >
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
                         <div>
