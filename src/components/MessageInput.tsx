@@ -22,6 +22,8 @@ export const MessageInput = ({ onSendMessage, currentUser }: MessageInputProps) 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Message submitted:", message);
+    
     if (message.trim() || files.length > 0) {
       let content = message.trim();
       
@@ -33,18 +35,36 @@ export const MessageInput = ({ onSendMessage, currentUser }: MessageInputProps) 
       onSendMessage(content);
       setMessage("");
       setFiles([]);
+      setShowEmojiPicker(false);
     }
   };
 
   const handleEmojiSelect = (emoji: string) => {
+    console.log("Emoji selected:", emoji);
     setMessage((prev) => prev + emoji);
     setShowEmojiPicker(false);
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("Files selected");
     if (e.target.files) {
       setFiles(Array.from(e.target.files));
     }
+  };
+
+  const handleFileButtonClick = () => {
+    console.log("File button clicked");
+    fileInputRef.current?.click();
+  };
+
+  const handleEmojiButtonClick = () => {
+    console.log("Emoji button clicked");
+    setShowEmojiPicker(!showEmojiPicker);
+  };
+
+  const handleAudioButtonClick = () => {
+    console.log("Audio button clicked");
+    setShowAudioRecorder(true);
   };
 
   const handlePaste = (e: React.ClipboardEvent) => {
@@ -89,20 +109,30 @@ export const MessageInput = ({ onSendMessage, currentUser }: MessageInputProps) 
     e.preventDefault();
   };
 
+  const isDisabled = !message.trim() && files.length === 0;
+
   return (
-    <form onSubmit={handleSubmit} className="p-4 border-t border-border bg-secondary/50">
-      {files.length > 0 && <FilePreview files={files} onRemove={(index) => {
-        setFiles(files.filter((_, i) => i !== index));
-      }} />}
+    <form onSubmit={handleSubmit} className="p-4 border-t border-border bg-secondary/50 relative z-10">
+      {files.length > 0 && (
+        <FilePreview 
+          files={files} 
+          onRemove={(index) => {
+            console.log("File removed:", index);
+            setFiles(files.filter((_, i) => i !== index));
+          }} 
+        />
+      )}
       
       {showAudioRecorder && (
         <AudioRecorder 
           onComplete={(audioBlob) => {
-            // In a real app, you would handle the audio blob
             console.log("Audio recorded:", audioBlob);
             setShowAudioRecorder(false);
           }}
-          onCancel={() => setShowAudioRecorder(false)}
+          onCancel={() => {
+            console.log("Audio recording cancelled");
+            setShowAudioRecorder(false);
+          }}
         />
       )}
       
@@ -112,7 +142,7 @@ export const MessageInput = ({ onSendMessage, currentUser }: MessageInputProps) 
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             placeholder="Type a message..."
-            className="min-h-[60px] w-full resize-none bg-muted rounded-lg pr-12"
+            className="min-h-[60px] w-full resize-none bg-muted rounded-lg pr-12 cursor-text focus:ring-2 focus:ring-primary transition-all"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -127,8 +157,12 @@ export const MessageInput = ({ onSendMessage, currentUser }: MessageInputProps) 
             <Button 
               type="submit" 
               size="icon" 
-              className="h-8 w-8 rounded-full"
-              disabled={!message.trim() && files.length === 0}
+              className={`h-8 w-8 rounded-full cursor-pointer transition-all ${
+                isDisabled 
+                  ? "opacity-50 cursor-not-allowed" 
+                  : "hover:scale-105 hover:bg-primary/90"
+              }`}
+              disabled={isDisabled}
             >
               <MessageCircle className="h-4 w-4" />
             </Button>
@@ -143,13 +177,14 @@ export const MessageInput = ({ onSendMessage, currentUser }: MessageInputProps) 
               type="button" 
               size="icon" 
               variant="ghost" 
-              className="h-8 w-8 rounded-full"
-              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              className="h-8 w-8 rounded-full cursor-pointer hover:bg-accent transition-colors"
+              onClick={handleEmojiButtonClick}
+              title="Add emoji"
             >
               <Smile className="h-4 w-4" />
             </Button>
             {showEmojiPicker && (
-              <div className="absolute bottom-10 left-0 z-10">
+              <div className="absolute bottom-10 left-0 z-50">
                 <EmojiPicker onEmojiSelect={handleEmojiSelect} />
               </div>
             )}
@@ -159,8 +194,9 @@ export const MessageInput = ({ onSendMessage, currentUser }: MessageInputProps) 
             type="button" 
             size="icon" 
             variant="ghost" 
-            className="h-8 w-8 rounded-full"
-            onClick={() => fileInputRef.current?.click()}
+            className="h-8 w-8 rounded-full cursor-pointer hover:bg-accent transition-colors"
+            onClick={handleFileButtonClick}
+            title="Attach file"
           >
             <Paperclip className="h-4 w-4" />
             <input 
@@ -176,8 +212,9 @@ export const MessageInput = ({ onSendMessage, currentUser }: MessageInputProps) 
             type="button" 
             size="icon" 
             variant="ghost" 
-            className="h-8 w-8 rounded-full"
-            onClick={() => setShowAudioRecorder(true)}
+            className="h-8 w-8 rounded-full cursor-pointer hover:bg-accent transition-colors"
+            onClick={handleAudioButtonClick}
+            title="Record audio"
           >
             <Mic className="h-4 w-4" />
           </Button>
