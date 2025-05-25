@@ -13,16 +13,27 @@ export interface Message {
   content: string;
   timestamp: Date;
   isEdited?: boolean;
-  chatWithUserId?: string; // Added to track which user this message is for
+  chatWithUserId?: string;
+  senderId?: string; // Added for compatibility with GroupChat
+  type: "text" | "image" | "audio" | "file"; // Added message types
 }
 
 export interface Group {
   id: string;
   name: string;
-  description: string;
+  description?: string; // Made optional to match usage
   avatar: string;
-  members: string[]; // Changed from User[] to string[] to store user IDs
-  createdBy: string; // Added to track who created the group
+  members: string[];
+  createdBy: string;
   createdAt: Date;
-  isPrivate?: boolean; // Made optional since it's not used in Groups.tsx
+  isPrivate?: boolean;
+}
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  timestamp: Date;
+  isRead: boolean;
+  type: "info" | "warning" | "error" | "success";
 }
