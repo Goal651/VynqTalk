@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { User, Message } from "../types";
 import { ChatSidebar } from "./ChatSidebar";
@@ -11,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
 import { LineWave } from "./LineWave";
+import { useToast } from "@/hooks/use-toast";
 
 interface ChatViewProps {
   onMessageDelete?: (messageId: string) => void;
@@ -19,6 +21,7 @@ interface ChatViewProps {
 
 export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [users] = useState<User[]>(mockUsers);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -29,8 +32,16 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
   const [activeChat, setActiveChat] = useState<User | null>(null);
 
   const handleSendMessage = (content: string) => {
-    if (!user || !activeChat) return;
+    if (!user || !activeChat) {
+      toast({
+        title: "Error",
+        description: "Please select a chat first",
+        variant: "destructive"
+      });
+      return;
+    }
     
+    console.log("Sending message:", content, "to user:", activeChat.name);
     const newMessage: Message = {
       id: `m${Date.now()}`,
       userId: user.id,
@@ -40,35 +51,56 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
       type: "text"
     };
     setMessages([...messages, newMessage]);
+    
+    toast({
+      title: "Message sent",
+      description: `Message sent to ${activeChat.name}`,
+    });
   };
 
   const handleUserClick = (clickedUser: User) => {
+    console.log("User clicked:", clickedUser.name);
     setActiveChat(clickedUser);
     setShowUserInfo(false);
+    
+    toast({
+      title: "Chat opened",
+      description: `Now chatting with ${clickedUser.name}`,
+    });
   };
 
   const handleUserAvatarClick = (clickedUser: User) => {
+    console.log("User avatar clicked:", clickedUser.name);
     setSelectedUser(clickedUser);
     setShowUserInfo(true);
   };
 
   const handleCloseUserInfo = () => {
+    console.log("Closing user info");
     setShowUserInfo(false);
   };
 
   const handleDeleteMessage = (messageId: string) => {
+    console.log("Delete message requested:", messageId);
     setMessageToDelete(messageId);
   };
 
   const confirmDeleteMessage = () => {
     if (messageToDelete) {
+      console.log("Confirming delete message:", messageToDelete);
       setMessages(messages.filter(message => message.id !== messageToDelete));
       if (onMessageDelete) onMessageDelete(messageToDelete);
       setMessageToDelete(null);
+      
+      toast({
+        title: "Message deleted",
+        description: "Message has been removed",
+      });
     }
   };
 
   const handleEditMessage = (message: Message) => {
+    console.log("Edit message requested:", message.id);
     setMessageToEdit(message);
     setEditedContent(message.content);
     if (onMessageEdit) onMessageEdit(message);
@@ -76,12 +108,18 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
 
   const confirmEditMessage = () => {
     if (messageToEdit) {
+      console.log("Confirming edit message:", messageToEdit.id, "new content:", editedContent);
       setMessages(messages.map(message => 
         message.id === messageToEdit.id 
           ? { ...message, content: editedContent, isEdited: true } 
           : message
       ));
       setMessageToEdit(null);
+      
+      toast({
+        title: "Message edited",
+        description: "Message has been updated",
+      });
     }
   };
 
@@ -106,9 +144,12 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
           <>
             <div className="p-4 border-b border-border bg-card/50 backdrop-blur">
               <div className="flex items-center gap-3">
-                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                <button 
+                  className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors cursor-pointer"
+                  onClick={() => handleUserAvatarClick(activeChat)}
+                >
                   <span className="text-sm font-medium">{activeChat.name.substring(0, 2).toUpperCase()}</span>
-                </div>
+                </button>
                 <div>
                   <h2 className="font-semibold">{activeChat.name}</h2>
                   <p className="text-xs text-muted-foreground">
@@ -154,8 +195,16 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDeleteMessage} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            <AlertDialogCancel onClick={() => {
+              console.log("Delete cancelled");
+              setMessageToDelete(null);
+            }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDeleteMessage} 
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -169,14 +218,27 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
           </DialogHeader>
           <Textarea 
             value={editedContent} 
-            onChange={(e) => setEditedContent(e.target.value)}
+            onChange={(e) => {
+              console.log("Edit content changed:", e.target.value);
+              setEditedContent(e.target.value);
+            }}
             className="min-h-[100px]"
+            placeholder="Edit your message..."
           />
           <DialogFooter>
-            <Button variant="outline" onClick={() => setMessageToEdit(null)}>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                console.log("Edit cancelled");
+                setMessageToEdit(null);
+              }}
+            >
               Cancel
             </Button>
-            <Button onClick={confirmEditMessage}>
+            <Button 
+              onClick={confirmEditMessage}
+              disabled={!editedContent.trim()}
+            >
               Save changes
             </Button>
           </DialogFooter>

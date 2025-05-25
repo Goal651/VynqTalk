@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CallPreview } from "./CallPreview";
+import { useToast } from "@/hooks/use-toast";
 
 interface ChatSidebarProps {
   users: User[];
@@ -17,25 +18,39 @@ export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps
   const [searchTerm, setSearchTerm] = useState("");
   const [callType, setCallType] = useState<"audio" | "video" | null>(null);
   const [callingUser, setCallingUser] = useState<User | null>(null);
+  const { toast } = useToast();
 
   const filteredUsers = users.filter((user) =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleCall = (user: User, type: "audio" | "video") => {
-    console.log("Call initiated:", type, user.name);
+    console.log("Call initiated:", type, "with", user.name);
     setCallingUser(user);
     setCallType(type);
+    
+    toast({
+      title: `${type === "audio" ? "Voice" : "Video"} call`,
+      description: `Calling ${user.name}...`,
+    });
   };
 
   const handleUserClick = (user: User) => {
-    console.log("User clicked:", user.name);
+    console.log("User clicked in sidebar:", user.name);
     onUserClick(user);
   };
 
   const handleNewChat = () => {
     console.log("New chat clicked");
-    // Add logic for new chat creation
+    toast({
+      title: "New Chat",
+      description: "Feature coming soon!",
+    });
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("Search term changed:", e.target.value);
+    setSearchTerm(e.target.value);
   };
 
   return (
@@ -59,7 +74,7 @@ export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps
             placeholder="Search users..."
             className="pl-9 cursor-text"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={handleSearchChange}
           />
         </div>
       </div>
@@ -134,11 +149,20 @@ export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps
           type={callType} 
           isOutgoing={true}
           onAccept={() => {
-            console.log("Call accepted");
-            // Handle call accept
+            console.log("Call accepted with", callingUser.name);
+            toast({
+              title: "Call connected",
+              description: `Connected with ${callingUser.name}`,
+            });
+            setCallType(null);
+            setCallingUser(null);
           }}
           onDecline={() => {
-            console.log("Call declined");
+            console.log("Call declined with", callingUser.name);
+            toast({
+              title: "Call ended",
+              description: "Call was declined",
+            });
             setCallType(null);
             setCallingUser(null);
           }}

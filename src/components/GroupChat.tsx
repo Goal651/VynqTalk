@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ArrowLeft, Send, Phone, Video, MoreVertical, Smile, Paperclip } from "lucide-react";
 import { Group, Message } from "@/types";
+import { useToast } from "@/hooks/use-toast";
 
 interface GroupChatProps {
   group: Group;
@@ -17,33 +18,39 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
     {
       id: "m1",
       content: "Hello everyone! Welcome to the group.",
-      userId: "u1", // Using userId instead of senderId
+      userId: "u1",
       timestamp: new Date(Date.now() - 3600000),
       type: "text"
     },
     {
       id: "m2", 
       content: "Thanks for adding me!",
-      userId: "u2", // Using userId instead of senderId
+      userId: "u2",
       timestamp: new Date(Date.now() - 1800000),
       type: "text"
     }
   ]);
   
   const [newMessage, setNewMessage] = useState("");
+  const { toast } = useToast();
 
   const handleSendMessage = () => {
     if (newMessage.trim()) {
-      console.log("Sending message:", newMessage);
+      console.log("Sending group message:", newMessage);
       const message: Message = {
         id: `m${Date.now()}`,
         content: newMessage,
-        userId: "current-user", // Using userId instead of senderId
+        userId: "current-user",
         timestamp: new Date(),
         type: "text"
       };
       setMessages([...messages, message]);
       setNewMessage("");
+      
+      toast({
+        title: "Message sent",
+        description: `Message sent to ${group.name}`,
+      });
     }
   };
 
@@ -52,6 +59,51 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
       e.preventDefault();
       handleSendMessage();
     }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("Message input changed:", e.target.value);
+    setNewMessage(e.target.value);
+  };
+
+  const handleVoiceCall = () => {
+    console.log("Voice call initiated for group:", group.name);
+    toast({
+      title: "Voice call",
+      description: `Starting voice call in ${group.name}`,
+    });
+  };
+
+  const handleVideoCall = () => {
+    console.log("Video call initiated for group:", group.name);
+    toast({
+      title: "Video call", 
+      description: `Starting video call in ${group.name}`,
+    });
+  };
+
+  const handleMoreOptions = () => {
+    console.log("More options clicked for group:", group.name);
+    toast({
+      title: "More options",
+      description: "Group options menu coming soon!",
+    });
+  };
+
+  const handleAttachFile = () => {
+    console.log("Attach file clicked");
+    toast({
+      title: "File attachment",
+      description: "File upload feature coming soon!",
+    });
+  };
+
+  const handleEmojiPicker = () => {
+    console.log("Emoji picker clicked");
+    toast({
+      title: "Emoji picker",
+      description: "Emoji selection coming soon!",
+    });
   };
 
   return (
@@ -64,7 +116,10 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
               <Button 
                 variant="ghost" 
                 size="icon"
-                onClick={onBack}
+                onClick={() => {
+                  console.log("Back button clicked");
+                  onBack();
+                }}
                 className="cursor-pointer hover:bg-accent"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -82,7 +137,7 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
               <Button 
                 variant="ghost" 
                 size="icon"
-                onClick={() => console.log("Voice call initiated")}
+                onClick={handleVoiceCall}
                 className="cursor-pointer hover:bg-accent"
               >
                 <Phone className="h-4 w-4" />
@@ -90,7 +145,7 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
               <Button 
                 variant="ghost" 
                 size="icon"
-                onClick={() => console.log("Video call initiated")}
+                onClick={handleVideoCall}
                 className="cursor-pointer hover:bg-accent"
               >
                 <Video className="h-4 w-4" />
@@ -98,7 +153,7 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
               <Button 
                 variant="ghost" 
                 size="icon"
-                onClick={() => console.log("More options clicked")}
+                onClick={handleMoreOptions}
                 className="cursor-pointer hover:bg-accent"
               >
                 <MoreVertical className="h-4 w-4" />
@@ -141,7 +196,7 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
             <Button 
               variant="ghost" 
               size="icon"
-              onClick={() => console.log("Attach file clicked")}
+              onClick={handleAttachFile}
               className="cursor-pointer hover:bg-accent"
             >
               <Paperclip className="h-4 w-4" />
@@ -149,14 +204,14 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
             <Input
               placeholder="Type a message..."
               value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
+              onChange={handleInputChange}
               onKeyPress={handleKeyPress}
               className="flex-1 cursor-text"
             />
             <Button 
               variant="ghost" 
               size="icon"
-              onClick={() => console.log("Emoji picker clicked")}
+              onClick={handleEmojiPicker}
               className="cursor-pointer hover:bg-accent"
             >
               <Smile className="h-4 w-4" />

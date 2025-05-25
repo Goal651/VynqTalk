@@ -11,10 +11,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Users, Settings, MessageCircle, Search, UserPlus, Crown, MoreVertical } from "lucide-react";
+import { Plus, Users, Settings, MessageCircle, Search, Crown } from "lucide-react";
 import { Group } from "@/types";
 import { GroupChat } from "@/components/GroupChat";
 import { GroupSettings } from "@/components/GroupSettings";
+import { useToast } from "@/hooks/use-toast";
 
 const createGroupSchema = z.object({
   name: z.string().min(2, { message: "Group name must be at least 2 characters" }),
@@ -47,6 +48,7 @@ export const Groups = () => {
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [currentView, setCurrentView] = useState<"list" | "chat" | "settings">("list");
   const [searchQuery, setSearchQuery] = useState("");
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof createGroupSchema>>({
     resolver: zodResolver(createGroupSchema),
@@ -70,6 +72,11 @@ export const Groups = () => {
     setGroups([...groups, newGroup]);
     setIsCreateOpen(false);
     form.reset();
+    
+    toast({
+      title: "Group created",
+      description: `${values.name} has been created successfully`,
+    });
   };
 
   const handleGroupChat = (group: Group) => {
@@ -85,8 +92,25 @@ export const Groups = () => {
   };
 
   const handleBackToList = () => {
+    console.log("Returning to groups list");
     setCurrentView("list");
     setSelectedGroup(null);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("Search query changed:", e.target.value);
+    setSearchQuery(e.target.value);
+  };
+
+  const handleCreateGroupClick = () => {
+    console.log("Create group button clicked");
+    setIsCreateOpen(true);
+  };
+
+  const handleCancelCreate = () => {
+    console.log("Create group cancelled");
+    setIsCreateOpen(false);
+    form.reset();
   };
 
   const filteredGroups = groups.filter(group =>
@@ -100,6 +124,7 @@ export const Groups = () => {
 
   if (currentView === "settings" && selectedGroup) {
     return <GroupSettings group={selectedGroup} onBack={handleBackToList} onSave={(updatedGroup) => {
+      console.log("Saving updated group:", updatedGroup);
       setGroups(groups.map(g => g.id === updatedGroup.id ? updatedGroup : g));
       setCurrentView("list");
     }} />;
@@ -114,7 +139,7 @@ export const Groups = () => {
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button className="cursor-pointer">
+            <Button className="cursor-pointer" onClick={handleCreateGroupClick}>
               <Plus className="h-4 w-4 mr-2" />
               Create Group
             </Button>
@@ -169,10 +194,7 @@ export const Groups = () => {
                   <Button 
                     type="button" 
                     variant="outline" 
-                    onClick={() => {
-                      console.log("Create group dialog cancelled");
-                      setIsCreateOpen(false);
-                    }}
+                    onClick={handleCancelCreate}
                     className="cursor-pointer"
                   >
                     Cancel
@@ -191,10 +213,7 @@ export const Groups = () => {
           <Input
             placeholder="Search groups..."
             value={searchQuery}
-            onChange={(e) => {
-              console.log("Search query:", e.target.value);
-              setSearchQuery(e.target.value);
-            }}
+            onChange={handleSearchChange}
             className="pl-8 cursor-text"
           />
         </div>
@@ -202,7 +221,7 @@ export const Groups = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredGroups.map((group) => (
-          <Card key={group.id} className="hover:shadow-md transition-shadow cursor-pointer">
+          <Card key={group.id} className="hover:shadow-md transition-shadow">
             <CardHeader className="pb-2">
               <div className="flex items-center space-x-3">
                 <Avatar className="cursor-pointer">
@@ -256,7 +275,9 @@ export const Groups = () => {
 
       {filteredGroups.length === 0 && (
         <div className="text-center py-8">
-          <p className="text-muted-foreground">No groups found matching your search.</p>
+          <p className="text-muted-foreground">
+            {searchQuery ? `No groups found matching "${searchQuery}"` : "No groups created yet. Create your first group!"}
+          </p>
         </div>
       )}
     </div>

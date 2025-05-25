@@ -11,6 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Camera, UserPlus, UserMinus, Crown, Shield, Trash2 } from "lucide-react";
 import { Group } from "@/types";
+import { useToast } from "@/hooks/use-toast";
 
 interface GroupSettingsProps {
   group: Group;
@@ -32,6 +33,8 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
     messageHistory: true,
   });
 
+  const { toast } = useToast();
+
   const mockMembers = [
     { id: "u1", name: "Alice Johnson", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=alice", role: "admin" },
     { id: "u2", name: "Bob Smith", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=bob", role: "member" },
@@ -47,15 +50,65 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
       avatar: groupData.avatar,
     };
     onSave(updatedGroup);
+    
+    toast({
+      title: "Settings saved",
+      description: "Group settings have been updated successfully",
+    });
   };
 
   const handleSettingChange = (key: string, value: boolean) => {
     console.log(`Setting ${key} changed to:`, value);
     setSettings(prev => ({ ...prev, [key]: value }));
+    
+    toast({
+      title: "Setting updated",
+      description: `${key.replace(/([A-Z])/g, ' $1').toLowerCase()} has been ${value ? 'enabled' : 'disabled'}`,
+    });
   };
 
-  const handleMemberAction = (action: string, memberId: string) => {
+  const handleMemberAction = (action: string, memberId: string, memberName: string) => {
     console.log(`Member action: ${action} for member ${memberId}`);
+    
+    toast({
+      title: "Member action",
+      description: `${action} action performed for ${memberName}`,
+    });
+  };
+
+  const handleAddMember = () => {
+    console.log("Add member clicked");
+    toast({
+      title: "Add member",
+      description: "Member invitation feature coming soon!",
+    });
+  };
+
+  const handleChangeAvatar = () => {
+    console.log("Change group avatar clicked");
+    toast({
+      title: "Change avatar",
+      description: "Avatar upload feature coming soon!",
+    });
+  };
+
+  const handleDeleteGroup = () => {
+    console.log("Delete group clicked");
+    toast({
+      title: "Delete group",
+      description: "Are you sure? This action cannot be undone.",
+      variant: "destructive"
+    });
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("Group name changed:", e.target.value);
+    setGroupData(prev => ({ ...prev, name: e.target.value }));
+  };
+
+  const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    console.log("Group description changed:", e.target.value);
+    setGroupData(prev => ({ ...prev, description: e.target.value }));
   };
 
   return (
@@ -64,7 +117,10 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
         <Button 
           variant="ghost" 
           size="icon"
-          onClick={onBack}
+          onClick={() => {
+            console.log("Back button clicked");
+            onBack();
+          }}
           className="cursor-pointer hover:bg-accent"
         >
           <ArrowLeft className="h-4 w-4" />
@@ -92,7 +148,7 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
                 size="sm"
                 variant="outline"
                 className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0 cursor-pointer"
-                onClick={() => console.log("Change group avatar clicked")}
+                onClick={handleChangeAvatar}
               >
                 <Camera className="h-4 w-4" />
               </Button>
@@ -103,10 +159,7 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
                 <Input 
                   id="groupName"
                   value={groupData.name}
-                  onChange={(e) => {
-                    console.log("Group name changed:", e.target.value);
-                    setGroupData(prev => ({ ...prev, name: e.target.value }));
-                  }}
+                  onChange={handleNameChange}
                   className="cursor-text"
                 />
               </div>
@@ -115,10 +168,7 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
                 <Textarea 
                   id="groupDescription"
                   value={groupData.description}
-                  onChange={(e) => {
-                    console.log("Group description changed:", e.target.value);
-                    setGroupData(prev => ({ ...prev, description: e.target.value }));
-                  }}
+                  onChange={handleDescriptionChange}
                   placeholder="Describe your group"
                   className="cursor-text resize-none"
                 />
@@ -192,7 +242,7 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
               <CardTitle>Members ({mockMembers.length})</CardTitle>
               <CardDescription>Manage group members and their roles</CardDescription>
             </div>
-            <Button className="cursor-pointer" onClick={() => console.log("Add member clicked")}>
+            <Button className="cursor-pointer" onClick={handleAddMember}>
               <UserPlus className="h-4 w-4 mr-2" />
               Add Member
             </Button>
@@ -221,7 +271,7 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
                   <Button 
                     size="sm" 
                     variant="outline"
-                    onClick={() => handleMemberAction("promote", member.id)}
+                    onClick={() => handleMemberAction("promote", member.id, member.name)}
                     className="cursor-pointer hover:bg-accent"
                   >
                     <Shield className="h-4 w-4" />
@@ -229,7 +279,7 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
                   <Button 
                     size="sm" 
                     variant="outline"
-                    onClick={() => handleMemberAction("remove", member.id)}
+                    onClick={() => handleMemberAction("remove", member.id, member.name)}
                     className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
                   >
                     <UserMinus className="h-4 w-4" />
@@ -250,7 +300,7 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
         <CardContent>
           <Button 
             variant="destructive" 
-            onClick={() => console.log("Delete group clicked")}
+            onClick={handleDeleteGroup}
             className="cursor-pointer"
           >
             <Trash2 className="h-4 w-4 mr-2" />
