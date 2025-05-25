@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { User, Message } from "../types";
 import { ChatSidebar } from "./ChatSidebar";
@@ -38,6 +37,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
       content: content,
       timestamp: new Date(),
       chatWithUserId: activeChat.id,
+      type: "text"
     };
     setMessages([...messages, newMessage]);
   };

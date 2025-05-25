@@ -33,37 +33,43 @@ export const mockMessages: Message[] = [
     id: "m1",
     userId: "u1",
     content: "Hey everyone! Welcome to PulseChat.",
-    timestamp: new Date(Date.now() - 600000)
+    timestamp: new Date(Date.now() - 600000),
+    type: "text"
   },
   {
     id: "m2",
     userId: "u2",
     content: "Thanks! The interface looks really nice!",
-    timestamp: new Date(Date.now() - 500000)
+    timestamp: new Date(Date.now() - 500000),
+    type: "text"
   },
   {
     id: "m3",
     userId: "u1",
     content: "Absolutely! I love the dark theme and subtle animations.",
-    timestamp: new Date(Date.now() - 400000)
+    timestamp: new Date(Date.now() - 400000),
+    type: "text"
   },
   {
     id: "m4",
     userId: "u4",
     content: "Just joined. This is a cool chat app!",
-    timestamp: new Date(Date.now() - 300000)
+    timestamp: new Date(Date.now() - 300000),
+    type: "text"
   },
   {
     id: "m5",
     userId: "u2",
     content: "I agree! The messages load so smoothly.",
-    timestamp: new Date(Date.now() - 200000)
+    timestamp: new Date(Date.now() - 200000),
+    type: "text"
   },
   {
     id: "m6",
     userId: "u1",
     content: "Let's try out some of the features. I think we can add emojis too! 😊",
-    timestamp: new Date(Date.now() - 100000)
+    timestamp: new Date(Date.now() - 100000),
+    type: "text"
   }
 ];
 

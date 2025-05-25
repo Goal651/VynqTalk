@@ -16,6 +16,7 @@ export const Chat = () => {
       userId: currentUser.id,
       content: content,
       timestamp: new Date(),
+      type: "text"
     };
     setMessages([...messages, newMessage]);
   };
