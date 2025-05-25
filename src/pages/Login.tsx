@@ -9,7 +9,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { LineWave } from "@/components/LineWave";
 import { Camera } from "lucide-react";
 
 const formSchema = z.object({
@@ -42,7 +41,6 @@ const Login = () => {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background p-4 relative overflow-hidden">
-      <LineWave className="absolute inset-0" />
       
       <Card className="w-full max-w-md bg-background/80 backdrop-blur-sm border-border/30 animate-fade-in">
         <CardHeader className="space-y-1 text-center">
@@ -78,7 +76,7 @@ const Login = () => {
                   </FormItem>
                 )}
               />
-              <Button type="button" type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Signing in..." : "Sign in"}
               </Button>
             </form>

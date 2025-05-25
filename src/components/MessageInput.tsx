@@ -154,7 +154,7 @@ export const MessageInput = ({ onSendMessage, currentUser }: MessageInputProps) 
             onDragOver={handleDragOver}
           />
           <div className="absolute right-3 bottom-3">
-            <Button type="button" 
+            <Button 
               type="submit" 
               size="icon" 
               className={`h-8 w-8 rounded-full cursor-pointer transition-all ${
@@ -173,7 +173,7 @@ export const MessageInput = ({ onSendMessage, currentUser }: MessageInputProps) 
       <div className="flex items-center justify-between mt-2">
         <div className="flex items-center space-x-2">
           <div className="relative">
-            <Button type="button" 
+            <Button 
               type="button" 
               size="icon" 
               variant="ghost" 
@@ -191,7 +191,6 @@ export const MessageInput = ({ onSendMessage, currentUser }: MessageInputProps) 
           </div>
           
           <Button type="button" 
-            type="button" 
             size="icon" 
             variant="ghost" 
             className="h-8 w-8 rounded-full cursor-pointer hover:bg-accent transition-colors"
@@ -209,7 +208,6 @@ export const MessageInput = ({ onSendMessage, currentUser }: MessageInputProps) 
           </Button>
           
           <Button type="button" 
-            type="button" 
             size="icon" 
             variant="ghost" 
             className="h-8 w-8 rounded-full cursor-pointer hover:bg-accent transition-colors"
