@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDistanceToNow } from "date-fns";
 import { Bell, MessageCircle, Users, UserPlus, Settings, Trash2, Check } from "lucide-react";
 
@@ -110,118 +111,126 @@ export const Notifications = () => {
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Bell className="h-6 w-6" />
-            Notifications
-            {unreadCount > 0 && (
-              <Badge variant="destructive">{unreadCount}</Badge>
-            )}
-          </h1>
-          <p className="text-muted-foreground">Stay updated with your latest activity</p>
+    <div className="h-full flex flex-col">
+      <div className="flex-shrink-0 p-6 border-b space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold flex items-center gap-2">
+              <Bell className="h-6 w-6" />
+              Notifications
+              {unreadCount > 0 && (
+                <Badge variant="destructive">{unreadCount}</Badge>
+              )}
+            </h1>
+            <p className="text-muted-foreground">Stay updated with your latest activity</p>
+          </div>
+          {unreadCount > 0 && (
+            <Button type="button" onClick={markAllAsRead} variant="outline">
+              Mark all as read
+            </Button>
+          )}
         </div>
-        {unreadCount > 0 && (
-          <Button type="button" onClick={markAllAsRead} variant="outline">
-            Mark all as read
-          </Button>
-        )}
+
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList>
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="unread">
+              Unread {unreadCount > 0 && <Badge className="ml-1">{unreadCount}</Badge>}
+            </TabsTrigger>
+            <TabsTrigger value="message">Messages</TabsTrigger>
+            <TabsTrigger value="group_invite">Groups</TabsTrigger>
+            <TabsTrigger value="system">System</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList>
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="unread">
-            Unread {unreadCount > 0 && <Badge className="ml-1">{unreadCount}</Badge>}
-          </TabsTrigger>
-          <TabsTrigger value="message">Messages</TabsTrigger>
-          <TabsTrigger value="group_invite">Groups</TabsTrigger>
-          <TabsTrigger value="system">System</TabsTrigger>
-        </TabsList>
-
-        {["all", "unread", "message", "group_invite", "system"].map((filter) => (
-          <TabsContent key={filter} value={filter} className="space-y-4">
-            {filterNotifications(filter).length === 0 ? (
-              <Card>
-                <CardContent className="flex items-center justify-center py-8">
-                  <div className="text-center">
-                    <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">No notifications found</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : (
-              filterNotifications(filter).map((notification) => (
-                <Card
-                  key={notification.id}
-                  className={`transition-all hover:shadow-md ${
-                    !notification.read ? "ring-2 ring-primary/20 bg-primary/5" : ""
-                  }`}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex items-start space-x-4">
-                      <div className="relative">
-                        {notification.avatar ? (
-                          <Avatar>
-                            <AvatarImage src={notification.avatar} />
-                            <AvatarFallback>
-                              {notification.title.substring(0, 2).toUpperCase()}
-                            </AvatarFallback>
-                          </Avatar>
-                        ) : (
-                          <div className={`p-2 rounded-full ${getNotificationColor(notification.type)}`}>
-                            {getNotificationIcon(notification.type)}
+      <ScrollArea className="flex-1">
+        <div className="p-6 max-w-4xl mx-auto">
+          <Tabs defaultValue="all" className="w-full">
+            {["all", "unread", "message", "group_invite", "system"].map((filter) => (
+              <TabsContent key={filter} value={filter} className="space-y-4">
+                {filterNotifications(filter).length === 0 ? (
+                  <Card>
+                    <CardContent className="flex items-center justify-center py-8">
+                      <div className="text-center">
+                        <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <p className="text-muted-foreground">No notifications found</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  filterNotifications(filter).map((notification) => (
+                    <Card
+                      key={notification.id}
+                      className={`transition-all hover:shadow-md ${
+                        !notification.read ? "ring-2 ring-primary/20 bg-primary/5" : ""
+                      }`}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start space-x-4">
+                          <div className="relative">
+                            {notification.avatar ? (
+                              <Avatar>
+                                <AvatarImage src={notification.avatar} />
+                                <AvatarFallback>
+                                  {notification.title.substring(0, 2).toUpperCase()}
+                                </AvatarFallback>
+                              </Avatar>
+                            ) : (
+                              <div className={`p-2 rounded-full ${getNotificationColor(notification.type)}`}>
+                                {getNotificationIcon(notification.type)}
+                              </div>
+                            )}
+                            {!notification.read && (
+                              <div className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full" />
+                            )}
                           </div>
-                        )}
-                        {!notification.read && (
-                          <div className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full" />
-                        )}
-                      </div>
-                      
-                      <div className="flex-1 space-y-1">
-                        <div className="flex items-center justify-between">
-                          <h3 className={`font-medium ${!notification.read ? "font-semibold" : ""}`}>
-                            {notification.title}
-                          </h3>
-                          <span className="text-xs text-muted-foreground">
-                            {formatDistanceToNow(notification.timestamp, { addSuffix: true })}
-                          </span>
+                          
+                          <div className="flex-1 space-y-1">
+                            <div className="flex items-center justify-between">
+                              <h3 className={`font-medium ${!notification.read ? "font-semibold" : ""}`}>
+                                {notification.title}
+                              </h3>
+                              <span className="text-xs text-muted-foreground">
+                                {formatDistanceToNow(notification.timestamp, { addSuffix: true })}
+                              </span>
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                              {notification.description}
+                            </p>
+                            
+                            <div className="flex items-center space-x-2 pt-2">
+                              {!notification.read && (
+                                <Button type="button"
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => markAsRead(notification.id)}
+                                >
+                                  <Check className="h-3 w-3 mr-1" />
+                                  Mark as read
+                                </Button>
+                              )}
+                              <Button type="button"
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => deleteNotification(notification.id)}
+                                className="text-destructive hover:text-destructive"
+                              >
+                                <Trash2 className="h-3 w-3 mr-1" />
+                                Delete
+                              </Button>
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          {notification.description}
-                        </p>
-                        
-                        <div className="flex items-center space-x-2 pt-2">
-                          {!notification.read && (
-                            <Button type="button"
-                              size="sm"
-                              variant="outline"
-                              onClick={() => markAsRead(notification.id)}
-                            >
-                              <Check className="h-3 w-3 mr-1" />
-                              Mark as read
-                            </Button>
-                          )}
-                          <Button type="button"
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => deleteNotification(notification.id)}
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-3 w-3 mr-1" />
-                            Delete
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </TabsContent>
-        ))}
-      </Tabs>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </TabsContent>
+            ))}
+          </Tabs>
+        </div>
+      </ScrollArea>
     </div>
   );
 };
