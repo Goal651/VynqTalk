@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { User, Message } from "../types";
 import { ChatSidebar } from "./ChatSidebar";
@@ -10,6 +9,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -140,7 +140,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
       <div className="flex-1 flex flex-col h-full border-l border-r border-border/30 bg-background/80 backdrop-blur-sm relative z-10">
         {activeChat ? (
           <>
-            <div className="p-4 border-b border-border bg-card/50 backdrop-blur">
+            <div className="p-4 border-b border-border bg-card/50 backdrop-blur flex-shrink-0">
               <div className="flex items-center gap-3">
                 <button type="button" 
                   className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors cursor-pointer"
@@ -156,7 +156,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
                 </div>
               </div>
             </div>
-            <div className="flex-1 overflow-y-auto">
+            <ScrollArea className="flex-1">
               <MessageList 
                 messages={filteredMessages} 
                 users={users} 
@@ -164,8 +164,10 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
                 onDeleteMessage={handleDeleteMessage}
                 onEditMessage={handleEditMessage}
               />
+            </ScrollArea>
+            <div className="flex-shrink-0">
+              <MessageInput onSendMessage={handleSendMessage} currentUser={user || undefined} />
             </div>
-            <MessageInput onSendMessage={handleSendMessage} currentUser={user || undefined} />
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center">

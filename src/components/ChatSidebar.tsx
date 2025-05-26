@@ -1,10 +1,10 @@
-
 import { useState } from "react";
 import { User } from "../types";
 import { Search, Plus, Phone, Video } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { CallPreview } from "./CallPreview";
 import { useToast } from "@/hooks/use-toast";
 
@@ -55,7 +55,7 @@ export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps
 
   return (
     <div className="w-80 border-r border-border flex flex-col h-full bg-card relative z-10">
-      <div className="p-4 border-b border-border bg-background/80">
+      <div className="p-4 border-b border-border bg-background/80 flex-shrink-0">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Chats</h2>
           <Button  
@@ -79,69 +79,71 @@ export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
-        {filteredUsers.map((user) => (
-          <div
-            key={user.id}
-            className={`flex items-center p-3 hover:bg-muted/50 cursor-pointer border-b border-border group transition-all duration-200 ${
-              activeChat?.id === user.id ? "bg-muted/50 border-l-4 border-l-primary" : "hover:bg-accent/30"
-            }`}
-            onClick={() => handleUserClick(user)}
-          >
-            <div className="relative">
-              <Avatar className={`cursor-pointer transition-transform hover:scale-105 ${user.isOnline ? "ring-2 ring-green-500" : ""}`}>
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                  {user.name.substring(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              {user.isOnline && (
-                <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-background animate-pulse"></span>
-              )}
-            </div>
-            <div className="ml-3 flex-1 overflow-hidden">
-              <div className="font-medium text-foreground">{user.name}</div>
-              <div className="text-xs text-muted-foreground truncate">
-                {activeChat?.id === user.id ? "Active chat" : user.isOnline ? "Online" : "Offline"}
+      <ScrollArea className="flex-1">
+        <div className="p-0">
+          {filteredUsers.map((user) => (
+            <div
+              key={user.id}
+              className={`flex items-center p-3 hover:bg-muted/50 cursor-pointer border-b border-border group transition-all duration-200 ${
+                activeChat?.id === user.id ? "bg-muted/50 border-l-4 border-l-primary" : "hover:bg-accent/30"
+              }`}
+              onClick={() => handleUserClick(user)}
+            >
+              <div className="relative">
+                <Avatar className={`cursor-pointer transition-transform hover:scale-105 ${user.isOnline ? "ring-2 ring-green-500" : ""}`}>
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                    {user.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                {user.isOnline && (
+                  <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-background animate-pulse"></span>
+                )}
+              </div>
+              <div className="ml-3 flex-1 overflow-hidden">
+                <div className="font-medium text-foreground">{user.name}</div>
+                <div className="text-xs text-muted-foreground truncate">
+                  {activeChat?.id === user.id ? "Active chat" : user.isOnline ? "Online" : "Offline"}
+                </div>
+              </div>
+              <div className="flex space-x-1">
+                <Button  
+                  size="icon" 
+                  variant="ghost" 
+                  className="h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-green-100 hover:text-green-600"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCall(user, "audio");
+                  }}
+                  type="button"
+                  title={`Call ${user.name}`}
+                >
+                  <Phone className="h-4 w-4" />
+                </Button>
+                <Button  
+                  size="icon" 
+                  variant="ghost" 
+                  className="h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-blue-100 hover:text-blue-600"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCall(user, "video");
+                  }}
+                  type="button"
+                  title={`Video call ${user.name}`}
+                >
+                  <Video className="h-4 w-4" />
+                </Button>
               </div>
             </div>
-            <div className="flex space-x-1">
-              <Button  
-                size="icon" 
-                variant="ghost" 
-                className="h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-green-100 hover:text-green-600"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleCall(user, "audio");
-                }}
-                type="button"
-                title={`Call ${user.name}`}
-              >
-                <Phone className="h-4 w-4" />
-              </Button>
-              <Button  
-                size="icon" 
-                variant="ghost" 
-                className="h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-blue-100 hover:text-blue-600"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleCall(user, "video");
-                }}
-                type="button"
-                title={`Video call ${user.name}`}
-              >
-                <Video className="h-4 w-4" />
-              </Button>
+          ))}
+          
+          {filteredUsers.length === 0 && searchTerm && (
+            <div className="p-4 text-center text-muted-foreground">
+              No users found matching "{searchTerm}"
             </div>
-          </div>
-        ))}
-        
-        {filteredUsers.length === 0 && searchTerm && (
-          <div className="p-4 text-center text-muted-foreground">
-            No users found matching "{searchTerm}"
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      </ScrollArea>
 
       {callType && callingUser && (
         <CallPreview 
