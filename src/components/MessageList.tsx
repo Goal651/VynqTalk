@@ -9,6 +9,9 @@ interface MessageListProps {
   onUserAvatarClick?: (user: User) => void;
   onDeleteMessage?: (messageId: string) => void;
   onEditMessage?: (message: Message) => void;
+  onReplyMessage?: (message: Message) => void;
+  onReactToMessage?: (messageId: string, emoji: string) => void;
+  currentUserId?: string;
 }
 
 export const MessageList = ({ 
@@ -16,7 +19,10 @@ export const MessageList = ({
   users, 
   onUserAvatarClick,
   onDeleteMessage,
-  onEditMessage
+  onEditMessage,
+  onReplyMessage,
+  onReactToMessage,
+  currentUserId = "current-user"
 }: MessageListProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -33,9 +39,12 @@ export const MessageList = ({
             key={message.id} 
             message={message} 
             user={user} 
+            currentUserId={currentUserId}
             onUserAvatarClick={onUserAvatarClick ? () => onUserAvatarClick(user) : undefined}
             onDeleteMessage={onDeleteMessage ? () => onDeleteMessage(message.id) : undefined}
             onEditMessage={onEditMessage ? () => onEditMessage(message) : undefined}
+            onReplyMessage={onReplyMessage}
+            onReactToMessage={onReactToMessage}
           />
         ) : null;
       })}

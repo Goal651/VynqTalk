@@ -1,4 +1,3 @@
-
 export interface User {
   id: string;
   name: string;
@@ -16,6 +15,20 @@ export interface Message {
   chatWithUserId?: string;
   senderId?: string; // Added for compatibility with GroupChat
   type: "text" | "image" | "audio" | "file"; // Added message types
+  reactions?: Reaction[];
+  replyTo?: {
+    messageId: string;
+    userId: string;
+    userName: string;
+    content: string;
+  };
+}
+
+export interface Reaction {
+  id: string;
+  emoji: string;
+  userId: string;
+  userName: string;
 }
 
 export interface Group {

@@ -29,8 +29,9 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
   const [messageToEdit, setMessageToEdit] = useState<Message | null>(null);
   const [editedContent, setEditedContent] = useState("");
   const [activeChat, setActiveChat] = useState<User | null>(null);
+  const [replyTo, setReplyTo] = useState<Message | null>(null);
 
-  const handleSendMessage = (content: string) => {
+  const handleSendMessage = (content: string, replyData?: Message["replyTo"]) => {
     if (!user || !activeChat) {
       toast({
         title: "Error",
@@ -40,14 +41,16 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
       return;
     }
     
-    console.log("Sending message:", content, "to user:", activeChat.name);
+    console.log("Sending message:", content, "to user:", activeChat.name, "reply:", replyData);
     const newMessage: Message = {
       id: `m${Date.now()}`,
       userId: user.id,
       content: content,
       timestamp: new Date(),
       chatWithUserId: activeChat.id,
-      type: "text"
+      type: "text",
+      replyTo: replyData,
+      reactions: []
     };
     setMessages([...messages, newMessage]);
     
@@ -61,6 +64,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
     console.log("User clicked:", clickedUser.name);
     setActiveChat(clickedUser);
     setShowUserInfo(false);
+    setReplyTo(null);
     
     toast({
       title: "Chat opened",
@@ -122,6 +126,58 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
     }
   };
 
+  const handleReplyMessage = (message: Message) => {
+    console.log("Reply to message requested:", message.id);
+    setReplyTo(message);
+    
+    toast({
+      title: "Replying to message",
+      description: "Type your reply below",
+    });
+  };
+
+  const handleCancelReply = () => {
+    console.log("Cancel reply");
+    setReplyTo(null);
+  };
+
+  const handleReactToMessage = (messageId: string, emoji: string) => {
+    console.log("React to message:", messageId, "with emoji:", emoji);
+    
+    setMessages(messages.map(message => {
+      if (message.id === messageId) {
+        const reactions = message.reactions || [];
+        const existingReaction = reactions.find(r => r.userId === user?.id && r.emoji === emoji);
+        
+        if (existingReaction) {
+          // Remove reaction if it already exists
+          return {
+            ...message,
+            reactions: reactions.filter(r => r.id !== existingReaction.id)
+          };
+        } else {
+          // Add new reaction
+          const newReaction = {
+            id: `r${Date.now()}`,
+            emoji,
+            userId: user?.id || "current-user",
+            userName: user?.name || "You"
+          };
+          return {
+            ...message,
+            reactions: [...reactions, newReaction]
+          };
+        }
+      }
+      return message;
+    }));
+    
+    toast({
+      title: "Reaction added",
+      description: `Reacted with ${emoji}`,
+    });
+  };
+
   // Filter messages for the active chat
   const filteredMessages = activeChat 
     ? messages.filter(message => 
@@ -160,13 +216,21 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
               <MessageList 
                 messages={filteredMessages} 
                 users={users} 
+                currentUserId={user?.id}
                 onUserAvatarClick={handleUserAvatarClick}
                 onDeleteMessage={handleDeleteMessage}
                 onEditMessage={handleEditMessage}
+                onReplyMessage={handleReplyMessage}
+                onReactToMessage={handleReactToMessage}
               />
             </ScrollArea>
             <div className="flex-shrink-0">
-              <MessageInput onSendMessage={handleSendMessage} currentUser={user || undefined} />
+              <MessageInput 
+                onSendMessage={handleSendMessage} 
+                currentUser={user || { id: "current-user", name: "You", avatar: "", isOnline: true }}
+                replyTo={replyTo || undefined}
+                onCancelReply={handleCancelReply}
+              />
             </div>
           </>
         ) : (

@@ -1,19 +1,25 @@
-
 import { useState, useRef } from "react";
-import { User } from "../types";
+import { User, Message } from "../types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageCircle, Smile, Paperclip, Mic, Image } from "lucide-react";
+import { MessageCircle, Smile, Paperclip, Mic, X } from "lucide-react";
 import { EmojiPicker } from "./EmojiPicker";
 import { AudioRecorder } from "./AudioRecorder";
 import { FilePreview } from "./FilePreview";
 
 interface MessageInputProps {
-  onSendMessage: (content: string) => void;
+  onSendMessage: (content: string, replyTo?: Message["replyTo"]) => void;
   currentUser: User;
+  replyTo?: Message;
+  onCancelReply?: () => void;
 }
 
-export const MessageInput = ({ onSendMessage, currentUser }: MessageInputProps) => {
+export const MessageInput = ({ 
+  onSendMessage, 
+  currentUser, 
+  replyTo,
+  onCancelReply 
+}: MessageInputProps) => {
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showAudioRecorder, setShowAudioRecorder] = useState(false);
@@ -32,10 +38,21 @@ export const MessageInput = ({ onSendMessage, currentUser }: MessageInputProps) 
         content += ` [${files.length} file(s) attached]`;
       }
       
-      onSendMessage(content);
+      const replyData = replyTo ? {
+        messageId: replyTo.id,
+        userId: replyTo.userId,
+        userName: replyTo.userId === currentUser.id ? currentUser.name : "Unknown User",
+        content: replyTo.content
+      } : undefined;
+      
+      onSendMessage(content, replyData);
       setMessage("");
       setFiles([]);
       setShowEmojiPicker(false);
+      
+      if (onCancelReply) {
+        onCancelReply();
+      }
     }
   };
 
@@ -113,6 +130,32 @@ export const MessageInput = ({ onSendMessage, currentUser }: MessageInputProps) 
 
   return (
     <form onSubmit={handleSubmit} className="p-4 border-t border-border bg-secondary/50 relative z-10">
+      {replyTo && (
+        <div className="mb-3 p-3 bg-muted/50 rounded-md border-l-2 border-primary">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="text-sm font-medium text-muted-foreground mb-1">
+                Replying to {replyTo.userId === currentUser.id ? "yourself" : "message"}
+              </div>
+              <div className="text-sm text-muted-foreground truncate">
+                {replyTo.content}
+              </div>
+            </div>
+            {onCancelReply && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 ml-2"
+                onClick={onCancelReply}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+
       {files.length > 0 && (
         <FilePreview 
           files={files} 
@@ -141,7 +184,7 @@ export const MessageInput = ({ onSendMessage, currentUser }: MessageInputProps) 
           <Textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Type a message..."
+            placeholder={replyTo ? "Reply to message..." : "Type a message..."}
             className="min-h-[60px] w-full resize-none bg-muted rounded-lg pr-12 cursor-text focus:ring-2 focus:ring-primary transition-all"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
