@@ -3,6 +3,7 @@ import { User, Message } from "../types";
 import { ChatSidebar } from "./ChatSidebar";
 import { MessageList } from "./MessageList";
 import { MessageInput } from "./MessageInput";
+import { ChatHeader } from "./ChatHeader";
 import { mockMessages, mockUsers } from "../data/mockData";
 import { UserInfo } from "./UserInfo";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -150,13 +151,11 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
         const existingReaction = reactions.find(r => r.userId === user?.id && r.emoji === emoji);
         
         if (existingReaction) {
-          // Remove reaction if it already exists
           return {
             ...message,
             reactions: reactions.filter(r => r.id !== existingReaction.id)
           };
         } else {
-          // Add new reaction
           const newReaction = {
             id: `r${Date.now()}`,
             emoji,
@@ -178,7 +177,20 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
     });
   };
 
-  // Filter messages for the active chat
+  const handleVoiceCall = () => {
+    toast({
+      title: "Voice call started",
+      description: `Calling ${activeChat?.name}...`,
+    });
+  };
+
+  const handleVideoCall = () => {
+    toast({
+      title: "Video call started",
+      description: `Video calling ${activeChat?.name}...`,
+    });
+  };
+
   const filteredMessages = activeChat 
     ? messages.filter(message => 
         (message.userId === user?.id && message.chatWithUserId === activeChat.id) ||
@@ -187,31 +199,22 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
     : [];
 
   return (
-    <div className="flex h-full relative">
+    <div className="flex h-full relative bg-gradient-to-br from-background to-secondary/10">
       <ChatSidebar 
         users={users} 
         onUserClick={handleUserClick}
         activeChat={activeChat}
       />
-      <div className="flex-1 flex flex-col h-full border-l border-r border-border/30 bg-background/80 backdrop-blur-sm relative z-10">
+      <div className="flex-1 flex flex-col h-full border-l border-r border-border/30 bg-background/90 backdrop-blur-sm relative z-10">
+        <ChatHeader 
+          users={users} 
+          activeChat={activeChat}
+          onVoiceCall={handleVoiceCall}
+          onVideoCall={handleVideoCall}
+        />
+        
         {activeChat ? (
           <>
-            <div className="p-4 border-b border-border bg-card/50 backdrop-blur flex-shrink-0">
-              <div className="flex items-center gap-3">
-                <button type="button" 
-                  className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors cursor-pointer"
-                  onClick={() => handleUserAvatarClick(activeChat)}
-                >
-                  <span className="text-sm font-medium">{activeChat.name.substring(0, 2).toUpperCase()}</span>
-                </button>
-                <div>
-                  <h2 className="font-semibold">{activeChat.name}</h2>
-                  <p className="text-xs text-muted-foreground">
-                    {activeChat.isOnline ? "Online" : "Offline"}
-                  </p>
-                </div>
-              </div>
-            </div>
             <ScrollArea className="flex-1">
               <MessageList 
                 messages={filteredMessages} 
@@ -224,7 +227,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
                 onReactToMessage={handleReactToMessage}
               />
             </ScrollArea>
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 border-t border-border/30 bg-background/50 backdrop-blur-sm">
               <MessageInput 
                 onSendMessage={handleSendMessage} 
                 currentUser={user || { id: "current-user", name: "You", avatar: "", isOnline: true }}
@@ -236,10 +239,10 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
         ) : (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <div className="h-12 w-12 rounded-full bg-muted mx-auto mb-4 flex items-center justify-center">
-                <span className="text-muted-foreground">💬</span>
+              <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 mx-auto mb-4 flex items-center justify-center">
+                <span className="text-2xl">💬</span>
               </div>
-              <h3 className="font-semibold mb-2">No conversation selected</h3>
+              <h3 className="font-semibold mb-2 text-lg">No conversation selected</h3>
               <p className="text-muted-foreground">Choose a user from the sidebar to start chatting</p>
             </div>
           </div>
@@ -251,7 +254,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
       )}
       
       <AlertDialog open={messageToDelete !== null} onOpenChange={(open) => !open && setMessageToDelete(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-background border border-border">
           <AlertDialogHeader>
             <AlertDialogTitle>Delete message</AlertDialogTitle>
             <AlertDialogDescription>
@@ -276,7 +279,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
       </AlertDialog>
       
       <Dialog open={messageToEdit !== null} onOpenChange={(open) => !open && setMessageToEdit(null)}>
-        <DialogContent>
+        <DialogContent className="bg-background border border-border">
           <DialogHeader>
             <DialogTitle>Edit message</DialogTitle>
           </DialogHeader>
@@ -286,7 +289,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
               console.log("Edit content changed:", e.target.value);
               setEditedContent(e.target.value);
             }}
-            className="min-h-[100px]"
+            className="min-h-[100px] bg-background/50 border-border/50 focus:border-primary/50"
             placeholder="Edit your message..."
           />
           <DialogFooter>
@@ -302,6 +305,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
             <Button type="button" 
               onClick={confirmEditMessage}
               disabled={!editedContent.trim()}
+              className="bg-primary hover:bg-primary/90"
             >
               Save changes
             </Button>
