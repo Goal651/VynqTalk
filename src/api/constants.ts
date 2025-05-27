@@ -1,7 +1,7 @@
 
 // API Configuration Constants
 export const API_CONFIG = {
-  BASE_URL: process.env.REACT_APP_API_URL || 'http://localhost:3001',
+  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:3001',
   API_VERSION: 'v1',
   TIMEOUT: 10000,
 };
