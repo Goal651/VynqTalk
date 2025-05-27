@@ -38,6 +38,7 @@ export interface AuthResponse {
     email: string;
     avatar?: string;
     isOnline: boolean;
+    isAdmin: boolean; 
     emailVerified: boolean;
     createdAt: string;
     updatedAt: string;
@@ -146,4 +147,17 @@ export interface ApiError {
   status: number;
   message: string;
   errors?: Record<string, string[]>;
+}
+
+export interface ChatMessage {
+  from: string;
+  to: string;
+  content: string;
+  timestamp?: string;
+}
+
+export interface SocketResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
 }

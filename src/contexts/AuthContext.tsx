@@ -25,6 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (authService.isAuthenticated()) {
       const storedUser = authService.getStoredUser();
       if (storedUser) {
+        console.log("User is already authenticated:", storedUser);
         setUser(storedUser);
         setIsAuthenticated(true);
       }
@@ -44,6 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: apiUser.email,
           avatar: apiUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${apiUser.name}`,
           isOnline: apiUser.isOnline,
+          isAdmin: apiUser.isAdmin || false
         };
         
         setUser(user);
@@ -92,6 +94,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: apiUser.email,
           avatar: apiUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${apiUser.name}`,
           isOnline: apiUser.isOnline,
+          isAdmin: apiUser.isAdmin || false
         };
         
         setUser(user);

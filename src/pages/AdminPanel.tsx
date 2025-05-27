@@ -14,6 +14,7 @@ import { GroupManagement } from "./admin/components/GroupManagement";
 import { ContentModeration } from "./admin/components/ContentModeration";
 import { Analytics } from "./admin/components/Analytics";
 import { SystemMetrics } from "./admin/components/SystemMetrics";
+import { toast } from "@/hooks/use-toast";
 
 export const AdminPanel = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,13 +24,17 @@ export const AdminPanel = () => {
 
   // Check if user is admin
   useEffect(() => {
-    if (user && user.role !== "admin") {
-      console.warn("Access denied: User is not an admin");
+    if (user && !user.isAdmin) {
+      toast({
+        title: "Unauthorized",
+        description: "You are not authorized to access this page.",
+        variant: "destructive",
+      });
     }
   }, [user]);
 
   // Redirect if user is not admin
-  if (!user || user.role !== "admin") {
+  if (!user || !user.isAdmin) {
     return <Navigate to="/login" replace />;
   }
 

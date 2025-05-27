@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { User, Message } from "../types";
 import { ChatSidebar } from "./ChatSidebar";
 import { MessageList } from "./MessageList";
@@ -13,6 +13,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { ChatMessage } from "@/api";
+import { socketService } from "@/api/services/socket";
 
 interface ChatViewProps {
   onMessageDelete?: (messageId: string) => void;
@@ -32,6 +34,15 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
   const [activeChat, setActiveChat] = useState<User | null>(null);
   const [replyTo, setReplyTo] = useState<Message | null>(null);
 
+  useEffect(() => {
+    socketService.connect();
+
+
+    return () => {
+      socketService.disconnect();
+    };
+  }, []);
+
   const handleSendMessage = (content: string, replyData?: Message["replyTo"]) => {
     if (!user || !activeChat) {
       toast({
@@ -41,7 +52,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
       });
       return;
     }
-    
+
     console.log("Sending message:", content, "to user:", activeChat.name, "reply:", replyData);
     const newMessage: Message = {
       id: `m${Date.now()}`,
@@ -54,11 +65,12 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
       reactions: []
     };
     setMessages([...messages, newMessage]);
-    
+
     toast({
       title: "Message sent",
       description: `Message sent to ${activeChat.name}`,
     });
+    socketService.sendMessage(newMessage.content, user.id);
   };
 
   const handleUserClick = (clickedUser: User) => {
@@ -66,7 +78,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
     setActiveChat(clickedUser);
     setShowUserInfo(false);
     setReplyTo(null);
-    
+
     toast({
       title: "Chat opened",
       description: `Now chatting with ${clickedUser.name}`,
@@ -95,7 +107,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
       setMessages(messages.filter(message => message.id !== messageToDelete));
       if (onMessageDelete) onMessageDelete(messageToDelete);
       setMessageToDelete(null);
-      
+
       toast({
         title: "Message deleted",
         description: "Message has been removed",
@@ -113,13 +125,13 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
   const confirmEditMessage = () => {
     if (messageToEdit) {
       console.log("Confirming edit message:", messageToEdit.id, "new content:", editedContent);
-      setMessages(messages.map(message => 
-        message.id === messageToEdit.id 
-          ? { ...message, content: editedContent, isEdited: true } 
+      setMessages(messages.map(message =>
+        message.id === messageToEdit.id
+          ? { ...message, content: editedContent, isEdited: true }
           : message
       ));
       setMessageToEdit(null);
-      
+
       toast({
         title: "Message edited",
         description: "Message has been updated",
@@ -130,7 +142,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
   const handleReplyMessage = (message: Message) => {
     console.log("Reply to message requested:", message.id);
     setReplyTo(message);
-    
+
     toast({
       title: "Replying to message",
       description: "Type your reply below",
@@ -144,12 +156,12 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
 
   const handleReactToMessage = (messageId: string, emoji: string) => {
     console.log("React to message:", messageId, "with emoji:", emoji);
-    
+
     setMessages(messages.map(message => {
       if (message.id === messageId) {
         const reactions = message.reactions || [];
         const existingReaction = reactions.find(r => r.userId === user?.id && r.emoji === emoji);
-        
+
         if (existingReaction) {
           return {
             ...message,
@@ -170,7 +182,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
       }
       return message;
     }));
-    
+
     toast({
       title: "Reaction added",
       description: `Reacted with ${emoji}`,
@@ -191,34 +203,34 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
     });
   };
 
-  const filteredMessages = activeChat 
-    ? messages.filter(message => 
-        (message.userId === user?.id && message.chatWithUserId === activeChat.id) ||
-        (message.userId === activeChat.id && (!message.chatWithUserId || message.chatWithUserId === user?.id))
-      )
+  const filteredMessages = activeChat
+    ? messages.filter(message =>
+      (message.userId === user?.id && message.chatWithUserId === activeChat.id) ||
+      (message.userId === activeChat.id && (!message.chatWithUserId || message.chatWithUserId === user?.id))
+    )
     : [];
 
   return (
     <div className="flex h-full relative bg-gradient-to-br from-background to-secondary/10">
-      <ChatSidebar 
-        users={users} 
+      <ChatSidebar
+        users={users}
         onUserClick={handleUserClick}
         activeChat={activeChat}
       />
       <div className="flex-1 flex flex-col h-full border-l border-r border-border/30 bg-background/90 backdrop-blur-sm relative z-10">
-        <ChatHeader 
-          users={users} 
+        <ChatHeader
+          users={users}
           activeChat={activeChat}
           onVoiceCall={handleVoiceCall}
           onVideoCall={handleVideoCall}
         />
-        
+
         {activeChat ? (
           <>
             <ScrollArea className="flex-1">
-              <MessageList 
-                messages={filteredMessages} 
-                users={users} 
+              <MessageList
+                messages={filteredMessages}
+                users={users}
                 currentUserId={user?.id}
                 onUserAvatarClick={handleUserAvatarClick}
                 onDeleteMessage={handleDeleteMessage}
@@ -228,9 +240,9 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
               />
             </ScrollArea>
             <div className="flex-shrink-0 border-t border-border/30 bg-background/50 backdrop-blur-sm">
-              <MessageInput 
-                onSendMessage={handleSendMessage} 
-                currentUser={user || { id: "current-user", name: "You", avatar: "", isOnline: true }}
+              <MessageInput
+                onSendMessage={handleSendMessage}
+                currentUser={user || { id: "current-user", name: "You", avatar: "", isOnline: true, isAdmin: false }}
                 replyTo={replyTo || undefined}
                 onCancelReply={handleCancelReply}
               />
@@ -248,11 +260,11 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
           </div>
         )}
       </div>
-      
+
       {showUserInfo && selectedUser && (
         <UserInfo user={selectedUser} onClose={handleCloseUserInfo} />
       )}
-      
+
       <AlertDialog open={messageToDelete !== null} onOpenChange={(open) => !open && setMessageToDelete(null)}>
         <AlertDialogContent className="bg-background border border-border">
           <AlertDialogHeader>
@@ -268,8 +280,8 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
             }}>
               Cancel
             </AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmDeleteMessage} 
+            <AlertDialogAction
+              onClick={confirmDeleteMessage}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete
@@ -277,14 +289,14 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
+
       <Dialog open={messageToEdit !== null} onOpenChange={(open) => !open && setMessageToEdit(null)}>
         <DialogContent className="bg-background border border-border">
           <DialogHeader>
             <DialogTitle>Edit message</DialogTitle>
           </DialogHeader>
-          <Textarea 
-            value={editedContent} 
+          <Textarea
+            value={editedContent}
             onChange={(e) => {
               console.log("Edit content changed:", e.target.value);
               setEditedContent(e.target.value);
@@ -293,8 +305,8 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
             placeholder="Edit your message..."
           />
           <DialogFooter>
-            <Button type="button" 
-              variant="outline" 
+            <Button type="button"
+              variant="outline"
               onClick={() => {
                 console.log("Edit cancelled");
                 setMessageToEdit(null);
@@ -302,7 +314,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
             >
               Cancel
             </Button>
-            <Button type="button" 
+            <Button type="button"
               onClick={confirmEditMessage}
               disabled={!editedContent.trim()}
               className="bg-primary hover:bg-primary/90"
