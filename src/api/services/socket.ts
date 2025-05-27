@@ -36,7 +36,7 @@ class SocketService {
         // Dispatch to store or set state here
     }
 
-    public sendMessage(content: string, receiver: string, sender: string) {
+    public sendMessage(content: string, receiver: number, sender: number) {
         const payload = { content, receiver, type: 'CHAT', sender };
         this.stompClient.publish({
             destination: '/app/chat.sendMessage',

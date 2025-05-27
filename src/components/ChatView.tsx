@@ -13,7 +13,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
-import { ChatMessage } from "@/api"
 import { socketService } from "@/api/services/socket"
 import { getMessages } from "@/api/services/messages"
 
@@ -37,17 +36,22 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
 
   useEffect(() => {
     const loadMessages = async () => {
-      const data = await getMessages(user.id, activeChat.id)
-      setMessages(data)
+
+      if (!user || !activeChat) return toast({
+        title: "Error",
+        description: "Please select a chat first",
+        variant: "destructive"
+      })
+      const response = await getMessages(user.id, activeChat.id)
+      console.log("Loaded messages:", response)
+      setMessages(response)
     }
     loadMessages()
-  }, [activeChat.id, user.id])
+  }, [activeChat, user])
 
 
   useEffect(() => {
     socketService.connect()
-
-
     return () => {
       socketService.disconnect()
     }
@@ -66,10 +70,10 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
     console.log("Sending message:", content, "to user:", activeChat.name, "reply:", replyData)
     const newMessage: Message = {
       id: `m${Date.now()}`,
-      userId: user.id,
+      senderId: user.id,
       content: content,
       timestamp: new Date(),
-      chatWithUserId: activeChat.id,
+      receiverId: activeChat.id,
       type: "text",
       replyTo: replyData,
       reactions: []
@@ -80,6 +84,8 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
       title: "Message sent",
       description: `Message sent to ${activeChat.name}`,
     })
+    setReplyTo(null)  
+    setEditedContent("") // Clear edited content after sending
     socketService.sendMessage(newMessage.content, activeChat.id, user.id)
   }
 
@@ -170,7 +176,8 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
     setMessages(messages.map(message => {
       if (message.id === messageId) {
         const reactions = message.reactions || []
-        const existingReaction = reactions.find(r => r.userId === user?.id && r.emoji === emoji)
+        const currentUserId = String(user?.id ?? "current-user")
+        const existingReaction = reactions.find(r => String(r.userId) === currentUserId && r.emoji === emoji)
 
         if (existingReaction) {
           return {
@@ -181,7 +188,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
           const newReaction = {
             id: `r${Date.now()}`,
             emoji,
-            userId: user?.id || "current-user",
+            userId: currentUserId,
             userName: user?.name || "You"
           }
           return {
@@ -215,8 +222,8 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
 
   const filteredMessages = activeChat
     ? messages.filter(message =>
-      (message.userId === user?.id && message.chatWithUserId === activeChat.id) ||
-      (message.userId === activeChat.id && (!message.chatWithUserId || message.chatWithUserId === user?.id))
+      (message.senderId === user?.id && message.receiverId === activeChat.id) ||
+      (message.senderId === activeChat.id && (!message.receiverId || message.receiverId === user?.id))
     )
     : []
 
@@ -252,7 +259,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
             <div className="flex-shrink-0 border-t border-border/30 bg-background/50 backdrop-blur-sm">
               <MessageInput
                 onSendMessage={handleSendMessage}
-                currentUser={user || { id: "current-user", name: "You", avatar: "", isOnline: true, isAdmin: false }}
+                currentUser={user || { id: 0, name: "You", avatar: "", isOnline: true, isAdmin: false }}
                 replyTo={replyTo || undefined}
                 onCancelReply={handleCancelReply}
               />

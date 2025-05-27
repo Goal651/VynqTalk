@@ -1,26 +1,22 @@
+import { Message } from "@/types";
 import { apiClient } from "../client";
 
-export const sendMessage = async (message: {
-    conversationId: string;
-    senderId: string;
-    content: string;
-}) => {
-    const response = await apiClient.post('/', message);
+
+// Get messages between two users
+export const getMessages = async (senderId: number, receiverId: number) => {
+    const response = await apiClient.get<Message[]>(`/messages/conv/${senderId}/${receiverId}`);
     return response.data;
 };
 
-export const getMessages = async (senderId:string, receiverId:string) => {
-    const response = await axios.get(`${API_BASE}/conv/${senderId}/${receiverId}`);
-    return response.data;
-};
-
+// Update a message by ID
 export const updateMessage = async (messageId: string, updatedContent: string) => {
-    const response = await axios.put(`${API_BASE}/${messageId}`, {
+    const response = await apiClient.put(`/${messageId}`, {
         content: updatedContent,
     });
     return response.data;
 };
 
+// Delete a message by ID
 export const deleteMessage = async (messageId: string) => {
-    await axios.delete(`${API_BASE}/${messageId}`);
+    await apiClient.delete(`/${messageId}`);
 };

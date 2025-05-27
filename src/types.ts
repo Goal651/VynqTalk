@@ -1,5 +1,5 @@
 export interface User {
-  id: string;
+  id: number ; // Changed to BigInteger for compatibility with GroupChat
   name: string;
   email?: string;
   avatar: string;
@@ -9,12 +9,11 @@ export interface User {
 
 export interface Message {
   id: string;
-  userId: string;
+  receiverId:number ;
   content: string;
   timestamp: Date;
-  isEdited?: boolean;
-  chatWithUserId?: string;
-  senderId?: string; // Added for compatibility with GroupChat
+  edited?: boolean;
+  senderId?:  number ; // Added for compatibility with GroupChat
   type: "text" | "image" | "audio" | "file"; // Added message types
   reactions?: Reaction[];
   replyTo?: {

@@ -21,7 +21,7 @@ interface MessageBubbleProps {
   onEditMessage?: () => void;
   onReplyMessage?: (message: Message) => void;
   onReactToMessage?: (messageId: string, emoji: string) => void;
-  currentUserId?: string;
+  currentUserId?: number;
 }
 
 export const MessageBubble = ({ 
@@ -32,7 +32,7 @@ export const MessageBubble = ({
   onEditMessage,
   onReplyMessage,
   onReactToMessage,
-  currentUserId = "current-user"
+  currentUserId = 0
 }: MessageBubbleProps) => {
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const isCurrentUser = user.id === currentUserId;
@@ -124,7 +124,7 @@ export const MessageBubble = ({
           }`}
         >
           {formattedTime}
-          {message.isEdited && (
+          {message.edited && (
             <span className="ml-1 italic">(edited)</span>
           )}
         </div>
