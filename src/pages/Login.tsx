@@ -41,21 +41,21 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-secondary/10 to-primary/5 p-4 relative overflow-hidden">
-      {/* Background decoration */}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4 relative overflow-hidden">
+      {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/3 left-1/4 w-32 h-32 bg-accent/20 rounded-full blur-2xl"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/3 left-1/4 w-32 h-32 bg-accent/10 rounded-full blur-2xl"></div>
       </div>
       
-      <Card className="w-full max-w-md bg-background/90 backdrop-blur-xl border-border/50 shadow-2xl animate-fade-in relative z-10">
+      <Card className="w-full max-w-md bg-card border border-border shadow-2xl animate-fade-in relative z-10">
         <CardHeader className="space-y-4 text-center pb-6">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-primary/70 rounded-2xl flex items-center justify-center shadow-lg">
+          <div className="mx-auto w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
             <MessageSquare className="h-8 w-8 text-primary-foreground" />
           </div>
           <div>
-            <CardTitle className="text-3xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+            <CardTitle className="text-3xl font-bold tracking-tight">
               Welcome back
             </CardTitle>
             <CardDescription className="text-muted-foreground mt-2">
@@ -79,7 +79,7 @@ const Login = () => {
                         <Input 
                           placeholder="your.email@example.com" 
                           {...field} 
-                          className="pl-10 bg-background/50 border-border/50 focus:border-primary/50 transition-colors"
+                          className="pl-10 bg-background border-border focus:border-primary transition-colors"
                         />
                       </div>
                     </FormControl>
@@ -101,13 +101,13 @@ const Login = () => {
                           type={showPassword ? "text" : "password"} 
                           placeholder="••••••••" 
                           {...field} 
-                          className="pl-10 pr-10 bg-background/50 border-border/50 focus:border-primary/50 transition-colors"
+                          className="pl-10 pr-10 bg-background border-border focus:border-primary transition-colors"
                         />
                         <Button
                           type="button"
                           variant="ghost"
                           size="sm"
-                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-muted/50"
                           onClick={() => setShowPassword(!showPassword)}
                         >
                           {showPassword ? (
@@ -125,7 +125,7 @@ const Login = () => {
               
               <Button 
                 type="submit" 
-                className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-medium py-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl" 
+                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl" 
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -152,7 +152,7 @@ const Login = () => {
             </Link>
           </div>
           
-          <div className="w-full p-3 bg-muted/50 rounded-lg border border-border/30">
+          <div className="w-full p-3 bg-muted rounded-lg border border-border">
             <p className="text-xs text-muted-foreground text-center font-medium">
               Demo credentials
             </p>
