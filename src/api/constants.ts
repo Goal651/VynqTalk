@@ -21,6 +21,10 @@ export const API_ENDPOINTS = {
     UPDATE_PROFILE: '/user/profile',
     UPLOAD_AVATAR: '/user/avatar',
   },
+  USERS: {
+    ALL: '/users',
+    BY_ID: (id: number | string) => `/users/${id}`,
+  },
   CHAT: {
     MESSAGES: '/chat/messages',
     SEND_MESSAGE: '/chat/send',

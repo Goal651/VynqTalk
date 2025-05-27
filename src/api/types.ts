@@ -1,6 +1,7 @@
 
 // Base API Response Types
 export interface ApiResponse<T = any> {
+  users(users: any): unknown;
   success: boolean;
   data?: T;
   message?: string;

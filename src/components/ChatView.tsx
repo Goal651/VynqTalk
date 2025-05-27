@@ -19,13 +19,13 @@ import { socketService } from "@/api/services/socket";
 interface ChatViewProps {
   onMessageDelete?: (messageId: string) => void;
   onMessageEdit?: (message: Message) => void;
+  users?: User[];
 }
 
-export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
+export const ChatView = ({ onMessageDelete, onMessageEdit,users }: ChatViewProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>(mockMessages);
-  const [users] = useState<User[]>(mockUsers);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showUserInfo, setShowUserInfo] = useState(false);
   const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
@@ -70,7 +70,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit }: ChatViewProps) => {
       title: "Message sent",
       description: `Message sent to ${activeChat.name}`,
     });
-    socketService.sendMessage(newMessage.content, user.id);
+    socketService.sendMessage(newMessage.content, activeChat.id,user.id);
   };
 
   const handleUserClick = (clickedUser: User) => {

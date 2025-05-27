@@ -10,6 +10,8 @@ export const Chat = () => {
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [users] = useState<User[]>(mockUsers);
 
+ 
+
   const handleSendMessage = (content: string) => {
     console.log("Sending message:", content);
     const newMessage: Message = {
@@ -29,7 +31,7 @@ export const Chat = () => {
 
   const handleMessageEdit = (message: Message) => {
     console.log("Editing message:", message.id);
-    setMessages(messages.map(msg => 
+    setMessages(messages.map(msg =>
       msg.id === message.id ? message : msg
     ));
   };
@@ -37,9 +39,9 @@ export const Chat = () => {
   return (
     <div className="flex flex-col h-screen bg-background">
       <ChatHeader users={users} />
-      <MessageList 
-        messages={messages} 
-        users={users} 
+      <MessageList
+        messages={messages}
+        users={users}
         onDeleteMessage={handleMessageDelete}
         onEditMessage={handleMessageEdit}
       />

@@ -6,25 +6,29 @@ export const mockUsers: User[] = [
     id: "u1",
     name: "Alex Johnson",
     avatar: "https://ui-avatars.com/api/?name=Alex+Johnson&background=random",
-    isOnline: true
+    isOnline: true,
+    isAdmin: false
   },
   {
     id: "u2",
     name: "Jamie Smith",
     avatar: "https://ui-avatars.com/api/?name=Jamie+Smith&background=random",
-    isOnline: true
+    isOnline: true,
+    isAdmin: false
   },
   {
     id: "u3",
     name: "Taylor Brown",
     avatar: "https://ui-avatars.com/api/?name=Taylor+Brown&background=random",
-    isOnline: false
+    isOnline: false,
+    isAdmin: false
   },
   {
     id: "u4",
     name: "Casey Wilson",
     avatar: "https://ui-avatars.com/api/?name=Casey+Wilson&background=random",
-    isOnline: true
+    isOnline: true,
+    isAdmin: false
   },
 ];
 
