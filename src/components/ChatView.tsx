@@ -1,47 +1,57 @@
-import { useEffect, useState } from "react";
-import { User, Message } from "../types";
-import { ChatSidebar } from "./ChatSidebar";
-import { MessageList } from "./MessageList";
-import { MessageInput } from "./MessageInput";
-import { ChatHeader } from "./ChatHeader";
-import { mockMessages, mockUsers } from "../data/mockData";
-import { UserInfo } from "./UserInfo";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { useAuth } from "@/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
-import { ChatMessage } from "@/api";
-import { socketService } from "@/api/services/socket";
+import { useEffect, useState } from "react"
+import { User, Message } from "../types"
+import { ChatSidebar } from "./ChatSidebar"
+import { MessageList } from "./MessageList"
+import { MessageInput } from "./MessageInput"
+import { ChatHeader } from "./ChatHeader"
+import { mockMessages, mockUsers } from "../data/mockData"
+import { UserInfo } from "./UserInfo"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { useAuth } from "@/contexts/AuthContext"
+import { useToast } from "@/hooks/use-toast"
+import { ChatMessage } from "@/api"
+import { socketService } from "@/api/services/socket"
+import { getMessages } from "@/api/services/messages"
 
 interface ChatViewProps {
-  onMessageDelete?: (messageId: string) => void;
-  onMessageEdit?: (message: Message) => void;
-  users?: User[];
+  onMessageDelete?: (messageId: string) => void
+  onMessageEdit?: (message: Message) => void
+  users?: User[]
 }
 
-export const ChatView = ({ onMessageDelete, onMessageEdit,users }: ChatViewProps) => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [showUserInfo, setShowUserInfo] = useState(false);
-  const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
-  const [messageToEdit, setMessageToEdit] = useState<Message | null>(null);
-  const [editedContent, setEditedContent] = useState("");
-  const [activeChat, setActiveChat] = useState<User | null>(null);
-  const [replyTo, setReplyTo] = useState<Message | null>(null);
+export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProps) => {
+  const { user } = useAuth()
+  const { toast } = useToast()
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [showUserInfo, setShowUserInfo] = useState(false)
+  const [messageToDelete, setMessageToDelete] = useState<string | null>(null)
+  const [messageToEdit, setMessageToEdit] = useState<Message | null>(null)
+  const [editedContent, setEditedContent] = useState("")
+  const [activeChat, setActiveChat] = useState<User | null>(null)
+  const [replyTo, setReplyTo] = useState<Message | null>(null)
+  const [messages, setMessages] = useState<Message[]>([])
 
   useEffect(() => {
-    socketService.connect();
+    const loadMessages = async () => {
+      const data = await getMessages(user.id, activeChat.id)
+      setMessages(data)
+    }
+    loadMessages()
+  }, [activeChat.id, user.id])
+
+
+  useEffect(() => {
+    socketService.connect()
 
 
     return () => {
-      socketService.disconnect();
-    };
-  }, []);
+      socketService.disconnect()
+    }
+  }, [])
 
   const handleSendMessage = (content: string, replyData?: Message["replyTo"]) => {
     if (!user || !activeChat) {
@@ -49,11 +59,11 @@ export const ChatView = ({ onMessageDelete, onMessageEdit,users }: ChatViewProps
         title: "Error",
         description: "Please select a chat first",
         variant: "destructive"
-      });
-      return;
+      })
+      return
     }
 
-    console.log("Sending message:", content, "to user:", activeChat.name, "reply:", replyData);
+    console.log("Sending message:", content, "to user:", activeChat.name, "reply:", replyData)
     const newMessage: Message = {
       id: `m${Date.now()}`,
       userId: user.id,
@@ -63,152 +73,152 @@ export const ChatView = ({ onMessageDelete, onMessageEdit,users }: ChatViewProps
       type: "text",
       replyTo: replyData,
       reactions: []
-    };
-    setMessages([...messages, newMessage]);
+    }
+    setMessages([...messages, newMessage])
 
     toast({
       title: "Message sent",
       description: `Message sent to ${activeChat.name}`,
-    });
-    socketService.sendMessage(newMessage.content, activeChat.id,user.id);
-  };
+    })
+    socketService.sendMessage(newMessage.content, activeChat.id, user.id)
+  }
 
   const handleUserClick = (clickedUser: User) => {
-    console.log("User clicked:", clickedUser.name);
-    setActiveChat(clickedUser);
-    setShowUserInfo(false);
-    setReplyTo(null);
+    console.log("User clicked:", clickedUser.name)
+    setActiveChat(clickedUser)
+    setShowUserInfo(false)
+    setReplyTo(null)
 
     toast({
       title: "Chat opened",
       description: `Now chatting with ${clickedUser.name}`,
-    });
-  };
+    })
+  }
 
   const handleUserAvatarClick = (clickedUser: User) => {
-    console.log("User avatar clicked:", clickedUser.name);
-    setSelectedUser(clickedUser);
-    setShowUserInfo(true);
-  };
+    console.log("User avatar clicked:", clickedUser.name)
+    setSelectedUser(clickedUser)
+    setShowUserInfo(true)
+  }
 
   const handleCloseUserInfo = () => {
-    console.log("Closing user info");
-    setShowUserInfo(false);
-  };
+    console.log("Closing user info")
+    setShowUserInfo(false)
+  }
 
   const handleDeleteMessage = (messageId: string) => {
-    console.log("Delete message requested:", messageId);
-    setMessageToDelete(messageId);
-  };
+    console.log("Delete message requested:", messageId)
+    setMessageToDelete(messageId)
+  }
 
   const confirmDeleteMessage = () => {
     if (messageToDelete) {
-      console.log("Confirming delete message:", messageToDelete);
-      setMessages(messages.filter(message => message.id !== messageToDelete));
-      if (onMessageDelete) onMessageDelete(messageToDelete);
-      setMessageToDelete(null);
+      console.log("Confirming delete message:", messageToDelete)
+      setMessages(messages.filter(message => message.id !== messageToDelete))
+      if (onMessageDelete) onMessageDelete(messageToDelete)
+      setMessageToDelete(null)
 
       toast({
         title: "Message deleted",
         description: "Message has been removed",
-      });
+      })
     }
-  };
+  }
 
   const handleEditMessage = (message: Message) => {
-    console.log("Edit message requested:", message.id);
-    setMessageToEdit(message);
-    setEditedContent(message.content);
-    if (onMessageEdit) onMessageEdit(message);
-  };
+    console.log("Edit message requested:", message.id)
+    setMessageToEdit(message)
+    setEditedContent(message.content)
+    if (onMessageEdit) onMessageEdit(message)
+  }
 
   const confirmEditMessage = () => {
     if (messageToEdit) {
-      console.log("Confirming edit message:", messageToEdit.id, "new content:", editedContent);
+      console.log("Confirming edit message:", messageToEdit.id, "new content:", editedContent)
       setMessages(messages.map(message =>
         message.id === messageToEdit.id
           ? { ...message, content: editedContent, isEdited: true }
           : message
-      ));
-      setMessageToEdit(null);
+      ))
+      setMessageToEdit(null)
 
       toast({
         title: "Message edited",
         description: "Message has been updated",
-      });
+      })
     }
-  };
+  }
 
   const handleReplyMessage = (message: Message) => {
-    console.log("Reply to message requested:", message.id);
-    setReplyTo(message);
+    console.log("Reply to message requested:", message.id)
+    setReplyTo(message)
 
     toast({
       title: "Replying to message",
       description: "Type your reply below",
-    });
-  };
+    })
+  }
 
   const handleCancelReply = () => {
-    console.log("Cancel reply");
-    setReplyTo(null);
-  };
+    console.log("Cancel reply")
+    setReplyTo(null)
+  }
 
   const handleReactToMessage = (messageId: string, emoji: string) => {
-    console.log("React to message:", messageId, "with emoji:", emoji);
+    console.log("React to message:", messageId, "with emoji:", emoji)
 
     setMessages(messages.map(message => {
       if (message.id === messageId) {
-        const reactions = message.reactions || [];
-        const existingReaction = reactions.find(r => r.userId === user?.id && r.emoji === emoji);
+        const reactions = message.reactions || []
+        const existingReaction = reactions.find(r => r.userId === user?.id && r.emoji === emoji)
 
         if (existingReaction) {
           return {
             ...message,
             reactions: reactions.filter(r => r.id !== existingReaction.id)
-          };
+          }
         } else {
           const newReaction = {
             id: `r${Date.now()}`,
             emoji,
             userId: user?.id || "current-user",
             userName: user?.name || "You"
-          };
+          }
           return {
             ...message,
             reactions: [...reactions, newReaction]
-          };
+          }
         }
       }
-      return message;
-    }));
+      return message
+    }))
 
     toast({
       title: "Reaction added",
       description: `Reacted with ${emoji}`,
-    });
-  };
+    })
+  }
 
   const handleVoiceCall = () => {
     toast({
       title: "Voice call started",
       description: `Calling ${activeChat?.name}...`,
-    });
-  };
+    })
+  }
 
   const handleVideoCall = () => {
     toast({
       title: "Video call started",
       description: `Video calling ${activeChat?.name}...`,
-    });
-  };
+    })
+  }
 
   const filteredMessages = activeChat
     ? messages.filter(message =>
       (message.userId === user?.id && message.chatWithUserId === activeChat.id) ||
       (message.userId === activeChat.id && (!message.chatWithUserId || message.chatWithUserId === user?.id))
     )
-    : [];
+    : []
 
   return (
     <div className="flex h-full relative bg-gradient-to-br from-background to-secondary/10">
@@ -275,8 +285,8 @@ export const ChatView = ({ onMessageDelete, onMessageEdit,users }: ChatViewProps
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => {
-              console.log("Delete cancelled");
-              setMessageToDelete(null);
+              console.log("Delete cancelled")
+              setMessageToDelete(null)
             }}>
               Cancel
             </AlertDialogCancel>
@@ -298,8 +308,8 @@ export const ChatView = ({ onMessageDelete, onMessageEdit,users }: ChatViewProps
           <Textarea
             value={editedContent}
             onChange={(e) => {
-              console.log("Edit content changed:", e.target.value);
-              setEditedContent(e.target.value);
+              console.log("Edit content changed:", e.target.value)
+              setEditedContent(e.target.value)
             }}
             className="min-h-[100px] bg-background/50 border-border/50 focus:border-primary/50"
             placeholder="Edit your message..."
@@ -308,8 +318,8 @@ export const ChatView = ({ onMessageDelete, onMessageEdit,users }: ChatViewProps
             <Button type="button"
               variant="outline"
               onClick={() => {
-                console.log("Edit cancelled");
-                setMessageToEdit(null);
+                console.log("Edit cancelled")
+                setMessageToEdit(null)
               }}
             >
               Cancel
@@ -325,5 +335,5 @@ export const ChatView = ({ onMessageDelete, onMessageEdit,users }: ChatViewProps
         </DialogContent>
       </Dialog>
     </div>
-  );
-};
+  )
+}

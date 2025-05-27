@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Message, User } from "@/types"
 import { useAuth } from "@/contexts/AuthContext"
 import { userService } from "@/api/services/users"
+import { getMessages } from "@/api/services/messages"
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<"chat" | "group" | "settings" | "notifications" | "admin">("chat")
