@@ -4,6 +4,7 @@ export interface User {
   email?: string;
   avatar: string;
   isOnline: boolean;
+  role?: string; // Added role field for admin access control
 }
 
 export interface Message {
