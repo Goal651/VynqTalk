@@ -31,6 +31,7 @@ export interface SignupRequest {
 }
 
 export interface AuthResponse {
+  accessToken: string;
   user: {
     id: string;
     name: string;
@@ -40,12 +41,7 @@ export interface AuthResponse {
     emailVerified: boolean;
     createdAt: string;
     updatedAt: string;
-  };
-  tokens: {
-    accessToken: string;
-    refreshToken: string;
-    expiresIn: number;
-  };
+  }
 }
 
 export interface RefreshTokenRequest {

@@ -20,8 +20,7 @@ export class AuthService {
 
     if (response.success && response.data) {
       // Store tokens in localStorage
-      localStorage.setItem('access_token', response.data.tokens.accessToken);
-      localStorage.setItem('refresh_token', response.data.tokens.refreshToken);
+      localStorage.setItem('access_token', response.data.accessToken);
       localStorage.setItem('lavable-user', JSON.stringify(response.data.user));
     }
 
@@ -36,8 +35,7 @@ export class AuthService {
 
     if (response.success && response.data) {
       // Store tokens in localStorage
-      localStorage.setItem('access_token', response.data.tokens.accessToken);
-      localStorage.setItem('refresh_token', response.data.tokens.refreshToken);
+      localStorage.setItem('access_token', response.data.accessToken);
       localStorage.setItem('lavable-user', JSON.stringify(response.data.user));
     }
 
@@ -74,8 +72,7 @@ export class AuthService {
     );
 
     if (response.success && response.data) {
-      localStorage.setItem('access_token', response.data.tokens.accessToken);
-      localStorage.setItem('refresh_token', response.data.tokens.refreshToken);
+      localStorage.setItem('access_token', response.data.accessToken);
       localStorage.setItem('lavable-user', JSON.stringify(response.data.user));
     }
 
