@@ -70,6 +70,72 @@
     --ring: 317 100% 54%;
   }
   
+  [data-theme="neon"] {
+    --background: 300 20% 7%;
+    --foreground: 310 100% 90%;
+    --card: 300 20% 10%;
+    --card-foreground: 310 100% 90%;
+    --popover: 300 20% 10%;
+    --popover-foreground: 310 100% 90%;
+    --primary: 315 100% 60%;
+    --primary-foreground: 300 20% 7%;
+    --secondary: 270 100% 65%;
+    --secondary-foreground: 300 20% 7%;
+    --muted: 300 20% 15%;
+    --muted-foreground: 310 50% 70%;
+    --accent: 195 100% 65%;
+    --accent-foreground: 300 20% 7%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 300 20% 18%;
+    --input: 300 20% 18%;
+    --ring: 315 100% 60%;
+  }
+  
+  [data-theme="ocean"] {
+    --background: 200 40% 8%;
+    --foreground: 180 100% 90%;
+    --card: 200 40% 12%;
+    --card-foreground: 180 100% 90%;
+    --popover: 200 40% 12%;
+    --popover-foreground: 180 100% 90%;
+    --primary: 190 100% 50%;
+    --primary-foreground: 200 40% 8%;
+    --secondary: 210 100% 45%;
+    --secondary-foreground: 200 40% 8%;
+    --muted: 200 40% 15%;
+    --muted-foreground: 180 50% 70%;
+    --accent: 160 100% 50%;
+    --accent-foreground: 200 40% 8%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 200 40% 18%;
+    --input: 200 40% 18%;
+    --ring: 190 100% 50%;
+  }
+  
+  [data-theme="sunset"] {
+    --background: 25 30% 8%;
+    --foreground: 50 100% 90%;
+    --card: 25 30% 12%;
+    --card-foreground: 50 100% 90%;
+    --popover: 25 30% 12%;
+    --popover-foreground: 50 100% 90%;
+    --primary: 15 100% 60%;
+    --primary-foreground: 25 30% 8%;
+    --secondary: 35 100% 55%;
+    --secondary-foreground: 25 30% 8%;
+    --muted: 25 30% 15%;
+    --muted-foreground: 50 50% 70%;
+    --accent: 45 100% 65%;
+    --accent-foreground: 25 30% 8%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 25 30% 18%;
+    --input: 25 30% 18%;
+    --ring: 15 100% 60%;
+  }
+  
   :root {
     --radius: 0.5rem;
     --sidebar-background: var(--card);

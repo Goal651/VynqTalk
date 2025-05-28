@@ -97,6 +97,10 @@ export default {
           '0%': { transform: 'translateX(0) translateZ(0) scaleY(1)' },
           '50%': { transform: 'translateX(-25%) translateZ(0) scaleY(0.55)' },
           '100%': { transform: 'translateX(-50%) translateZ(0) scaleY(1)' }
+        },
+        'glow': {
+          '0%, 100%': { boxShadow: '0 0 5px hsl(var(--primary))' },
+          '50%': { boxShadow: '0 0 20px hsl(var(--primary)), 0 0 30px hsl(var(--primary))' }
         }
       },
       animation: {
@@ -106,7 +110,8 @@ export default {
         'slide-in': 'slide-in 0.3s ease-out',
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'float': 'float 6s ease-in-out infinite',
-        'wave': 'wave 25s -5s linear infinite'
+        'wave': 'wave 25s -5s linear infinite',
+        'glow': 'glow 2s ease-in-out infinite alternate'
       }
     }
   },
@@ -115,6 +120,6 @@ export default {
     require("daisyui")
   ],
   daisyui: {
-    themes: ["blue", "dark", "cyberpunk"],
+    themes: ["blue", "dark", "cyberpunk", "neon", "ocean", "sunset"],
   },
 } satisfies Config;
