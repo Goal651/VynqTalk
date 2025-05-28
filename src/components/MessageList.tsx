@@ -7,11 +7,11 @@ interface MessageListProps {
   messages: Message[];
   users: User[];
   onUserAvatarClick?: (user: User) => void;
-  onDeleteMessage?: (messageId: string) => void;
+  onDeleteMessage?: (messageId: number) => void;
   onEditMessage?: (message: Message) => void;
   onReplyMessage?: (message: Message) => void;
-  onReactToMessage?: (messageId: string, emoji: string) => void;
-  currentUserId?: string;
+  onReactToMessage?: (messageId: number, emoji: string) => void;
+  currentUserId?: number;
 }
 
 export const MessageList = ({
@@ -22,7 +22,7 @@ export const MessageList = ({
   onEditMessage,
   onReplyMessage,
   onReactToMessage,
-  currentUserId = "u1"
+  currentUserId = 1
 }: MessageListProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 

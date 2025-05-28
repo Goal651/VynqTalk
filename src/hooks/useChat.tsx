@@ -18,12 +18,12 @@ export const useChat = () => {
   useEffect(() => {
     const loadMessages = async () => {
       if (!user || !activeChat) return;
-      
+
       try {
         const response = await messageService.getMessages(String(user.id), String(activeChat.id));
-        console.log("Loaded messages:", response);
         if (response.success && response.data) {
           setMessages(response.data);
+          console.log("Loaded messages:", response);
         }
       } catch (error) {
         console.error("Failed to load messages:", error);
@@ -56,10 +56,10 @@ export const useChat = () => {
 
     console.log("Sending message:", content, "to user:", activeChat.name, "reply:", replyData);
     const newMessage: Message = {
-      id: `m${Date.now()}`,
+      id: Date.now(),
       senderId: user.id,
       content: content,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       receiverId: activeChat.id,
       type: "text",
       replyTo: replyData,
@@ -113,13 +113,13 @@ export const useChat = () => {
     setReplyTo(null);
   };
 
-  const handleReactToMessage = (messageId: string, emoji: string) => {
+  const handleReactToMessage = (messageId: number, emoji: string) => {
     console.log("React to message:", messageId, "with emoji:", emoji);
 
     setMessages(messages.map(message => {
       if (message.id === messageId) {
         const reactions = message.reactions || [];
-        const currentUserId = user?.id ?? "current-user";
+        const currentUserId = user?.id ?? 1;
         const existingReaction = reactions.find(r => r.userId === currentUserId && r.emoji === emoji);
 
         if (existingReaction) {
@@ -129,7 +129,7 @@ export const useChat = () => {
           };
         } else {
           const newReaction = {
-            id: `r${Date.now()}`,
+            id: Date.now(),
             emoji,
             userId: currentUserId,
             userName: user?.name || "You"
@@ -151,9 +151,9 @@ export const useChat = () => {
 
   const filteredMessages = activeChat
     ? messages.filter(message =>
-        (message.senderId === user?.id && message.receiverId === activeChat.id) ||
-        (message.senderId === activeChat.id && (!message.receiverId || message.receiverId === user?.id))
-      )
+      (message.senderId === user?.id && message.receiverId === activeChat.id) ||
+      (message.senderId === activeChat.id && (!message.receiverId || message.receiverId === user?.id))
+    )
     : [];
 
   return {

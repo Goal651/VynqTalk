@@ -2,10 +2,10 @@
 import { formatDistanceToNow } from "date-fns";
 import { Message, User, Reaction } from "../types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  ContextMenu, 
-  ContextMenuContent, 
-  ContextMenuItem, 
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
   ContextMenuTrigger,
   ContextMenuSeparator
 } from "@/components/ui/context-menu";
@@ -20,19 +20,19 @@ interface MessageBubbleProps {
   onDeleteMessage?: () => void;
   onEditMessage?: () => void;
   onReplyMessage?: (message: Message) => void;
-  onReactToMessage?: (messageId: string, emoji: string) => void;
-  currentUserId?: string;
+  onReactToMessage?: (messageId: number, emoji: string) => void;
+  currentUserId?: number;
 }
 
-export const MessageBubble = ({ 
-  message, 
-  user, 
-  onUserAvatarClick, 
+export const MessageBubble = ({
+  message,
+  user,
+  onUserAvatarClick,
   onDeleteMessage,
   onEditMessage,
   onReplyMessage,
   onReactToMessage,
-  currentUserId = "u1"
+  currentUserId = 1
 }: MessageBubbleProps) => {
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const isCurrentUser = user.id === currentUserId;
@@ -95,9 +95,8 @@ export const MessageBubble = ({
   const messageBubble = (
     <div className="relative">
       {message.replyTo && (
-        <div className={`mb-2 p-2 rounded-md bg-muted/50 border-l-2 border-primary text-sm ${
-          isCurrentUser ? "mr-4" : "ml-4"
-        }`}>
+        <div className={`mb-2 p-2 rounded-md bg-muted/50 border-l-2 border-primary text-sm ${isCurrentUser ? "mr-4" : "ml-4"
+          }`}>
           <div className="font-medium text-muted-foreground">
             Replying to {message.replyTo.userName}
           </div>
@@ -106,22 +105,20 @@ export const MessageBubble = ({
           </div>
         </div>
       )}
-      
+
       <div
-        className={`rounded-lg p-3 max-w-[80%] transition-all hover:shadow-md cursor-pointer select-text ${
-          isCurrentUser
+        className={`rounded-lg p-3 max-w-[80%] transition-all hover:shadow-md cursor-pointer select-text ${isCurrentUser
             ? "bg-primary text-primary-foreground"
             : "bg-muted text-foreground"
-        }`}
+          }`}
       >
         {!isCurrentUser && (
           <div className="font-semibold text-sm mb-1">{user.name}</div>
         )}
         <div className="break-words whitespace-pre-wrap">{message.content}</div>
         <div
-          className={`text-xs mt-1 ${
-            isCurrentUser ? "text-primary-foreground/70" : "text-muted-foreground"
-          }`}
+          className={`text-xs mt-1 ${isCurrentUser ? "text-primary-foreground/70" : "text-muted-foreground"
+            }`}
         >
           {formattedTime}
           {message.edited && (
@@ -155,9 +152,8 @@ export const MessageBubble = ({
       )}
 
       {showReactionPicker && (
-        <div className={`absolute top-full mt-1 z-50 bg-popover border border-border rounded-md shadow-lg p-2 ${
-          isCurrentUser ? "right-0" : "left-0"
-        }`}>
+        <div className={`absolute top-full mt-1 z-50 bg-popover border border-border rounded-md shadow-lg p-2 ${isCurrentUser ? "right-0" : "left-0"
+          }`}>
           <div className="flex gap-1">
             {reactionEmojis.map((emoji) => (
               <Button
@@ -178,11 +174,10 @@ export const MessageBubble = ({
 
   return (
     <div
-      className={`flex items-start gap-2 animate-fade-in ${
-        isCurrentUser ? "flex-row-reverse" : "flex-row"
-      }`}
+      className={`flex items-start gap-2 animate-fade-in ${isCurrentUser ? "flex-row-reverse" : "flex-row"
+        }`}
     >
-      <Avatar 
+      <Avatar
         className={`cursor-pointer hover:scale-105 transition-transform ${user.isOnline ? "ring-2 ring-green-500 ring-offset-2 ring-offset-background" : ""}`}
         onClick={handleAvatarClick}
       >
@@ -191,44 +186,44 @@ export const MessageBubble = ({
           {user.name.substring(0, 2).toUpperCase()}
         </AvatarFallback>
       </Avatar>
-      
+
       <ContextMenu>
         <ContextMenuTrigger className="focus:outline-none">
           {messageBubble}
         </ContextMenuTrigger>
         <ContextMenuContent className="bg-background border border-border shadow-lg z-50">
           {onReplyMessage && (
-            <ContextMenuItem 
-              onClick={handleReplyClick} 
+            <ContextMenuItem
+              onClick={handleReplyClick}
               className="cursor-pointer hover:bg-accent transition-colors"
             >
               <Reply className="mr-2 h-4 w-4" />
               Reply
             </ContextMenuItem>
           )}
-          
-          <ContextMenuItem 
-            onClick={handleReactClick} 
+
+          <ContextMenuItem
+            onClick={handleReactClick}
             className="cursor-pointer hover:bg-accent transition-colors"
           >
             <span className="mr-2">😀</span>
             React
           </ContextMenuItem>
-          
-          <ContextMenuItem 
-            onClick={handleCopyClick} 
+
+          <ContextMenuItem
+            onClick={handleCopyClick}
             className="cursor-pointer hover:bg-accent transition-colors"
           >
             <Copy className="mr-2 h-4 w-4" />
             Copy
           </ContextMenuItem>
-          
+
           {isCurrentUser && (
             <>
               <ContextMenuSeparator />
               {onEditMessage && (
-                <ContextMenuItem 
-                  onClick={handleEditClick} 
+                <ContextMenuItem
+                  onClick={handleEditClick}
                   className="cursor-pointer hover:bg-accent transition-colors"
                 >
                   <Edit className="mr-2 h-4 w-4" />
@@ -236,8 +231,8 @@ export const MessageBubble = ({
                 </ContextMenuItem>
               )}
               {onDeleteMessage && (
-                <ContextMenuItem 
-                  onClick={handleDeleteClick} 
+                <ContextMenuItem
+                  onClick={handleDeleteClick}
                   className="cursor-pointer text-destructive focus:text-destructive hover:bg-destructive/10 transition-colors"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />

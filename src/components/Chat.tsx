@@ -1,28 +1,32 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChatHeader } from "./ChatHeader";
 import { MessageList } from "./MessageList";
 import { MessageInput } from "./MessageInput";
 import { Message, User } from "../types";
 import { mockMessages, mockUsers, currentUser } from "../data/mockData";
+import { useChat } from "../hooks/useChat"
 
 export const Chat = () => {
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
+  const chat=useChat();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [users] = useState<User[]>(mockUsers);
+
+
 
   const handleSendMessage = (content: string) => {
     console.log("Sending message:", content);
     const newMessage: Message = {
-      id: `m${Date.now()}`,
+      id: Date.now(),
       senderId: currentUser.id,
       content: content,
-      timestamp: new Date(),
+      timestamp: new Date().toISOString(),
       type: "text"
     };
     setMessages([...messages, newMessage]);
   };
 
-  const handleMessageDelete = (messageId: string) => {
+  const handleMessageDelete = (messageId: number) => {
     console.log("Deleting message:", messageId);
     setMessages(messages.filter(msg => msg.id !== messageId));
   };
