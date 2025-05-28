@@ -1,4 +1,3 @@
-
 // API Configuration Constants
 export const API_CONFIG = {
   BASE_URL: 'http://localhost:4000',
@@ -38,7 +37,7 @@ export const API_ENDPOINTS = {
     DELETE_MESSAGE: (id: string) => `/chat/messages/${id}`,
   },
   MESSAGES: {
-    CONVERSATION: (senderId: number, receiverId: number) => `/messages/conv/${senderId}/${receiverId}`,
+    CONVERSATION: (senderId: string, receiverId: string) => `/messages/conv/${senderId}/${receiverId}`,
     BY_ID: (id: string) => `/messages/${id}`,
     UPDATE: (id: string) => `/messages/${id}`,
     DELETE: (id: string) => `/messages/${id}`,
