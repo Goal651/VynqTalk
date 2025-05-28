@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react"
 import { User, Message } from "../types"
 import { ChatSidebar } from "./ChatSidebar"
@@ -14,7 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 import { socketService } from "@/api/services/socket"
-import { getMessages } from "@/api/services/messages"
+import { messageService } from "@/api/services/messages"
 
 interface ChatViewProps {
   onMessageDelete?: (messageId: string) => void
@@ -36,19 +37,29 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
 
   useEffect(() => {
     const loadMessages = async () => {
-
       if (!user || !activeChat) return toast({
         title: "Error",
         description: "Please select a chat first",
         variant: "destructive"
       })
-      const response = await getMessages(user.id, activeChat.id)
-      console.log("Loaded messages:", response)
-      setMessages(response)
+      
+      try {
+        const response = await messageService.getMessages(user.id, activeChat.id)
+        console.log("Loaded messages:", response)
+        if (response.success && response.data) {
+          setMessages(response.data)
+        }
+      } catch (error) {
+        console.error("Failed to load messages:", error)
+        toast({
+          title: "Error",
+          description: "Failed to load messages",
+          variant: "destructive"
+        })
+      }
     }
     loadMessages()
-  }, [activeChat, user])
-
+  }, [activeChat, user, toast])
 
   useEffect(() => {
     socketService.connect()
@@ -85,7 +96,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
       description: `Message sent to ${activeChat.name}`,
     })
     setReplyTo(null)  
-    setEditedContent("") // Clear edited content after sending
+    setEditedContent("")
     socketService.sendMessage(newMessage.content, activeChat.id, user.id)
   }
 
@@ -143,7 +154,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
       console.log("Confirming edit message:", messageToEdit.id, "new content:", editedContent)
       setMessages(messages.map(message =>
         message.id === messageToEdit.id
-          ? { ...message, content: editedContent, isEdited: true }
+          ? { ...message, content: editedContent, edited: true }
           : message
       ))
       setMessageToEdit(null)
@@ -176,8 +187,8 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
     setMessages(messages.map(message => {
       if (message.id === messageId) {
         const reactions = message.reactions || []
-        const currentUserId = String(user?.id ?? "current-user")
-        const existingReaction = reactions.find(r => String(r.userId) === currentUserId && r.emoji === emoji)
+        const currentUserId = user?.id ?? "current-user"
+        const existingReaction = reactions.find(r => r.userId === currentUserId && r.emoji === emoji)
 
         if (existingReaction) {
           return {
@@ -247,7 +258,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
             <ScrollArea className="flex-1">
               <MessageList
                 messages={filteredMessages}
-                users={users}
+                users={users || []}
                 currentUserId={user?.id}
                 onUserAvatarClick={handleUserAvatarClick}
                 onDeleteMessage={handleDeleteMessage}
@@ -259,7 +270,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
             <div className="flex-shrink-0 border-t border-border/30 bg-background/50 backdrop-blur-sm">
               <MessageInput
                 onSendMessage={handleSendMessage}
-                currentUser={user || { id: 0, name: "You", avatar: "", isOnline: true, isAdmin: false }}
+                currentUser={user || { id: "guest", name: "Guest", avatar: "", isOnline: true, isAdmin: false }}
                 replyTo={replyTo || undefined}
                 onCancelReply={handleCancelReply}
               />
