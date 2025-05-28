@@ -1,5 +1,3 @@
-
-```markdown
 # VynqTalk
 
 **VynqTalk** is a vibrant, modern chat application designed for seamless and dynamic communication. Whether for personal, gaming, or professional use, VynqTalk aims to deliver a fast, secure, and engaging messaging experience.
@@ -35,22 +33,22 @@ To get a local copy of VynqTalk up and running, follow these steps.
 
 ### Installation
 1. Clone the repository:
-   ```bash
+   bash
    git clone https://github.com/your-username/VynqTalk.git
-   ```
+   
 2. Navigate to the project directory:
-   ```bash
+   bash
    cd VynqTalk
-   ```
+   
 3. Install dependencies:
-   ```bash
+   bash
    npm install
-   ```
-   *Replace with appropriate command for your tech stack, e.g., `pip install -r requirements.txt` for Python.*
+   
+
 4. Start the development server:
-   ```bash
+   bash
    npm start
-   ```
+   
    
 
 ## Contributing
