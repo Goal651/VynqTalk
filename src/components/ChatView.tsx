@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react"
 import { User, Message } from "../types"
 import { ChatSidebar } from "./ChatSidebar"
