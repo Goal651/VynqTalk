@@ -1,22 +1,58 @@
 import { Message } from "@/types";
 import { apiClient } from "../client";
+import { API_ENDPOINTS } from "../constants";
+import { ApiResponse } from "../types";
 
+export interface SendMessageRequest {
+  content: string;
+  receiverId: number;
+  senderId: number;
+  type?: "text" | "image" | "audio" | "file";
+  replyToId?: string;
+}
 
-// Get messages between two users
-export const getMessages = async (senderId: number, receiverId: number) => {
-    const response = await apiClient.get<Message[]>(`/messages/conv/${senderId}/${receiverId}`);
-    return response.data;
-};
+export class MessageService {
+  // Get messages between two users
+  async getMessages(senderId: number, receiverId: number): Promise<ApiResponse<Message[]>> {
+    return await apiClient.get<Message[]>(API_ENDPOINTS.MESSAGES.CONVERSATION(senderId, receiverId));
+  }
 
-// Update a message by ID
-export const updateMessage = async (messageId: string, updatedContent: string) => {
-    const response = await apiClient.put(`/${messageId}`, {
-        content: updatedContent,
+  // Send a new message
+  async sendMessage(messageData: SendMessageRequest): Promise<ApiResponse<Message>> {
+    return await apiClient.post<Message>(API_ENDPOINTS.MESSAGES.SEND, messageData);
+  }
+
+  // Update a message by ID
+  async updateMessage(messageId: string, updatedContent: string): Promise<ApiResponse<Message>> {
+    return await apiClient.put<Message>(API_ENDPOINTS.MESSAGES.UPDATE(messageId), {
+      content: updatedContent,
     });
-    return response.data;
-};
+  }
 
-// Delete a message by ID
-export const deleteMessage = async (messageId: string) => {
-    await apiClient.delete(`/${messageId}`);
-};
+  // Delete a message by ID
+  async deleteMessage(messageId: string): Promise<ApiResponse<void>> {
+    return await apiClient.delete<void>(API_ENDPOINTS.MESSAGES.DELETE(messageId));
+  }
+
+  // Get message by ID
+  async getMessageById(messageId: string): Promise<ApiResponse<Message>> {
+    return await apiClient.get<Message>(API_ENDPOINTS.MESSAGES.BY_ID(messageId));
+  }
+
+  // React to a message
+  async reactToMessage(messageId: string, emoji: string): Promise<ApiResponse<void>> {
+    return await apiClient.post<void>(`${API_ENDPOINTS.MESSAGES.BY_ID(messageId)}/react`, { emoji });
+  }
+
+  // Remove reaction from a message
+  async removeReaction(messageId: string, reactionId: string): Promise<ApiResponse<void>> {
+    return await apiClient.delete<void>(`${API_ENDPOINTS.MESSAGES.BY_ID(messageId)}/reactions/${reactionId}`);
+  }
+}
+
+export const messageService = new MessageService();
+
+// Keep the old functions for backward compatibility
+export const getMessages = messageService.getMessages.bind(messageService);
+export const updateMessage = messageService.updateMessage.bind(messageService);
+export const deleteMessage = messageService.deleteMessage.bind(messageService);

@@ -41,7 +41,7 @@ export const useAdminData = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get('/admin/users');
+      const response = await apiClient.get<AdminUser[]>('/admin/users');
       if (response.success && response.data) {
         setUsers(response.data);
       }
