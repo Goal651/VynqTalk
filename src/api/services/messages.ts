@@ -24,7 +24,7 @@ export class MessageService {
   }
 
   // Update a message by ID
-  async updateMessage(messageId: string, updatedContent: string): Promise<ApiResponse<Message>> {
+  async updateMessage(messageId: number, updatedContent: string): Promise<ApiResponse<Message>> {
     return await apiClient.put<Message>(API_ENDPOINTS.MESSAGES.UPDATE(messageId), {
       content: updatedContent,
     });
@@ -36,17 +36,17 @@ export class MessageService {
   }
 
   // Get message by ID
-  async getMessageById(messageId: string): Promise<ApiResponse<Message>> {
+  async getMessageById(messageId: number): Promise<ApiResponse<Message>> {
     return await apiClient.get<Message>(API_ENDPOINTS.MESSAGES.BY_ID(messageId));
   }
 
   // React to a message
-  async reactToMessage(messageId: string, emoji: string): Promise<ApiResponse<void>> {
+  async reactToMessage(messageId: number, emoji: string): Promise<ApiResponse<void>> {
     return await apiClient.post<void>(`${API_ENDPOINTS.MESSAGES.BY_ID(messageId)}/react`, { emoji });
   }
 
   // Remove reaction from a message
-  async removeReaction(messageId: string, reactionId: string): Promise<ApiResponse<void>> {
+  async removeReaction(messageId: number, reactionId: string): Promise<ApiResponse<void>> {
     return await apiClient.delete<void>(`${API_ENDPOINTS.MESSAGES.BY_ID(messageId)}/reactions/${reactionId}`);
   }
 }

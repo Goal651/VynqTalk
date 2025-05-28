@@ -38,9 +38,6 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
     setMessages
   } = useChat();
 
-  useEffect(() => {
-    console.log("Testing messages",messages)
-  }, [messages]);
 
   const {
     messageToDelete,

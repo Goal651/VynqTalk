@@ -37,7 +37,7 @@ export const useMessageOperations = (
     console.log("Edit message requested:", message.id);
     setMessageToEdit(message);
     setEditedContent(message.content);
-    if (onMessageEdit) onMessageEdit(message);
+
   };
 
   const confirmEditMessage = () => {
@@ -48,6 +48,7 @@ export const useMessageOperations = (
           ? { ...message, content: editedContent, edited: true }
           : message
       ));
+      if (onMessageEdit) onMessageEdit({...messageToEdit, content: editedContent, edited: true});
       setMessageToEdit(null);
 
       toast({

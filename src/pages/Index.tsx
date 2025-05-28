@@ -23,16 +23,15 @@ const Index = () => {
     const fetchUsers = async () => {
       try {
         const response = await userService.getAllUsers()
-
         if (response && response.data) setUsers(response.data)
-
       } catch (error) {
         console.error('Error fetching users:', error)
       }
     }
     fetchUsers()
   }, [])
-  const handleMessageDeleted =async (messageId: number) => {
+
+  const handleMessageDeleted = async (messageId: number) => {
     try {
       await messageService.deleteMessage(messageId)
       toast({
@@ -49,11 +48,21 @@ const Index = () => {
     }
   }
 
-  const handleMessageEdit = (message: Message) => {
-    toast({
-      title: "Edit message",
-      description: "You can now edit your message.",
-    })
+  const handleMessageEdit = async(message: Message) => {
+    try {
+      await messageService.updateMessage(message.id, message.content)
+      toast({
+        title: "Message updated",
+        description: "Your message has been updated successfully.",
+      })
+    } catch (error) {
+      console.error('Error updating message:', error)
+      toast({
+        title: "Error",
+        description: "There was an error updating your message.",
+        variant: "destructive",
+      })
+    }
   }
 
   const handleLogout = () => {
