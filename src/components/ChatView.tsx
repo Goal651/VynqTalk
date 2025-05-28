@@ -97,7 +97,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
     })
     setReplyTo(null)  
     setEditedContent("")
-    socketService.sendMessage(newMessage.content, String(activeChat.id), String(user.id))
+    socketService.sendMessage(newMessage.content, Number(activeChat.id), Number(user.id))
   }
 
   const handleUserClick = (clickedUser: User) => {
