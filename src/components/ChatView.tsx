@@ -43,7 +43,8 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
       })
       
       try {
-        const response = await messageService.getMessages(user.id, activeChat.id)
+        // Ensure we're passing string IDs to match the updated API signature
+        const response = await messageService.getMessages(String(user.id), String(activeChat.id))
         console.log("Loaded messages:", response)
         if (response.success && response.data) {
           setMessages(response.data)
