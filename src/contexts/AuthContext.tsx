@@ -3,7 +3,6 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 import { User } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { authService, LoginRequest, SignupRequest, ApiError } from "@/api";
-import axios from "axios";
 
 interface AuthContextType {
   user: User | null;

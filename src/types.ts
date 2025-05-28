@@ -1,20 +1,22 @@
+
 export interface User {
-  id: number ; // Changed to BigInteger for compatibility with GroupChat
+  id: string; // Changed back to string for consistency
   name: string;
   email?: string;
   avatar: string;
   isOnline?: boolean;
-  isAdmin:boolean
+  isAdmin: boolean;
+  role?: 'user' | 'admin' | 'moderator';
 }
 
 export interface Message {
   id: string;
-  receiverId:number ;
+  senderId: string; // Changed to string and keeping senderId
+  receiverId?: string; // Made optional and string
   content: string;
   timestamp: Date;
   edited?: boolean;
-  senderId?:  number ; // Added for compatibility with GroupChat
-  type: "text" | "image" | "audio" | "file"; // Added message types
+  type: "text" | "image" | "audio" | "file";
   reactions?: Reaction[];
   replyTo?: {
     messageId: string;
@@ -34,7 +36,7 @@ export interface Reaction {
 export interface Group {
   id: string;
   name: string;
-  description?: string; // Made optional to match usage
+  description?: string;
   avatar: string;
   members: string[];
   createdBy: string;

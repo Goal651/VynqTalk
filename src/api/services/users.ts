@@ -17,15 +17,15 @@ export class UserService {
     return await apiClient.get<User[]>(API_ENDPOINTS.USERS.ALL);
   }
 
-  async getUserById(id: number): Promise<ApiResponse<User>> {
+  async getUserById(id: string): Promise<ApiResponse<User>> {
     return await apiClient.get<User>(API_ENDPOINTS.USERS.BY_ID(id));
   }
 
-  async updateUser(id: number, updates: UpdateUserRequest): Promise<ApiResponse<User>> {
+  async updateUser(id: string, updates: UpdateUserRequest): Promise<ApiResponse<User>> {
     return await apiClient.put<User>(API_ENDPOINTS.USERS.UPDATE(id), updates);
   }
 
-  async deleteUser(id: number): Promise<ApiResponse<void>> {
+  async deleteUser(id: string): Promise<ApiResponse<void>> {
     return await apiClient.delete<void>(API_ENDPOINTS.USERS.DELETE(id));
   }
 
@@ -41,11 +41,11 @@ export class UserService {
     return await apiClient.uploadFile<{ avatarUrl: string }>(API_ENDPOINTS.USER.UPLOAD_AVATAR, file);
   }
 
-  async blockUser(userId: number): Promise<ApiResponse<void>> {
+  async blockUser(userId: string): Promise<ApiResponse<void>> {
     return await apiClient.post<void>('/users/block', { userId });
   }
 
-  async unblockUser(userId: number): Promise<ApiResponse<void>> {
+  async unblockUser(userId: string): Promise<ApiResponse<void>> {
     return await apiClient.post<void>('/users/unblock', { userId });
   }
 

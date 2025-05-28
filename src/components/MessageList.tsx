@@ -11,7 +11,7 @@ interface MessageListProps {
   onEditMessage?: (message: Message) => void;
   onReplyMessage?: (message: Message) => void;
   onReactToMessage?: (messageId: string, emoji: string) => void;
-  currentUserId?: number;
+  currentUserId?: string;
 }
 
 export const MessageList = ({
@@ -22,7 +22,7 @@ export const MessageList = ({
   onEditMessage,
   onReplyMessage,
   onReactToMessage,
-  currentUserId = 0
+  currentUserId = "u1"
 }: MessageListProps) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -34,7 +34,7 @@ export const MessageList = ({
   return (
     <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-background/80 to-background">
       {messages.map((message) => {
-        const user = users.find((u) => u.id == message.senderId);
+        const user = users.find((u) => u.id === message.senderId);
         return user ? (
           <MessageBubble
             key={message.id}

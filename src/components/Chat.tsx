@@ -10,13 +10,11 @@ export const Chat = () => {
   const [messages, setMessages] = useState<Message[]>(mockMessages);
   const [users] = useState<User[]>(mockUsers);
 
- 
-
   const handleSendMessage = (content: string) => {
     console.log("Sending message:", content);
     const newMessage: Message = {
       id: `m${Date.now()}`,
-      userId: currentUser.id,
+      senderId: currentUser.id,
       content: content,
       timestamp: new Date(),
       type: "text"
@@ -44,6 +42,7 @@ export const Chat = () => {
         users={users}
         onDeleteMessage={handleMessageDelete}
         onEditMessage={handleMessageEdit}
+        currentUserId={currentUser.id}
       />
       <MessageInput onSendMessage={handleSendMessage} currentUser={currentUser} />
     </div>

@@ -18,14 +18,14 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
     {
       id: "m1",
       content: "Hello everyone! Welcome to the group.",
-      userId: "u1",
+      senderId: "u1",
       timestamp: new Date(Date.now() - 3600000),
       type: "text"
     },
     {
       id: "m2", 
       content: "Thanks for adding me!",
-      userId: "u2",
+      senderId: "u2",
       timestamp: new Date(Date.now() - 1800000),
       type: "text"
     }
@@ -40,7 +40,7 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
       const message: Message = {
         id: `m${Date.now()}`,
         content: newMessage,
-        userId: "current-user",
+        senderId: "current-user",
         timestamp: new Date(),
         type: "text"
       };
@@ -169,17 +169,17 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex ${message.userId === "current-user" ? "justify-end" : "justify-start"}`}
+              className={`flex ${message.senderId === "current-user" ? "justify-end" : "justify-start"}`}
             >
               <div
                 className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                  message.userId === "current-user"
+                  message.senderId === "current-user"
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted"
                 }`}
               >
-                {message.userId !== "current-user" && (
-                  <p className="text-xs text-muted-foreground mb-1">User {message.userId}</p>
+                {message.senderId !== "current-user" && (
+                  <p className="text-xs text-muted-foreground mb-1">User {message.senderId}</p>
                 )}
                 <p className="text-sm">{message.content}</p>
                 <p className="text-xs opacity-70 mt-1">

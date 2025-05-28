@@ -1,3 +1,4 @@
+
 import { Message } from "@/types";
 import { apiClient } from "../client";
 import { API_ENDPOINTS } from "../constants";
@@ -5,15 +6,15 @@ import { ApiResponse } from "../types";
 
 export interface SendMessageRequest {
   content: string;
-  receiverId: number;
-  senderId: number;
+  receiverId: string;
+  senderId: string;
   type?: "text" | "image" | "audio" | "file";
   replyToId?: string;
 }
 
 export class MessageService {
   // Get messages between two users
-  async getMessages(senderId: number, receiverId: number): Promise<ApiResponse<Message[]>> {
+  async getMessages(senderId: string, receiverId: string): Promise<ApiResponse<Message[]>> {
     return await apiClient.get<Message[]>(API_ENDPOINTS.MESSAGES.CONVERSATION(senderId, receiverId));
   }
 

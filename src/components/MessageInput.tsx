@@ -40,8 +40,8 @@ export const MessageInput = ({
       
       const replyData = replyTo ? {
         messageId: replyTo.id,
-        userId: replyTo.userId,
-        userName: replyTo.userId === currentUser.id ? currentUser.name : "Unknown User",
+        userId: replyTo.senderId,
+        userName: replyTo.senderId === currentUser.id ? currentUser.name : "Unknown User",
         content: replyTo.content
       } : undefined;
       
@@ -135,7 +135,7 @@ export const MessageInput = ({
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="text-sm font-medium text-muted-foreground mb-1">
-                Replying to {replyTo.userId === currentUser.id ? "yourself" : "message"}
+                Replying to {replyTo.senderId === currentUser.id ? "yourself" : "message"}
               </div>
               <div className="text-sm text-muted-foreground truncate">
                 {replyTo.content}
