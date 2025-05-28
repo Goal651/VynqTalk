@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast"
 import { Message, User } from "@/types"
 import { useAuth } from "@/contexts/AuthContext"
 import { userService } from "@/api/services/users"
+import { messageService } from "@/api/services/messages"
 
 const Index = () => {
   const [currentView, setCurrentView] = useState<"chat" | "group" | "settings" | "notifications" | "admin">("chat")
@@ -31,11 +32,21 @@ const Index = () => {
     }
     fetchUsers()
   }, [])
-  const handleMessageDeleted = (messageId: string) => {
-    toast({
-      title: "Message deleted",
-      description: "Your message has been deleted successfully.",
-    })
+  const handleMessageDeleted =async (messageId: number) => {
+    try {
+      await messageService.deleteMessage(messageId)
+      toast({
+        title: "Message deleted",
+        description: "Your message has been deleted successfully.",
+      })
+    } catch (error) {
+      console.error('Error deleting message:', error)
+      toast({
+        title: "Error",
+        description: "There was an error deleting your message.",
+        variant: "destructive",
+      })
+    }
   }
 
   const handleMessageEdit = (message: Message) => {

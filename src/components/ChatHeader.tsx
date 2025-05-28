@@ -56,11 +56,11 @@ export const ChatHeader = ({ users, activeChat, onVoiceCall, onVideoCall }: Chat
                 )}
               </div>
               <div>
-                <p className="font-semibold text-sm text-foreground">{activeChat.name}</p>
-                <p className="text-xs text-muted-foreground flex items-center">
-                  <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${activeChat.isOnline ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                <div className="font-semibold text-sm text-foreground">{activeChat.name}</div>
+                <div className="text-xs text-muted-foreground flex items-center">
+                  <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${activeChat.isOnline ? 'bg-green-500' : 'bg-gray-400'}`}/>
                   {activeChat.isOnline ? "Active now" : "Offline"}
-                </p>
+                </div>
               </div>
             </div>
           </div>

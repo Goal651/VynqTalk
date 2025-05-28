@@ -31,7 +31,7 @@ export class MessageService {
   }
 
   // Delete a message by ID
-  async deleteMessage(messageId: string): Promise<ApiResponse<void>> {
+  async deleteMessage(messageId: number): Promise<ApiResponse<void>> {
     return await apiClient.delete<void>(API_ENDPOINTS.MESSAGES.DELETE(messageId));
   }
 

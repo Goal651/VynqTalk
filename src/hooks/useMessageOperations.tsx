@@ -6,15 +6,15 @@ import { useToast } from "@/hooks/use-toast";
 export const useMessageOperations = (
   messages: Message[],
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
-  onMessageDelete?: (messageId: string) => void,
+  onMessageDelete?: (messageId: number) => void,
   onMessageEdit?: (message: Message) => void
 ) => {
   const { toast } = useToast();
-  const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
+  const [messageToDelete, setMessageToDelete] = useState<number | null>(null);
   const [messageToEdit, setMessageToEdit] = useState<Message | null>(null);
   const [editedContent, setEditedContent] = useState("");
 
-  const handleDeleteMessage = (messageId: string) => {
+  const handleDeleteMessage = (messageId: number) => {
     console.log("Delete message requested:", messageId);
     setMessageToDelete(messageId);
   };

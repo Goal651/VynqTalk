@@ -6,11 +6,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Message } from "@/types";
 
 interface MessageDialogsProps {
-  messageToDelete: string | null;
+  messageToDelete: number | null;
   messageToEdit: Message | null;
   editedContent: string;
   setEditedContent: (content: string) => void;
-  setMessageToDelete: (id: string | null) => void;
+  setMessageToDelete: (id: number | null) => void;
   setMessageToEdit: (message: Message | null) => void;
   confirmDeleteMessage: () => void;
   confirmEditMessage: () => void;

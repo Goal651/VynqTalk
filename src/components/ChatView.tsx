@@ -11,9 +11,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChat } from "@/hooks/useChat";
 import { useMessageOperations } from "@/hooks/useMessageOperations";
+import { useEffect } from "react";
 
 interface ChatViewProps {
-  onMessageDelete?: (messageId: string) => void;
+  onMessageDelete?: (messageId: number) => void;
   onMessageEdit?: (message: Message) => void;
   users?: User[];
 }
@@ -36,6 +37,10 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
     handleReactToMessage,
     setMessages
   } = useChat();
+
+  useEffect(() => {
+    console.log("Testing messages",messages)
+  }, [messages]);
 
   const {
     messageToDelete,
@@ -85,7 +90,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
             <div className="flex-shrink-0 border-t border-border/30 bg-background/50 backdrop-blur-sm">
               <MessageInput
                 onSendMessage={handleSendMessage}
-                currentUser={user || { id: "guest", name: "Guest", avatar: "", isOnline: true, isAdmin: false }}
+                currentUser={user || { id: 0, name: "Guest", avatar: "", isOnline: true, isAdmin: false }}
                 replyTo={replyTo || undefined}
                 onCancelReply={handleCancelReply}
               />

@@ -40,7 +40,7 @@ export const API_ENDPOINTS = {
     CONVERSATION: (senderId: string, receiverId: string) => `/messages/conv/${senderId}/${receiverId}`,
     BY_ID: (id: string) => `/messages/${id}`,
     UPDATE: (id: string) => `/messages/${id}`,
-    DELETE: (id: string) => `/messages/${id}`,
+    DELETE: (id: number) => `/messages/${id}`,
     SEND: '/messages/send',
   },
   GROUPS: {
