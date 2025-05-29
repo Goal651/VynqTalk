@@ -72,7 +72,7 @@ export const useChat = () => {
       description: `Message sent to ${activeChat.name}`,
     })
     setReplyTo(null)
-    socketService.sendMessage(newMessage.content, Number(activeChat.id), Number(user.id))
+    socketService.sendMessage(newMessage.content, Number(activeChat.id), newMessage.type,Number(user.id))
   }
 
   const handleUserClick = (clickedUser: User) => {

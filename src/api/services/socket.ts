@@ -28,6 +28,7 @@ class SocketService {
 
     private subscribeToPublic() {
         this.stompClient.subscribe('/topic/public', this.handleMessage);
+        this.stompClient.subscribe('/topic/onlineUsers', this.handleOnlineUsers)
     }
 
     private handleMessage(message: IMessage) {
@@ -36,8 +37,12 @@ class SocketService {
         // Dispatch to store or set state here
     }
 
-    public sendMessage(content: string, receiver: number, sender: number) {
-        const payload = { content, receiver, type: 'CHAT', sender };
+    private handleOnlineUsers(onlineUsers: IMessage) {
+        console.log(onlineUsers)
+    }
+
+    public sendMessage(content: string, receiver: number, type: 'text' | 'image' | 'audio' | 'file', sender: number) {
+        const payload = { content, receiver, type, sender };
         this.stompClient.publish({
             destination: '/app/chat.sendMessage',
             body: JSON.stringify(payload),
