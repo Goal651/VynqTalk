@@ -29,15 +29,6 @@ class SocketService {
                     throw error; // Prevent client activation
                 }
             },
-            connectHeaders: () => {
-                try {
-                    const token = localStorage.getItem("access_token");
-                    return token ? { Authorization: `Bearer ${token}` } : {};
-                } catch (error) {
-                    console.error('Error setting connect headers:', error.message);
-                    return {};
-                }
-            },
             reconnectDelay: 5000,
             onConnect: () => {
                 try {
