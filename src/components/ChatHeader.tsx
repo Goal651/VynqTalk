@@ -1,8 +1,9 @@
-
 import { User } from "../types";
 import { Button } from "@/components/ui/button";
 import { Phone, Video, MoreVertical, MessageSquare } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { socketService } from "@/api/services/socket"
+import { useEffect, useState } from "react";
 
 interface ChatHeaderProps {
   users: User[];
@@ -11,9 +12,22 @@ interface ChatHeaderProps {
   onVideoCall?: () => void;
 }
 
+
 export const ChatHeader = ({ users, activeChat, onVoiceCall, onVideoCall }: ChatHeaderProps) => {
-  const onlineCount = users.filter(user => user.isOnline).length;
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([])
+  useEffect(() => {
+    socketService.connect()
+    const handleUsers = (users: string[]) => {
+      setOnlineUsers(users);
+    };
   
+    socketService.onOnlineUsersChange(handleUsers);
+    return () => {
+      socketService.disconnect()
+    }
+  }, [])
+
+
   const handleVoiceCall = () => {
     console.log("Voice call initiated");
     if (onVoiceCall) onVoiceCall();
@@ -23,7 +37,7 @@ export const ChatHeader = ({ users, activeChat, onVoiceCall, onVideoCall }: Chat
     console.log("Video call initiated");
     if (onVideoCall) onVideoCall();
   };
-  
+
   return (
     <div className="p-4 border-b border-border/30 flex items-center justify-between bg-gradient-to-r from-card/80 via-card to-card/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
       <div className="flex items-center space-x-4">
@@ -37,17 +51,17 @@ export const ChatHeader = ({ users, activeChat, onVoiceCall, onVideoCall }: Chat
           <div className="px-3 py-1.5 rounded-full bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 text-xs font-medium text-green-700 dark:text-green-300 shadow-sm">
             <div className="flex items-center space-x-1">
               <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-              <span>{onlineCount} online</span>
+              <span>{onlineUsers.length} online</span>
             </div>
           </div>
         </div>
-        
+
         {activeChat && (
           <div className="flex items-center space-x-3 ml-6 pl-4 border-l border-border/50">
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <img 
-                  src={activeChat.avatar} 
+                <img
+                  src={activeChat.avatar}
                   alt={activeChat.name}
                   className="w-9 h-9 rounded-full border-2 border-primary/20 shadow-md ring-2 ring-background"
                 />
@@ -58,7 +72,7 @@ export const ChatHeader = ({ users, activeChat, onVoiceCall, onVideoCall }: Chat
               <div>
                 <div className="font-semibold text-sm text-foreground">{activeChat.name}</div>
                 <div className="text-xs text-muted-foreground flex items-center">
-                  <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${activeChat.isOnline ? 'bg-green-500' : 'bg-gray-400'}`}/>
+                  <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${activeChat.isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
                   {activeChat.isOnline ? "Active now" : "Offline"}
                 </div>
               </div>
@@ -109,13 +123,13 @@ export const ChatHeader = ({ users, activeChat, onVoiceCall, onVideoCall }: Chat
 
         <div className="flex -space-x-2">
           {users.slice(0, 4).map((user) => (
-            <div 
-              key={user.id} 
+            <div
+              key={user.id}
               className="relative w-8 h-8 rounded-full border-2 border-background overflow-hidden shadow-md hover:scale-110 hover:z-10 transition-all duration-200 cursor-pointer ring-1 ring-primary/10"
               title={user.name}
             >
-              <img 
-                src={user.avatar} 
+              <img
+                src={user.avatar}
                 alt={user.name}
                 className="w-full h-full object-cover"
               />

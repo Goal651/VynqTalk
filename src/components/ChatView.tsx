@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChat } from "@/hooks/useChat";
 import { useMessageOperations } from "@/hooks/useMessageOperations";
-import { useEffect } from "react";
+
 
 interface ChatViewProps {
   onMessageDelete?: (messageId: number) => void;

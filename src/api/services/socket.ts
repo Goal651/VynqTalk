@@ -3,50 +3,295 @@ import { Client, IMessage } from '@stomp/stompjs';
 
 class SocketService {
     private stompClient: Client;
+    private onlineUsers: string[] = [];
+    private onlineUserListeners: ((users: string[]) => void)[] = [];
+    private logoutListeners: (() => void)[] = [];
+    private connectionAttempts: number = 0;
+    private maxConnectionAttempts: number = 3;
 
     constructor() {
         this.stompClient = new Client({
-            webSocketFactory: () => new SockJS('http://localhost:4000/ws'),
+            webSocketFactory: () => {
+                try {
+                    const token = localStorage.getItem("access_token");
+                    if (!token) {
+                        console.warn('No token in localStorage, triggering logout');
+                        this.logout();
+                        throw new Error('Missing access token');
+                    }
+                    return new SockJS(`http://localhost:4000/ws?token=${encodeURIComponent(token)}`, null, {
+                        transports: ['websocket', 'xhr-polling', 'eventsource'],
+                        timeout: 10000
+                    });
+                } catch (error) {
+                    console.error('Failed to initialize WebSocket factory:', error.message);
+                    this.logout();
+                    throw error; // Prevent client activation
+                }
+            },
+            connectHeaders: () => {
+                try {
+                    const token = localStorage.getItem("access_token");
+                    return token ? { Authorization: `Bearer ${token}` } : {};
+                } catch (error) {
+                    console.error('Error setting connect headers:', error.message);
+                    return {};
+                }
+            },
             reconnectDelay: 5000,
             onConnect: () => {
-                console.log('WebSocket connected');
-                this.subscribeToPublic();
+                try {
+                    console.log('WebSocket connected');
+                    this.connectionAttempts = 0; // Reset attempts
+                    this.subscribeToPublic();
+                } catch (error) {
+                    console.error('Error in onConnect handler:', error.message);
+                }
             },
             onStompError: (frame) => {
-                console.error('STOMP error:', frame.headers['message'], frame.body);
+                try {
+                    console.error('STOMP error:', frame.headers['message'], frame.body);
+                    if (
+                        frame.headers['message']?.includes('Unauthorized') ||
+                        frame.body?.includes('401') ||
+                        frame.headers['message']?.includes('token')
+                    ) {
+                        console.warn('Unauthorized error detected, attempting token refresh');
+                        this.handleUnauthorized();
+                    } else {
+                        this.handleConnectionError(new Error(`STOMP error: ${frame.headers['message']}`));
+                    }
+                } catch (error) {
+                    console.error('Error handling STOMP error:', error.message);
+                }
             },
+            onWebSocketError: (error) => {
+                try {
+                    console.error('WebSocket connection error:', error.message);
+                    if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+                        console.warn('WebSocket 401 error, attempting token refresh');
+                        this.handleUnauthorized();
+                    } else {
+                        this.handleConnectionError(error);
+                    }
+                } catch (err) {
+                    console.error('Error handling WebSocket error:', err.message);
+                }
+            }
         });
+    }
+
+    private async handleUnauthorized() {
+        try {
+            if (this.connectionAttempts >= this.maxConnectionAttempts) {
+                console.warn('Max connection attempts reached, logging out');
+                this.logout();
+                return;
+            }
+            this.connectionAttempts++;
+            const refreshToken = localStorage.getItem("refresh_token");
+            if (!refreshToken) {
+                throw new Error('No refresh token available');
+            }
+            const response = await fetch('http://localhost:4000/api/auth/refresh', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refreshToken })
+            });
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem("access_token", data.accessToken);
+                console.log('Token refreshed, reconnecting');
+                await this.stompClient.deactivate();
+                this.stompClient.activate();
+                this.connectionAttempts = 0;
+            } else {
+                console.warn('Token refresh failed with status:', response.status);
+                throw new Error('Refresh token invalid or expired');
+            }
+        } catch (error) {
+            console.error('Failed to refresh token:', error.message);
+            this.logout();
+        }
+    }
+
+    private handleConnectionError(error: Error) {
+        try {
+            console.error('Handling connection error:', error.message);
+            if (this.connectionAttempts < this.maxConnectionAttempts) {
+                console.warn(`Connection attempt ${this.connectionAttempts + 1}/${this.maxConnectionAttempts}`);
+                this.connectionAttempts++;
+                setTimeout(() => {
+                    console.log('Retrying WebSocket connection');
+                    this.stompClient.activate();
+                }, 2000 * this.connectionAttempts);
+            } else {
+                console.warn('Max connection attempts reached, logging out');
+                this.logout();
+            }
+        } catch (err) {
+            console.error('Error in connection error handler:', err.message);
+            this.logout();
+        }
+    }
+
+    public async logout() {
+        try {
+            console.log('Logging out user');
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            await this.stompClient.deactivate();
+            this.onlineUsers = [];
+            this.onlineUserListeners.forEach((callback) => {
+                try {
+                    callback([]);
+                } catch (error) {
+                    console.error('Error in online users callback:', error.message);
+                }
+            });
+            this.logoutListeners.forEach((callback) => {
+                try {
+                    callback();
+                } catch (error) {
+                    console.error('Error in logout callback:', error.message);
+                }
+            });
+        } catch (error) {
+            console.error('Error during logout:', error.message);
+        } finally {
+            this.logoutListeners.forEach((callback) => {
+                try {
+                    callback();
+                } catch (error) {
+                    console.error('Error in final logout callback:', error.message);
+                }
+            });
+        }
+    }
+
+    public onLogout(callback: () => void) {
+        try {
+            this.logoutListeners.push(callback);
+        } catch (error) {
+            console.error('Error adding logout listener:', error.message);
+        }
+    }
+
+    public removeLogoutListener(callback: () => void) {
+        try {
+            this.logoutListeners = this.logoutListeners.filter(cb => cb !== callback);
+        } catch (error) {
+            console.error('Error removing logout listener:', error.message);
+        }
     }
 
     public connect() {
-        this.stompClient.activate();
+        try {
+            const token = localStorage.getItem("access_token");
+            if (!token) {
+                console.warn('No access token found, logging out');
+                this.logout();
+                return;
+            }
+            this.stompClient.activate();
+        } catch (error) {
+            console.error('Error connecting to WebSocket:', error.message);
+            this.handleConnectionError(error);
+        }
     }
 
-    public disconnect() {
-        this.stompClient.deactivate();
+    public async disconnect() {
+        try {
+            await this.stompClient.deactivate();
+            this.onlineUsers = [];
+            this.onlineUserListeners.forEach((callback) => {
+                try {
+                    callback([]);
+                } catch (error) {
+                    console.error('Error in online users callback:', error.message);
+                }
+            });
+        } catch (error) {
+            console.error('Error disconnecting WebSocket:', error.message);
+        }
     }
 
     private subscribeToPublic() {
-        this.stompClient.subscribe('/topic/public', this.handleMessage);
-        this.stompClient.subscribe('/topic/onlineUsers', this.handleOnlineUsers)
+        try {
+            this.stompClient.subscribe('/topic/public', (message) => this.handleMessage(message));
+            this.stompClient.subscribe('/topic/onlineUsers', (message) => this.handleOnlineUsers(message));
+        } catch (error) {
+            console.error('Error subscribing to public topics:', error.message);
+        }
     }
 
     private handleMessage(message: IMessage) {
-        const body = JSON.parse(message.body);
-        console.log('Received message:', body);
-        // Dispatch to store or set state here
+        try {
+            const body = JSON.parse(message.body);
+            console.log('Received message:', body);
+        } catch (error) {
+            console.error('Failed to parse message:', error.message);
+        }
     }
 
-    private handleOnlineUsers(onlineUsers: IMessage) {
-        console.log(onlineUsers)
+    private handleOnlineUsers(message: IMessage) {
+        try {
+            const users = JSON.parse(message.body) as string[];
+            this.onlineUsers = users;
+            this.onlineUserListeners.forEach((callback) => {
+                try {
+                    callback(users);
+                } catch (error) {
+                    console.error('Error in online users callback:', error.message);
+                }
+            });
+        } catch (error) {
+            console.error('Failed to parse online users:', error.message);
+        }
     }
 
-    public sendMessage(content: string, receiver: number, type: 'text' | 'image' | 'audio' | 'file', sender: number) {
-        const payload = { content, receiver, type, sender };
-        this.stompClient.publish({
-            destination: '/app/chat.sendMessage',
-            body: JSON.stringify(payload),
-        });
+    public sendMessage(content: string, receiverId: number, type: 'text' | 'image' | 'audio' | 'file', senderId: number) {
+        try {
+            if (!this.stompClient.connected) {
+                console.warn('Cannot send message: WebSocket not connected');
+                return;
+            }
+            const payload = { content, receiverId, type, senderId }; // Match backend
+            this.stompClient.publish({
+                destination: '/app/chat.sendMessage',
+                body: JSON.stringify(payload),
+            });
+        } catch (error) {
+            console.error('Error sending message:', error.message);
+            if (error.message?.includes('Unauthorized') || error.message?.includes('401')) {
+                this.handleUnauthorized();
+            }
+        }
+    }
+
+    public getOnlineUsers() {
+        try {
+            return this.onlineUsers;
+        } catch (error) {
+            console.error('Error getting online users:', error.message);
+            return [];
+        }
+    }
+
+    public onOnlineUsersChange(callback: (users: string[]) => void) {
+        try {
+            this.onlineUserListeners.push(callback);
+        } catch (error) {
+            console.error('Error adding online users listener:', error.message);
+        }
+    }
+
+    public removeOnlineUsersListener(callback: (users: string[]) => void) {
+        try {
+            this.onlineUserListeners = this.onlineUserListeners.filter(cb => cb !== callback);
+        } catch (error) {
+            console.error('Error removing online users listener:', error.message);
+        }
     }
 }
 

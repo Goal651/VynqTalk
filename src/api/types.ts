@@ -34,7 +34,7 @@ export interface SignupRequest {
 export interface AuthResponse {
   accessToken: string;
   user: {
-    id: string;
+    id: number;
     name: string;
     email: string;
     avatar?: string;
