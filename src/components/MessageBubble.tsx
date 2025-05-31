@@ -94,22 +94,22 @@ export const MessageBubble = ({
 
   const messageBubble = (
     <div className="relative">
-      {message.replyTo && (
+      {message.replyToMessageId && (
         <div className={`mb-2 p-2 rounded-md bg-muted/50 border-l-2 border-primary text-sm ${isCurrentUser ? "mr-4" : "ml-4"
           }`}>
           <div className="font-medium text-muted-foreground">
-            Replying to {message.replyTo.userName}
+            Replying to {message.replyToMessageId.senderId}
           </div>
           <div className="text-muted-foreground truncate">
-            {message.replyTo.content}
+            {message.replyToMessageId.content}
           </div>
         </div>
       )}
 
       <div
         className={`rounded-lg p-3 max-w-[80%] transition-all hover:shadow-md cursor-pointer select-text ${isCurrentUser
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted text-foreground"
+          ? "bg-primary text-primary-foreground"
+          : "bg-muted text-foreground"
           }`}
       >
         {!isCurrentUser && (
@@ -131,12 +131,12 @@ export const MessageBubble = ({
         <div className={`flex flex-wrap gap-1 mt-1 ${isCurrentUser ? "justify-end mr-4" : "ml-4"}`}>
           {Object.entries(
             message.reactions.reduce((acc, reaction) => {
-              if (!acc[reaction.emoji]) {
-                acc[reaction.emoji] = [];
+              if (!acc[reaction]) {
+                acc[reaction] = [];
               }
-              acc[reaction.emoji].push(reaction);
+              acc[reaction].push(reaction);
               return acc;
-            }, {} as Record<string, Reaction[]>)
+            }, {} as Record<string, string[]>)
           ).map(([emoji, reactions]) => (
             <Button
               key={emoji}
@@ -154,7 +154,7 @@ export const MessageBubble = ({
       {showReactionPicker && (
         <div className={`absolute top-full mt-1 z-50 bg-popover border border-border rounded-md shadow-lg p-2 ${isCurrentUser ? "right-0" : "left-0"
           }`}>
-          <div className="flex gap-1">
+          <div className="flex gap-1 ">
             {reactionEmojis.map((emoji) => (
               <Button
                 key={emoji}
@@ -182,7 +182,7 @@ export const MessageBubble = ({
         onClick={handleAvatarClick}
       >
         <AvatarImage src={user.avatar} alt={user.name} />
-        <AvatarFallback className="bg-primary/10 text-primary font-medium">
+        <AvatarFallback className="bg-primary/10 text-primary font-medium ">
           {user.name.substring(0, 2).toUpperCase()}
         </AvatarFallback>
       </Avatar>

@@ -8,7 +8,7 @@ import { AudioRecorder } from "./AudioRecorder";
 import { FilePreview } from "./FilePreview";
 
 interface MessageInputProps {
-  onSendMessage: (content: string, replyTo?: Message["replyTo"]) => void;
+  onSendMessage: (content: string, replyTo?: Message) => void;
   currentUser: User;
   replyTo?: Message;
   onCancelReply?: () => void;
@@ -38,14 +38,7 @@ export const MessageInput = ({
         content += ` [${files.length} file(s) attached]`;
       }
       
-      const replyData = replyTo ? {
-        messageId: replyTo.id,
-        userId: replyTo.senderId,
-        userName: replyTo.senderId === currentUser.id ? currentUser.name : "Unknown User",
-        content: replyTo.content
-      } : undefined;
-      
-      onSendMessage(content, replyData);
+      onSendMessage(content, replyTo);
       setMessage("");
       setFiles([]);
       setShowEmojiPicker(false);

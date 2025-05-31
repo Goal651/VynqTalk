@@ -17,13 +17,8 @@ export interface Message {
   timestamp: string
   edited?: boolean
   type: "text" | "image" | "audio" | "file"
-  reactions?: Reaction[]
-  replyTo?: {
-    messageId: string
-    userId: string
-    userName: string
-    content: string
-  }
+  reactions?: string[]
+  replyToMessageId?: Message
 }
 
 export interface Reaction {

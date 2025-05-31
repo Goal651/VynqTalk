@@ -44,7 +44,7 @@ export const useChat = () => {
     }
   }, [])
 
-  const handleSendMessage = (content: string, replyData?: Message["replyTo"]) => {
+  const handleSendMessage = (content: string, replyData?: Message) => {
     if (!user || !activeChat) {
       toast({
         title: "Error",
@@ -62,9 +62,10 @@ export const useChat = () => {
       timestamp: new Date().toISOString(),
       receiverId: activeChat.id,
       type: "text",
-      replyTo: replyData,
+      replyToMessageId: replyData,
       reactions: []
     }
+
     setMessages([...messages, newMessage])
 
     toast({
@@ -72,7 +73,9 @@ export const useChat = () => {
       description: `Message sent to ${activeChat.name}`,
     })
     setReplyTo(null)
-    socketService.sendMessage(newMessage.content, Number(activeChat.id), newMessage.type,Number(user.id))
+    if (replyData) socketService.messageReply(newMessage.content, Number(activeChat.id), newMessage.type, Number(user.id), replyData)
+    else socketService.sendMessage(newMessage.content, Number(activeChat.id), newMessage.type, Number(user.id))
+
   }
 
   const handleUserClick = (clickedUser: User) => {
@@ -118,30 +121,28 @@ export const useChat = () => {
     setMessages(messages.map(message => {
       if (message.id === messageId) {
         const reactions = message.reactions || []
-        const currentUserId = user?.id ?? 1
-        const existingReaction = reactions.find(r => r.userId === currentUserId && r.emoji === emoji)
+        const existingReaction = reactions.find(r => r === emoji)
+
 
         if (existingReaction) {
-          return {
+          message = {
             ...message,
-            reactions: reactions.filter(r => r.id !== existingReaction.id)
+            reactions: reactions.filter(r => r !== existingReaction)
           }
         } else {
-          const newReaction = {
-            id: Date.now(),
-            emoji,
-            userId: currentUserId,
-            userName: user?.name || "You"
-          }
-          return {
+          message = {
             ...message,
-            reactions: [...reactions, newReaction]
+            reactions: [...reactions, emoji]
           }
         }
+        // Send reaction through socket service
+        socketService.messageReact(messageId, message.reactions);
+        return message;
       }
+
+
       return message
     }))
-
     toast({
       title: "Reaction added",
       description: `Reacted with ${emoji}`,

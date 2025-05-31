@@ -1,5 +1,6 @@
 import SockJS from 'sockjs-client';
 import { Client, IMessage } from '@stomp/stompjs';
+import { Message } from '@/types';
 
 class SocketService {
     private stompClient: Client;
@@ -250,6 +251,44 @@ class SocketService {
             const payload = { content, receiverId, type, senderId }; // Match backend
             this.stompClient.publish({
                 destination: '/app/chat.sendMessage',
+                body: JSON.stringify(payload),
+            });
+        } catch (error) {
+            console.error('Error sending message:', error.message);
+            if (error.message?.includes('Unauthorized') || error.message?.includes('401')) {
+                this.handleUnauthorized();
+            }
+        }
+    }
+
+    public messageReply(content: string, receiverId: number, type: 'text' | 'image' | 'audio' | 'file', senderId: number,replyToMessage:Message) {
+        try {
+            if (!this.stompClient.connected) {
+                console.warn('Cannot send message: WebSocket not connected');
+                return;
+            }
+            const payload = { content, receiverId, type, senderId,replyToMessage }; // Match backend
+            this.stompClient.publish({
+                destination: '/app/chat.sendMessageReply',
+                body: JSON.stringify(payload),
+            });
+        } catch (error) {
+            console.error('Error sending message:', error.message);
+            if (error.message?.includes('Unauthorized') || error.message?.includes('401')) {
+                this.handleUnauthorized();
+            }
+        }
+    }
+
+    public messageReact(messageId:number,reactions:string[]) {
+        try {
+            if (!this.stompClient.connected) {
+                console.warn('Cannot send message: WebSocket not connected');
+                return;
+            }
+            const payload = { messageId,reactions}; // Match backend
+            this.stompClient.publish({
+                destination: '/app/chat.sendMessageReaction',
                 body: JSON.stringify(payload),
             });
         } catch (error) {
