@@ -54,15 +54,14 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
 
   return (
     <div className="flex h-full relative bg-gradient-to-br from-background to-secondary/10">
-      <CallControls activeChat={activeChat} />
-      
+
       <ChatSidebar
         users={users}
         onUserClick={handleUserClick}
         activeChat={activeChat}
       />
       
-      <div className="flex-1 flex flex-col h-full border-l border-r border-border/30 bg-background/90 backdrop-blur-sm relative z-10">
+      <div className="flex-1 flex flex-col h-full border-l border-r border-border/30 bg-background/90 backdrop-blur-sm relative z-0">
         <ChatHeader
           users={users}
           activeChat={activeChat}
