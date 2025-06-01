@@ -5,7 +5,7 @@ import { Message } from "@/types";
 export const useMessageOperations = (
   messages: Message[],
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
-  onMessageDelete?: (messageId: string) => void,
+  onMessageDelete?: (messageId: number) => void,
   onMessageEdit?: (message: Message) => void
 ) => {
   const [messageToDelete, setMessageToDelete] = useState<Message | null>(null);

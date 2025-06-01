@@ -14,7 +14,7 @@ const Index = () => {
   const [currentView, setCurrentView] = useState<"chat" | "group" | "settings" | "notifications" | "admin">("chat");
   const { user, logout } = useAuth();
 
-  const handleMessageDelete = (messageId: string) => {
+  const handleMessageDelete = (messageId: number) => {
     console.log("Message deleted:", messageId);
   };
 
@@ -33,7 +33,7 @@ const Index = () => {
           />
         );
       case "group":
-        return <GroupChat />;
+        return <GroupChat group={{ id: 1, name: "General", description: "General discussion", avatar: "", members: [], createdBy: 1, createdAt: new Date(), isPrivate: false }} onBack={() => setCurrentView("chat")} />;
       case "settings":
         return <Settings />;
       case "notifications":

@@ -12,7 +12,7 @@ import { useChat } from "@/hooks/useChat";
 import { useMessageOperations } from "@/hooks/useMessageOperations";
 
 interface ChatViewProps {
-  onMessageDelete?: (messageId: string) => void;
+  onMessageDelete?: (messageId: number) => void;
   onMessageEdit?: (message: Message) => void;
   users?: User[];
 }
@@ -82,7 +82,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
             <div className="flex-shrink-0 border-t border-border/30 bg-background/50 backdrop-blur-sm">
               <MessageInput
                 onSendMessage={handleSendMessage}
-                currentUser={user || { id: "guest", name: "Guest", avatar: "", isOnline: true, isAdmin: false }}
+                currentUser={user || { id: 1, name: "Guest", avatar: "", isOnline: true, isAdmin: false }}
                 replyTo={replyTo || undefined}
                 onCancelReply={handleCancelReply}
               />

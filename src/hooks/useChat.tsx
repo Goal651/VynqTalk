@@ -6,7 +6,7 @@ import { mockUsers, mockMessages } from "@/data/mockData";
 export const useChat = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showUserInfo, setShowUserInfo] = useState(false);
-  const [activeChat, setActiveChat] = useState<string | null>(null);
+  const [activeChat, setActiveChat] = useState<number | null>(null);
   const [replyTo, setReplyTo] = useState<Message | null>(null);
   const [messages, setMessages] = useState<Message[]>(mockMessages);
 
@@ -15,15 +15,15 @@ export const useChat = () => {
     (message) =>
       activeChat &&
       ((message.senderId === activeChat || message.receiverId === activeChat) ||
-        (message.senderId === "current-user" || message.receiverId === "current-user"))
+        (message.senderId === 1 || message.receiverId === 1)) // Assuming current user ID is 1
   );
 
-  const handleSendMessage = (content: string, currentUser: User) => {
+  const handleSendMessage = (content: string, replyTo?: Message) => {
     if (!activeChat || !content.trim()) return;
 
     const newMessage: Message = {
-      id: Date.now().toString(),
-      senderId: currentUser.id,
+      id: Date.now(),
+      senderId: 1, // Current user ID
       receiverId: activeChat,
       content: content.trim(),
       timestamp: new Date(),
@@ -58,7 +58,7 @@ export const useChat = () => {
     setReplyTo(null);
   };
 
-  const handleReactToMessage = (messageId: string, emoji: string) => {
+  const handleReactToMessage = (messageId: number, emoji: string) => {
     setMessages((prev) =>
       prev.map((message) => {
         if (message.id === messageId) {

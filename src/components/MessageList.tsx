@@ -5,18 +5,18 @@ import { MessageBubble } from "./MessageBubble";
 interface MessageListProps {
   messages: Message[];
   users: User[];
-  currentUserId?: string;
+  currentUserId?: number;
   onUserAvatarClick?: () => void;
   onDeleteMessage?: (message: Message) => void;
   onEditMessage?: (message: Message) => void;
   onReplyMessage?: (message: Message) => void;
-  onReactToMessage?: (messageId: string, emoji: string) => void;
+  onReactToMessage?: (messageId: number, emoji: string) => void;
 }
 
 export const MessageList = ({
   messages,
   users,
-  currentUserId = "current-user",
+  currentUserId = 1,
   onUserAvatarClick,
   onDeleteMessage,
   onEditMessage,
@@ -26,7 +26,7 @@ export const MessageList = ({
   console.log("MessageList received messages:", messages.length);
   console.log("MessageList users:", users.length);
 
-  const getUserById = (userId: string) => {
+  const getUserById = (userId: number) => {
     const user = users.find((u) => u.id === userId);
     if (!user) {
       console.log("User not found for ID:", userId);

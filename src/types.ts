@@ -1,6 +1,6 @@
 
 export interface User {
-  id: string // Changed to string for consistency
+  id: number // Changed back to number
   name: string
   email?: string
   avatar: string
@@ -10,11 +10,11 @@ export interface User {
 }
 
 export interface Message {
-  id: string // Changed to string
-  senderId: string // Changed to string
-  receiverId?: string // Made optional and string
+  id: number // Changed back to number
+  senderId: number // Changed back to number
+  receiverId?: number // Changed back to number
   content: string
-  timestamp: Date // Changed to Date for proper date handling
+  timestamp: Date
   edited?: boolean
   type: "text" | "image" | "audio" | "file"
   reactions?: string[]
@@ -22,25 +22,25 @@ export interface Message {
 }
 
 export interface Reaction {
-  id: string // Changed to string
+  id: number // Changed back to number
   emoji: string
-  userId: string // Changed to string
+  userId: number // Changed back to number
   userName: string
 }
 
 export interface Group {
-  id: string // Changed to string
+  id: number // Changed back to number
   name: string
   description?: string
   avatar: string
-  members: string[]
-  createdBy: string
+  members: number[]
+  createdBy: number
   createdAt: Date
   isPrivate?: boolean
 }
 
 export interface Notification {
-  id: string
+  id: number
   title: string
   message: string
   timestamp: Date
