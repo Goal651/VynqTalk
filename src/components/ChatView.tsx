@@ -5,13 +5,11 @@ import { MessageList } from "./MessageList";
 import { MessageInput } from "./MessageInput";
 import { ChatHeader } from "./ChatHeader";
 import { UserInfo } from "./UserInfo";
-import { CallControls } from "./CallControls";
 import { MessageDialogs } from "./MessageDialogs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChat } from "@/hooks/useChat";
 import { useMessageOperations } from "@/hooks/useMessageOperations";
-
 
 interface ChatViewProps {
   onMessageDelete?: (messageId: number) => void;
@@ -38,7 +36,6 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
     setMessages
   } = useChat();
 
-
   const {
     messageToDelete,
     messageToEdit,
@@ -54,7 +51,6 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
 
   return (
     <div className="flex h-full relative bg-gradient-to-br from-background to-secondary/10">
-
       <ChatSidebar
         users={users}
         onUserClick={handleUserClick}
@@ -86,7 +82,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
             <div className="flex-shrink-0 border-t border-border/30 bg-background/50 backdrop-blur-sm">
               <MessageInput
                 onSendMessage={handleSendMessage}
-                currentUser={user || { id: 0, name: "Guest", avatar: "", isOnline: true, isAdmin: false }}
+                currentUser={user || { id: 1, name: "Guest", avatar: "", isOnline: true, isAdmin: false }}
                 replyTo={replyTo || undefined}
                 onCancelReply={handleCancelReply}
               />

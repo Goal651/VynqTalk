@@ -1,118 +1,63 @@
 
-import { useEffect, useState } from "react"
-import { Navbar } from "../components/Navbar"
-import { ChatView } from "../components/ChatView"
-import { Groups } from "./Groups"
-import { Settings } from "./Settings"
-import { Notifications } from "./Notifications"
-import { AdminPanel } from "./AdminPanel"
-import { ThemeProvider } from "../contexts/ThemeContext"
-import { useToast } from "@/hooks/use-toast"
-import { Message, User } from "@/types"
-import { useAuth } from "@/contexts/AuthContext"
-import { userService } from "@/api/services/users"
-import { messageService } from "@/api/services/messages"
+import { useState } from "react";
+import { ChatView } from "@/components/ChatView";
+import { GroupChat } from "@/components/GroupChat";
+import { AdminPanel } from "./AdminPanel";
+import { Settings } from "./Settings";
+import { Notifications } from "./Notifications";
+import { Navbar } from "@/components/Navbar";
+import { useAuth } from "@/contexts/AuthContext";
+import { mockUsers } from "@/data/mockData";
+import { Message } from "@/types";
 
 const Index = () => {
-  const [currentView, setCurrentView] = useState<"chat" | "group" | "settings" | "notifications" | "admin">("chat")
-  const { toast } = useToast()
-  const { user, logout } = useAuth()
-  const [users, setUsers] = useState<User[]>([])
+  const [currentView, setCurrentView] = useState<"chat" | "group" | "settings" | "notifications" | "admin">("chat");
+  const { user, logout } = useAuth();
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await userService.getAllUsers()
-        if (response && response.data) setUsers(response.data)
-      } catch (error) {
-        console.error('Error fetching users:', error)
-      }
-    }
-    fetchUsers()
-  }, [])
+  const handleMessageDelete = (messageId: number) => {
+    console.log("Message deleted:", messageId);
+  };
 
-  const handleMessageDeleted = async (messageId: number) => {
-    try {
-      await messageService.deleteMessage(messageId)
-      toast({
-        title: "Message deleted",
-        description: "Your message has been deleted successfully.",
-      })
-    } catch (error) {
-      console.error('Error deleting message:', error)
-      toast({
-        title: "Error",
-        description: "There was an error deleting your message.",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const handleMessageEdit = async(message: Message) => {
-    try {
-      await messageService.updateMessage(message.id, message.content)
-      toast({
-        title: "Message updated",
-        description: "Your message has been updated successfully.",
-      })
-    } catch (error) {
-      console.error('Error updating message:', error)
-      toast({
-        title: "Error",
-        description: "There was an error updating your message.",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const handleLogout = () => {
-    logout()
-  }
+  const handleMessageEdit = (message: Message) => {
+    console.log("Message edited:", message);
+  };
 
   const renderCurrentView = () => {
     switch (currentView) {
       case "chat":
         return (
           <ChatView
-            onMessageDelete={handleMessageDeleted}
+            users={mockUsers}
+            onMessageDelete={handleMessageDelete}
             onMessageEdit={handleMessageEdit}
-            users={users}
           />
-        )
+        );
       case "group":
-        return <Groups />
+        return <GroupChat group={{ id: 1, name: "General", description: "General discussion", avatar: "", members: [], createdBy: 1, createdAt: new Date(), isPrivate: false }} onBack={() => setCurrentView("chat")} />;
       case "settings":
-        return <Settings />
+        return <Settings />;
       case "notifications":
-        return <Notifications />
+        return <Notifications />;
       case "admin":
-        return <AdminPanel />
+        return <AdminPanel />;
       default:
-        return (
-          <ChatView
-            onMessageDelete={handleMessageDeleted}
-            onMessageEdit={handleMessageEdit}
-            users={users}
-          />
-        )
+        return <ChatView users={mockUsers} />;
     }
-  }
+  };
 
   return (
-    <ThemeProvider>
-      <div className="flex flex-col h-screen bg-background">
-        <Navbar
-          currentView={currentView}
-          onViewChange={setCurrentView}
-          onLogout={handleLogout}
-          user={user}
-        />
-        <main className="flex-1 overflow-hidden relative">
-          {renderCurrentView()}
-        </main>
-      </div>
-    </ThemeProvider>
-  )
-}
+    <div className="h-screen flex flex-col bg-background">
+      <Navbar
+        currentView={currentView}
+        onViewChange={setCurrentView}
+        onLogout={logout}
+        user={user || undefined}
+      />
+      <main className="flex-1 overflow-hidden">
+        {renderCurrentView()}
+      </main>
+    </div>
+  );
+};
 
-export default Index
+export default Index;

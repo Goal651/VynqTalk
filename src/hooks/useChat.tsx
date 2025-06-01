@@ -1,161 +1,81 @@
 
-import { useState, useEffect } from "react"
-import { User, Message } from "@/types"
-import { useAuth } from "@/contexts/AuthContext"
-import { useToast } from "@/hooks/use-toast"
-import { socketService } from "@/api/services/socket"
-import { messageService } from "@/api/services/messages"
+import { useState, useEffect } from "react";
+import { User, Message } from "@/types";
+import { mockUsers, mockMessages } from "@/data/mockData";
 
 export const useChat = () => {
-  const { user } = useAuth()
-  const { toast } = useToast()
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
-  const [showUserInfo, setShowUserInfo] = useState(false)
-  const [activeChat, setActiveChat] = useState<User | null>(null)
-  const [replyTo, setReplyTo] = useState<Message | null>(null)
-  const [messages, setMessages] = useState<Message[]>([])
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showUserInfo, setShowUserInfo] = useState(false);
+  const [activeChat, setActiveChat] = useState<number | null>(null);
+  const [replyTo, setReplyTo] = useState<Message | null>(null);
+  const [messages, setMessages] = useState<Message[]>(mockMessages);
 
-  useEffect(() => {
-    const loadMessages = async () => {
-      if (!user || !activeChat) return
+  // Filter messages for the current active chat
+  const filteredMessages = messages.filter(
+    (message) =>
+      activeChat &&
+      ((message.senderId === activeChat || message.receiverId === activeChat) ||
+        (message.senderId === 1 || message.receiverId === 1)) // Assuming current user ID is 1
+  );
 
-      try {
-        const response = await messageService.getMessages(String(user.id), String(activeChat.id))
-        if (response.success && response.data) {
-          setMessages(response.data)
-          console.log("Loaded messages:", response)
-        }
-      } catch (error) {
-        console.error("Failed to load messages:", error)
-        toast({
-          title: "Error",
-          description: "Failed to load messages",
-          variant: "destructive"
-        })
-      }
-    }
-    loadMessages()
-  }, [activeChat, user, toast])
+  const handleSendMessage = (content: string, replyTo?: Message) => {
+    if (!activeChat || !content.trim()) return;
 
-  useEffect(() => {
-    socketService.connect()
-    return () => {
-      socketService.disconnect()
-    }
-  }, [])
-
-  const handleSendMessage = (content: string, replyData?: Message) => {
-    if (!user || !activeChat) {
-      toast({
-        title: "Error",
-        description: "Please select a chat first",
-        variant: "destructive"
-      })
-      return
-    }
-
-    console.log("Sending message:", content, "to user:", activeChat.name, "reply:", replyData)
     const newMessage: Message = {
       id: Date.now(),
-      senderId: user.id,
-      content: content,
-      timestamp: new Date().toISOString(),
-      receiverId: activeChat.id,
+      senderId: 1, // Current user ID
+      receiverId: activeChat,
+      content: content.trim(),
+      timestamp: new Date(),
       type: "text",
-      replyToMessageId: replyData,
-      reactions: []
-    }
+      replyToMessageId: replyTo || undefined,
+    };
 
-    setMessages([...messages, newMessage])
+    setMessages((prev) => [...prev, newMessage]);
+    setReplyTo(null);
+  };
 
-    toast({
-      title: "Message sent",
-      description: `Message sent to ${activeChat.name}`,
-    })
-    setReplyTo(null)
-    if (replyData) socketService.messageReply(newMessage.content, Number(activeChat.id), newMessage.type, Number(user.id), replyData)
-    else socketService.sendMessage(newMessage.content, Number(activeChat.id), newMessage.type, Number(user.id))
+  const handleUserClick = (user: User) => {
+    console.log("User clicked in chat:", user.name);
+    setActiveChat(user.id);
+    setSelectedUser(user);
+    setShowUserInfo(false);
+  };
 
-  }
-
-  const handleUserClick = (clickedUser: User) => {
-    setActiveChat(clickedUser)
-    setShowUserInfo(false)
-    setReplyTo(null)
-
-    toast({
-      title: "Chat opened",
-      description: `Now chatting with ${clickedUser.name}`,
-    })
-  }
-
-  const handleUserAvatarClick = (clickedUser: User) => {
-    console.log("User avatar clicked:", clickedUser.name)
-    setSelectedUser(clickedUser)
-    setShowUserInfo(true)
-  }
+  const handleUserAvatarClick = () => {
+    setShowUserInfo(true);
+  };
 
   const handleCloseUserInfo = () => {
-    console.log("Closing user info")
-    setShowUserInfo(false)
-  }
+    setShowUserInfo(false);
+  };
 
   const handleReplyMessage = (message: Message) => {
-    console.log("Reply to message requested:", message.id)
-    setReplyTo(message)
-
-    toast({
-      title: "Replying to message",
-      description: "Type your reply below",
-    })
-  }
+    setReplyTo(message);
+  };
 
   const handleCancelReply = () => {
-    console.log("Cancel reply")
-    setReplyTo(null)
-  }
+    setReplyTo(null);
+  };
 
   const handleReactToMessage = (messageId: number, emoji: string) => {
-    console.log("React to message:", messageId, "with emoji:", emoji)
-
-    setMessages(messages.map(message => {
-      if (message.id === messageId) {
-        const reactions = message.reactions || []
-        const existingReaction = reactions.find(r => r === emoji)
-
-
-        if (existingReaction) {
-          message = {
+    setMessages((prev) =>
+      prev.map((message) => {
+        if (message.id === messageId) {
+          const currentReactions = message.reactions || [];
+          const hasReaction = currentReactions.includes(emoji);
+          
+          return {
             ...message,
-            reactions: reactions.filter(r => r !== existingReaction)
-          }
-        } else {
-          message = {
-            ...message,
-            reactions: [...reactions, emoji]
-          }
+            reactions: hasReaction
+              ? currentReactions.filter((r) => r !== emoji)
+              : [...currentReactions, emoji],
+          };
         }
-        // Send reaction through socket service
-        socketService.messageReact(messageId, message.reactions);
         return message;
-      }
-
-
-      return message
-    }))
-    toast({
-      title: "Reaction added",
-      description: `Reacted with ${emoji}`,
-    })
-  }
-
-  const filteredMessages = activeChat
-    ? messages.filter(message =>
-      (message.senderId == user?.id && message.receiverId == activeChat.id) ||
-      (message.senderId == activeChat.id && message.receiverId == user?.id)
-    )
-    : []
-
+      })
+    );
+  };
 
   return {
     selectedUser,
@@ -171,6 +91,6 @@ export const useChat = () => {
     handleReplyMessage,
     handleCancelReply,
     handleReactToMessage,
-    setMessages
-  }
-}
+    setMessages,
+  };
+};

@@ -1,81 +1,155 @@
 
-import { Message, User } from "../types";
+import { User, Message, Group, Notification } from "../types";
 
 export const mockUsers: User[] = [
   {
-    id: "u1",
-    name: "Alex Johnson",
-    avatar: "https://ui-avatars.com/api/?name=Alex+Johnson&background=random",
+    id: 1, // Changed back to number
+    name: "Alice Johnson",
+    email: "alice@example.com",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alice",
     isOnline: true,
-    isAdmin: false
+    isAdmin: false,
+    role: "user"
   },
   {
-    id: "u2",
-    name: "Jamie Smith",
-    avatar: "https://ui-avatars.com/api/?name=Jamie+Smith&background=random",
-    isOnline: true,
-    isAdmin: false
-  },
-  {
-    id: "u3",
-    name: "Taylor Brown",
-    avatar: "https://ui-avatars.com/api/?name=Taylor+Brown&background=random",
+    id: 2, // Changed back to number
+    name: "Bob Smith",
+    email: "bob@example.com",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Bob",
     isOnline: false,
-    isAdmin: false
+    isAdmin: false,
+    role: "user"
   },
   {
-    id: "u4",
-    name: "Casey Wilson",
-    avatar: "https://ui-avatars.com/api/?name=Casey+Wilson&background=random",
+    id: 3, // Changed back to number
+    name: "Charlie Brown",
+    email: "charlie@example.com", 
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Charlie",
     isOnline: true,
-    isAdmin: false
+    isAdmin: true,
+    role: "admin"
   },
+  {
+    id: 4, // Changed back to number
+    name: "Diana Prince",
+    email: "diana@example.com",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Diana",
+    isOnline: true,
+    isAdmin: false,
+    role: "moderator"
+  }
 ];
 
 export const mockMessages: Message[] = [
   {
-    id: "m1",
-    senderId: "u1",
-    content: "Hey everyone! Welcome to PulseChat.",
-    timestamp: new Date(Date.now() - 600000).toISOString(),
+    id: 1, // Changed back to number
+    senderId: 1,
+    receiverId: 2,
+    content: "Hey Bob! How are you doing?",
+    timestamp: new Date("2024-01-15T10:30:00Z"),
+    type: "text",
+    reactions: ["👍", "❤️"]
+  },
+  {
+    id: 2, // Changed back to number
+    senderId: 2,
+    receiverId: 1,
+    content: "Hi Alice! I'm doing great, thanks for asking!",
+    timestamp: new Date("2024-01-15T10:32:00Z"),
     type: "text"
   },
   {
-    id: "m2",
-    senderId: "u2",
-    content: "Thanks! The interface looks really nice!",
-    timestamp: new Date(Date.now() - 500000).toISOString(),
+    id: 3, // Changed back to number
+    senderId: 1,
+    receiverId: 3, 
+    content: "Charlie, can you help me with the admin panel?",
+    timestamp: new Date("2024-01-15T11:15:00Z"),
     type: "text"
   },
   {
-    id: "m3",
-    senderId: "u1",
-    content: "Absolutely! I love the dark theme and subtle animations.",
-    timestamp: new Date(Date.now() - 400000).toISOString(),
-    type: "text"
+    id: 4, // Changed back to number
+    senderId: 3,
+    receiverId: 1,
+    content: "Of course! Let me know what you need help with.",
+    timestamp: new Date("2024-01-15T11:18:00Z"),
+    type: "text",
+    reactions: ["👍"]
   },
   {
-    id: "m4",
-    senderId: "u4",
-    content: "Just joined. This is a cool chat app!",
-    timestamp: new Date(Date.now() - 300000).toISOString(),
-    type: "text"
+    id: 5, // Changed back to number
+    senderId: 4, 
+    receiverId: 1,
+    content: "Welcome to VynqTalk! Hope you enjoy using the platform.",
+    timestamp: new Date("2024-01-15T09:45:00Z"),
+    type: "text",
+    reactions: ["🎉", "👋"]
   },
   {
-    id: "m5",
-    senderId: "u2",
-    content: "I agree! The messages load so smoothly.",
-    timestamp: new Date(Date.now() - 200000).toISOString(),
-    type: "text"
-  },
-  {
-    id: "m6",
-    senderId: "u1",
-    content: "Let's try out some of the features. I think we can add emojis too! 😊",
-    timestamp: new Date(Date.now() - 100000).toISOString(),
+    id: 6, // Changed back to number
+    senderId: 1,
+    receiverId: 4,
+    content: "Thank you Diana! The platform looks amazing.",
+    timestamp: new Date("2024-01-15T09:47:00Z"),
     type: "text"
   }
 ];
 
-// Current user is set to Alex Johnson for this demo
-export const currentUser: User = mockUsers[0];
+export const mockGroups: Group[] = [
+  {
+    id: 1, // Changed back to number
+    name: "General Discussion",
+    description: "Main chat for everyone",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=GD",
+    members: [1, 2, 3, 4],
+    createdBy: 3,
+    createdAt: new Date("2024-01-01T00:00:00Z"),
+    isPrivate: false
+  },
+  {
+    id: 2, // Changed back to number
+    name: "Tech Talk",
+    description: "Discuss technology and development",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=TT", 
+    members: [1, 3, 4],
+    createdBy: 3,
+    createdAt: new Date("2024-01-05T00:00:00Z"),
+    isPrivate: false
+  },
+  {
+    id: 3, // Changed back to number
+    name: "Admin Only",
+    description: "Private admin discussions",
+    avatar: "https://api.dicebear.com/7.x/initials/svg?seed=AO",
+    members: [3],
+    createdBy: 3, 
+    createdAt: new Date("2024-01-10T00:00:00Z"),
+    isPrivate: true
+  }
+];
+
+export const mockNotifications: Notification[] = [
+  {
+    id: 1,
+    title: "New Message",
+    message: "Alice sent you a message",
+    timestamp: new Date("2024-01-15T10:30:00Z"),
+    isRead: false,
+    type: "info"
+  },
+  {
+    id: 2, 
+    title: "Group Invitation",
+    message: "You've been invited to Tech Talk",
+    timestamp: new Date("2024-01-15T09:15:00Z"),
+    isRead: true,
+    type: "success"
+  },
+  {
+    id: 3,
+    title: "System Update",
+    message: "VynqTalk has been updated to v2.1",
+    timestamp: new Date("2024-01-14T16:00:00Z"),
+    isRead: false,
+    type: "info"
+  }
+];

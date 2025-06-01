@@ -1,11 +1,14 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, Send, Phone, Video, MoreVertical, Smile, Paperclip } from "lucide-react";
-import { Group, GroupMessage,  Message } from "@/types";
+
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, Send, Phone, Video, MoreVertical, Smile, Paperclip, Users } from "lucide-react";
+import { Group, Message } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -15,8 +18,30 @@ interface GroupChatProps {
 }
 
 export const GroupChat = ({ group, onBack }: GroupChatProps) => {
-  const { user } = useAuth();
-  const [messages, setMessages] = useState<GroupMessage[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: "m1",
+      content: "Hello everyone! Welcome to the group.",
+      senderId: "alice_smith",
+      timestamp: new Date(Date.now() - 3600000),
+      type: "text"
+    },
+    {
+      id: "m2", 
+      content: "Thanks for adding me! Looking forward to our discussions.",
+      senderId: "bob_jones",
+      timestamp: new Date(Date.now() - 1800000),
+      type: "text"
+    },
+    {
+      id: "m3",
+      content: "Great to have everyone here! Let's get started with our project.",
+      senderId: "current-user",
+      timestamp: new Date(Date.now() - 900000),
+      type: "text"
+    }
+  ]);
+  
 
   const [newMessage, setNewMessage] = useState("");
   const { toast } = useToast();
@@ -94,123 +119,198 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
     });
   };
 
+  const getUserDisplayName = (senderId: string) => {
+    const userNames: Record<string, string> = {
+      "alice_smith": "Alice",
+      "bob_jones": "Bob",
+      "current-user": "You"
+    };
+    return userNames[senderId] || senderId;
+  };
+
+  const getUserAvatar = (senderId: string) => {
+    return `https://api.dicebear.com/7.x/avataaars/svg?seed=${senderId}`;
+  };
+
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <Card className="border-b rounded-none flex-shrink-0">
-        <CardHeader className="pb-3">
+    <div className="flex flex-col h-full bg-gradient-to-br from-background via-background to-muted/20">
+      {/* Enhanced Header */}
+      <Card className="border-b rounded-none flex-shrink-0 bg-card/80 backdrop-blur-xl border-border/50">
+        <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Button type="button"
-                variant="ghost"
+
+            <div className="flex items-center space-x-4">
+              <Button type="button" 
+                variant="ghost" 
                 size="icon"
                 onClick={() => {
                   console.log("Back button clicked");
                   onBack();
                 }}
-                className="cursor-pointer hover:bg-accent"
+                className="cursor-pointer hover:bg-accent/80 rounded-xl transition-all duration-200"
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className="h-5 w-5" />
               </Button>
-              <Avatar>
-                <AvatarImage src={group.avatar} alt={group.name} />
-                <AvatarFallback>{group.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div>
-                <h2 className="font-semibold">{group.name}</h2>
-                <p className="text-sm text-muted-foreground">{group.members.length} members</p>
+              
+              <div className="flex items-center space-x-3">
+                <div className="relative">
+                  <Avatar className="h-12 w-12 ring-2 ring-primary/20 ring-offset-2 ring-offset-background">
+                    <AvatarImage src={group.avatar} alt={group.name} />
+                    <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-primary font-semibold">
+                      {group.name.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background"></div>
+                </div>
+                
+                <div className="space-y-1">
+                  <h2 className="font-bold text-lg text-foreground">{group.name}</h2>
+                  <div className="flex items-center space-x-2">
+                    <Badge variant="secondary" className="text-xs bg-muted/50 text-muted-foreground">
+                      <Users className="h-3 w-3 mr-1" />
+                      {group.members.length} members
+                    </Badge>
+                    <Badge variant="outline" className="text-xs border-green-500/30 text-green-600">
+                      Active
+                    </Badge>
+                  </div>
+                </div>
               </div>
             </div>
+            
             <div className="flex space-x-2">
               <Button type="button"
                 variant="ghost"
                 size="icon"
                 onClick={handleVoiceCall}
-                className="cursor-pointer hover:bg-accent"
+                className="cursor-pointer hover:bg-accent/80 rounded-xl transition-all duration-200 hover:scale-105"
               >
-                <Phone className="h-4 w-4" />
+                <Phone className="h-5 w-5" />
               </Button>
               <Button type="button"
                 variant="ghost"
                 size="icon"
                 onClick={handleVideoCall}
-                className="cursor-pointer hover:bg-accent"
+                className="cursor-pointer hover:bg-accent/80 rounded-xl transition-all duration-200 hover:scale-105"
               >
-                <Video className="h-4 w-4" />
+                <Video className="h-5 w-5" />
               </Button>
               <Button type="button"
                 variant="ghost"
                 size="icon"
                 onClick={handleMoreOptions}
-                className="cursor-pointer hover:bg-accent"
+                className="cursor-pointer hover:bg-accent/80 rounded-xl transition-all duration-200 hover:scale-105"
               >
-                <MoreVertical className="h-4 w-4" />
+                <MoreVertical className="h-5 w-5" />
               </Button>
             </div>
           </div>
         </CardHeader>
       </Card>
 
-      {/* Messages */}
+      {/* Enhanced Messages Area */}
       <ScrollArea className="flex-1">
-        <div className="p-4 space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.senderId === user.id ? "justify-end" : "justify-start"}`}
-            >
+
+        <div className="p-6 space-y-4">
+          {messages.map((message, index) => {
+            const isCurrentUser = message.senderId === "current-user";
+            const showAvatar = index === 0 || messages[index - 1].senderId !== message.senderId;
+            
+            return (
               <div
-                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${message.senderId === user.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted"
-                  }`}
+                key={message.id}
+                className={`flex items-end space-x-3 animate-fade-in ${
+                  isCurrentUser ? "flex-row-reverse space-x-reverse" : ""
+                }`}
               >
-                {message.senderId !== user.id && (
-                  <p className="text-xs text-muted-foreground mb-1">User {message.senderId}</p>
+                {showAvatar && !isCurrentUser && (
+                  <Avatar className="h-8 w-8 ring-2 ring-primary/10">
+                    <AvatarImage src={getUserAvatar(message.senderId)} alt={getUserDisplayName(message.senderId)} />
+                    <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-xs font-medium">
+                      {getUserDisplayName(message.senderId).substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 )}
-                <p className="text-sm">{message.content}</p>
-                <p className="text-xs opacity-70 mt-1">
-                  {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </p>
+                
+                {!showAvatar && !isCurrentUser && <div className="w-8" />}
+                
+                <div className={`flex flex-col space-y-1 max-w-[70%] ${isCurrentUser ? "items-end" : "items-start"}`}>
+                  {showAvatar && !isCurrentUser && (
+                    <span className="text-xs font-medium text-muted-foreground ml-3">
+                      {getUserDisplayName(message.senderId)}
+                    </span>
+                  )}
+                  
+                  <div
+                    className={`px-4 py-3 rounded-2xl shadow-sm transition-all duration-200 hover:shadow-md ${
+                      isCurrentUser
+                        ? "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground rounded-br-md"
+                        : "bg-card/80 backdrop-blur-sm border border-border/50 text-foreground rounded-bl-md"
+                    }`}
+                  >
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                    <div className="flex items-center justify-end mt-1 space-x-1">
+                      <span className={`text-xs ${
+                        isCurrentUser ? "text-primary-foreground/70" : "text-muted-foreground"
+                      }`}>
+                        {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      {isCurrentUser && (
+                        <div className="flex space-x-1">
+                          <div className="w-1 h-1 bg-primary-foreground/70 rounded-full"></div>
+                          <div className="w-1 h-1 bg-primary-foreground/70 rounded-full"></div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </ScrollArea>
 
-      {/* Message Input */}
-      <Card className="border-t rounded-none flex-shrink-0">
+      {/* Enhanced Message Input */}
+      <Card className="border-t rounded-none flex-shrink-0 bg-card/80 backdrop-blur-xl border-border/50">
         <CardContent className="p-4">
-          <div className="flex items-center space-x-2">
-            <Button type="button"
-              variant="ghost"
+
+          <div className="flex items-center space-x-3">
+            <Button type="button" 
+              variant="ghost" 
+
               size="icon"
               onClick={handleAttachFile}
-              className="cursor-pointer hover:bg-accent"
+              className="cursor-pointer hover:bg-accent/80 rounded-xl transition-all duration-200 hover:scale-105"
             >
-              <Paperclip className="h-4 w-4" />
+
+              <Paperclip className="h-5 w-5" />
             </Button>
-            <Input
-              placeholder="Type a message..."
-              value={newMessage}
-              onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
-              className="flex-1 cursor-text"
-            />
-            <Button type="button"
-              variant="ghost"
-              size="icon"
-              onClick={handleEmojiPicker}
-              className="cursor-pointer hover:bg-accent"
-            >
-              <Smile className="h-4 w-4" />
-            </Button>
-            <Button type="button"
+            
+            <div className="flex-1 relative">
+              <Input
+                placeholder="Type your message..."
+                value={newMessage}
+                onChange={handleInputChange}
+                onKeyPress={handleKeyPress}
+                className="cursor-text bg-background/50 border-border/50 rounded-xl px-4 py-3 pr-12 focus:bg-background/80 transition-all duration-200"
+              />
+              <Button type="button" 
+                variant="ghost" 
+                size="icon"
+                onClick={handleEmojiPicker}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer hover:bg-accent/80 rounded-lg"
+              >
+                <Smile className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <Button type="button" 
               onClick={handleSendMessage}
               disabled={!newMessage.trim()}
-              className="cursor-pointer"
+              className="cursor-pointer bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 rounded-xl px-6 py-3 transition-all duration-200 hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
             >
-              <Send className="h-4 w-4" />
+              <Send className="h-5 w-5" />
             </Button>
           </div>
         </CardContent>

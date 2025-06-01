@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (response.success && response.data) {
         const apiUser = response.data.user;
         const user: User = {
-          id: apiUser.id,
+          id: apiUser.id.toString(),
           name: apiUser.name,
           email: apiUser.email,
           avatar: apiUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${apiUser.name}`,
@@ -88,7 +88,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (response.success && response.data) {
         const apiUser = response.data.user;
         const user: User = {
-          id: apiUser.id,
+          id: apiUser.id.toString(),
           name: apiUser.name,
           email: apiUser.email,
           avatar: apiUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${apiUser.name}`,
