@@ -86,7 +86,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
             <div className="flex-shrink-0 border-t border-border/30 bg-background/50 backdrop-blur-sm">
               <MessageInput
                 onSendMessage={handleSendMessage}
-                currentUser={user || { id: 0, name: "Guest", avatar: "", isOnline: true, isAdmin: false }}
+                currentUser={user || { id: 0, name: "Guest", avatar: "",  isAdmin: false }}
                 replyTo={replyTo || undefined}
                 onCancelReply={handleCancelReply}
               />
