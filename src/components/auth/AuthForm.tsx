@@ -6,7 +6,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Mail, Lock, Eye, EyeOff, User } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, User, Shield, Zap } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -44,25 +44,28 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         {type === 'signup' && (
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-semibold text-foreground/90">Full Name</FormLabel>
+                <FormLabel className="text-sm font-semibold text-gray-200 flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Full Name
+                </FormLabel>
                 <FormControl>
                   <div className="relative group">
-                    <User className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input 
                       placeholder="Enter your full name" 
                       {...field} 
-                      className="pl-12 h-12 bg-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50 focus:bg-background/80 transition-all duration-200 rounded-xl"
+                      className="h-14 bg-black/40 backdrop-blur-sm border-white/20 focus:border-purple-400/50 focus:bg-black/60 transition-all duration-200 rounded-xl text-white placeholder:text-gray-400 pl-4 focus:ring-2 focus:ring-purple-400/20"
                     />
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-500/10 to-cyan-500/10 opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none"></div>
                   </div>
                 </FormControl>
-                <FormMessage className="text-xs" />
+                <FormMessage className="text-xs text-red-400" />
               </FormItem>
             )}
           />
@@ -73,18 +76,21 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-semibold text-foreground/90">Email Address</FormLabel>
+              <FormLabel className="text-sm font-semibold text-gray-200 flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                Email Address
+              </FormLabel>
               <FormControl>
                 <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                   <Input 
                     placeholder="Enter your email address" 
                     {...field} 
-                    className="pl-12 h-12 bg-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50 focus:bg-background/80 transition-all duration-200 rounded-xl"
+                    className="h-14 bg-black/40 backdrop-blur-sm border-white/20 focus:border-cyan-400/50 focus:bg-black/60 transition-all duration-200 rounded-xl text-white placeholder:text-gray-400 pl-4 focus:ring-2 focus:ring-cyan-400/20"
                   />
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/10 to-blue-500/10 opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none"></div>
                 </div>
               </FormControl>
-              <FormMessage className="text-xs" />
+              <FormMessage className="text-xs text-red-400" />
             </FormItem>
           )}
         />
@@ -94,32 +100,35 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-semibold text-foreground/90">Password</FormLabel>
+              <FormLabel className="text-sm font-semibold text-gray-200 flex items-center gap-2">
+                <Lock className="h-4 w-4" />
+                Password
+              </FormLabel>
               <FormControl>
                 <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                   <Input 
                     type={showPassword ? "text" : "password"} 
                     placeholder="Enter your password" 
                     {...field} 
-                    className="pl-12 pr-12 h-12 bg-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50 focus:bg-background/80 transition-all duration-200 rounded-xl"
+                    className="h-14 bg-black/40 backdrop-blur-sm border-white/20 focus:border-pink-400/50 focus:bg-black/60 transition-all duration-200 rounded-xl text-white placeholder:text-gray-400 pl-4 pr-14 focus:ring-2 focus:ring-pink-400/20"
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-muted/50 rounded-lg"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 h-10 w-10 p-0 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      <EyeOff className="h-5 w-5" />
                     ) : (
-                      <Eye className="h-4 w-4 text-muted-foreground" />
+                      <Eye className="h-5 w-5" />
                     )}
                   </Button>
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-pink-500/10 to-purple-500/10 opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none"></div>
                 </div>
               </FormControl>
-              <FormMessage className="text-xs" />
+              <FormMessage className="text-xs text-red-400" />
             </FormItem>
           )}
         />
@@ -130,53 +139,62 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-semibold text-foreground/90">Confirm Password</FormLabel>
+                <FormLabel className="text-sm font-semibold text-gray-200 flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  Confirm Password
+                </FormLabel>
                 <FormControl>
                   <div className="relative group">
-                    <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input 
                       type={showConfirmPassword ? "text" : "password"} 
                       placeholder="Confirm your password" 
                       {...field} 
-                      className="pl-12 pr-12 h-12 bg-background/50 backdrop-blur-sm border-border/50 focus:border-primary/50 focus:bg-background/80 transition-all duration-200 rounded-xl"
+                      className="h-14 bg-black/40 backdrop-blur-sm border-white/20 focus:border-green-400/50 focus:bg-black/60 transition-all duration-200 rounded-xl text-white placeholder:text-gray-400 pl-4 pr-14 focus:ring-2 focus:ring-green-400/20"
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-8 w-8 p-0 hover:bg-muted/50 rounded-lg"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-10 w-10 p-0 hover:bg-white/10 rounded-lg text-gray-400 hover:text-white transition-colors"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                       {showConfirmPassword ? (
-                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        <EyeOff className="h-5 w-5" />
                       ) : (
-                        <Eye className="h-4 w-4 text-muted-foreground" />
+                        <Eye className="h-5 w-5" />
                       )}
                     </Button>
+                    <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-green-500/10 to-teal-500/10 opacity-0 group-focus-within:opacity-100 transition-opacity pointer-events-none"></div>
                   </div>
                 </FormControl>
-                <FormMessage className="text-xs" />
+                <FormMessage className="text-xs text-red-400" />
               </FormItem>
             )}
           />
         )}
         
-        <div className="pt-4">
+        <div className="pt-6">
           <Button 
             type="submit" 
-            className="w-full h-14 bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary/80 text-primary-foreground font-semibold rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl hover:shadow-primary/25 transform hover:scale-[1.02] active:scale-[0.98]" 
+            className="w-full h-16 bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 hover:from-purple-500 hover:via-blue-500 hover:to-cyan-500 text-white font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:shadow-purple-500/25 transform hover:scale-[1.02] active:scale-[0.98] relative overflow-hidden group" 
             disabled={isLoading}
           >
-            {isLoading ? (
-              <div className="flex items-center space-x-3">
-                <div className="w-5 h-5 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
-                <span>{type === 'login' ? 'Signing you in...' : 'Creating your account...'}</span>
-              </div>
-            ) : (
-              <span className="text-base">
-                {type === 'login' ? 'Sign in to VynqTalk' : 'Create your account'}
-              </span>
-            )}
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 blur-lg opacity-75 group-hover:opacity-100 transition-opacity"></div>
+            <div className="relative z-10 flex items-center justify-center">
+              {isLoading ? (
+                <div className="flex items-center space-x-3">
+                  <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <span className="text-lg">{type === 'login' ? 'Signing you in...' : 'Creating your account...'}</span>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <Zap className="h-5 w-5" />
+                  <span className="text-lg font-semibold">
+                    {type === 'login' ? 'Sign in to VynqTalk' : 'Create your account'}
+                  </span>
+                </div>
+              )}
+            </div>
           </Button>
         </div>
       </form>

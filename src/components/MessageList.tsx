@@ -1,55 +1,70 @@
 
-import { useEffect, useRef } from "react";
 import { Message, User } from "../types";
 import { MessageBubble } from "./MessageBubble";
 
 interface MessageListProps {
   messages: Message[];
   users: User[];
-  onUserAvatarClick?: (user: User) => void;
-  onDeleteMessage?: (messageId: number) => void;
+  currentUserId?: string;
+  onUserAvatarClick?: () => void;
+  onDeleteMessage?: (message: Message) => void;
   onEditMessage?: (message: Message) => void;
   onReplyMessage?: (message: Message) => void;
-  onReactToMessage?: (messageId: number, emoji: string) => void;
-  currentUserId?: number;
+  onReactToMessage?: (messageId: string, emoji: string) => void;
 }
 
 export const MessageList = ({
   messages,
   users,
+  currentUserId = "current-user",
   onUserAvatarClick,
   onDeleteMessage,
   onEditMessage,
   onReplyMessage,
   onReactToMessage,
-  currentUserId = 1
 }: MessageListProps) => {
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  console.log("MessageList received messages:", messages.length);
+  console.log("MessageList users:", users.length);
 
-  useEffect(() => {
-    console.log("MessageList messages:", messages);
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  const getUserById = (userId: string) => {
+    const user = users.find((u) => u.id === userId);
+    if (!user) {
+      console.log("User not found for ID:", userId);
+      return {
+        id: userId,
+        name: "Unknown User",
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${userId}`,
+        isOnline: false,
+        isAdmin: false,
+      };
+    }
+    return user;
+  };
+
+  const sortedMessages = [...messages].sort(
+    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  );
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-background/80 to-background">
-      {messages.map((message) => {
-        const user = users.find((u) => u.id == message.senderId);
-        return user ? (
+    <div className="flex flex-col space-y-4 p-4">
+      {sortedMessages.map((message) => {
+        const user = getUserById(message.senderId);
+        console.log("Rendering message:", message.id, "from user:", user.name);
+
+        return (
           <MessageBubble
             key={message.id}
             message={message}
-            user={user}
+            user={user as User}
             currentUserId={currentUserId}
-            onUserAvatarClick={onUserAvatarClick ? () => onUserAvatarClick(user) : undefined}
-            onDeleteMessage={onDeleteMessage ? () => onDeleteMessage(message.id) : undefined}
-            onEditMessage={onEditMessage ? () => onEditMessage(message) : undefined}
+            onUserAvatarClick={onUserAvatarClick}
+            onDeleteMessage={() => onDeleteMessage?.(message)}
+            onEditMessage={() => onEditMessage?.(message)}
             onReplyMessage={onReplyMessage}
             onReactToMessage={onReactToMessage}
           />
-        ) : null;
+        );
       })}
-      <div ref={messagesEndRef} />
     </div>
   );
 };

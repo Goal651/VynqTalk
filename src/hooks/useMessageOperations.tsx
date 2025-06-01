@@ -1,35 +1,32 @@
 
 import { useState } from "react";
 import { Message } from "@/types";
-import { useToast } from "@/hooks/use-toast";
 
 export const useMessageOperations = (
   messages: Message[],
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
-  onMessageDelete?: (messageId: number) => void,
+  onMessageDelete?: (messageId: string) => void,
   onMessageEdit?: (message: Message) => void
 ) => {
-  const { toast } = useToast();
-  const [messageToDelete, setMessageToDelete] = useState<number | null>(null);
+  const [messageToDelete, setMessageToDelete] = useState<Message | null>(null);
   const [messageToEdit, setMessageToEdit] = useState<Message | null>(null);
   const [editedContent, setEditedContent] = useState("");
 
-  const handleDeleteMessage = (messageId: number) => {
-    console.log("Delete message requested:", messageId);
-    setMessageToDelete(messageId);
+  const handleDeleteMessage = (message: Message) => {
+    console.log("Delete message requested:", message.id);
+    setMessageToDelete(message);
   };
 
   const confirmDeleteMessage = () => {
     if (messageToDelete) {
-      console.log("Confirming delete message:", messageToDelete);
-      setMessages(messages.filter(message => message.id !== messageToDelete));
-      if (onMessageDelete) onMessageDelete(messageToDelete);
+      console.log("Confirming delete for message:", messageToDelete.id);
+      setMessages((prev) =>
+        prev.filter((msg) => msg.id !== messageToDelete.id)
+      );
+      if (onMessageDelete) {
+        onMessageDelete(messageToDelete.id);
+      }
       setMessageToDelete(null);
-
-      toast({
-        title: "Message deleted",
-        description: "Message has been removed",
-      });
     }
   };
 
@@ -37,24 +34,27 @@ export const useMessageOperations = (
     console.log("Edit message requested:", message.id);
     setMessageToEdit(message);
     setEditedContent(message.content);
-
   };
 
   const confirmEditMessage = () => {
-    if (messageToEdit) {
-      console.log("Confirming edit message:", messageToEdit.id, "new content:", editedContent);
-      setMessages(messages.map(message =>
-        message.id === messageToEdit.id
-          ? { ...message, content: editedContent, edited: true }
-          : message
-      ));
-      if (onMessageEdit) onMessageEdit({...messageToEdit, content: editedContent, edited: true});
-      setMessageToEdit(null);
+    if (messageToEdit && editedContent.trim()) {
+      console.log("Confirming edit for message:", messageToEdit.id);
+      const updatedMessage = {
+        ...messageToEdit,
+        content: editedContent.trim(),
+        edited: true,
+      };
 
-      toast({
-        title: "Message edited",
-        description: "Message has been updated",
-      });
+      setMessages((prev) =>
+        prev.map((msg) => (msg.id === messageToEdit.id ? updatedMessage : msg))
+      );
+
+      if (onMessageEdit) {
+        onMessageEdit(updatedMessage);
+      }
+
+      setMessageToEdit(null);
+      setEditedContent("");
     }
   };
 
@@ -68,6 +68,6 @@ export const useMessageOperations = (
     handleDeleteMessage,
     confirmDeleteMessage,
     handleEditMessage,
-    confirmEditMessage
+    confirmEditMessage,
   };
 };
