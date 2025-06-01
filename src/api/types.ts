@@ -1,12 +1,12 @@
 
 // Base API Response Types
 export interface ApiResponse<T = any> {
-  users(users: any): unknown;
   success: boolean;
   data?: T;
-  message?: string;
+  message: string;
   error?: string;
   errors?: Record<string, string[]>;
+  status: number;
 }
 
 export interface PaginatedResponse<T> extends ApiResponse<T[]> {

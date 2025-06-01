@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext"
 import { userService } from "@/api/services/users"
 import { messageService } from "@/api/services/messages"
 
+
 const Index = () => {
   const [currentView, setCurrentView] = useState<"chat" | "group" | "settings" | "notifications" | "admin">("chat")
   const { toast } = useToast()
@@ -23,9 +24,17 @@ const Index = () => {
     const fetchUsers = async () => {
       try {
         const response = await userService.getAllUsers()
+        console.log("Users:", response)
         if (response && response.data) setUsers(response.data)
       } catch (error) {
-        console.error('Error fetching users:', error)
+        if (error instanceof Error) {
+          console.error('Error fetching users:', error.message)
+          toast({
+            title: "Error",
+            description: "There was an error fetching users.",
+            variant: "destructive",
+          })
+        }
       }
     }
     fetchUsers()

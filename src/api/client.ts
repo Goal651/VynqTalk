@@ -50,9 +50,9 @@ class ApiClient {
         try {
           if (error.response) {
             const apiError: ApiError = {
-              status: error.response.status,
-              message: error.response.data?.message || 'An error occurred',
-              errors: error.response.data?.errors,
+              status: error.status,
+              message: error?.message || 'An error occurred',
+              errors: error.errors,
             };
             if (apiError.status === HTTP_STATUS.UNAUTHORIZED) {
               console.warn('401 Unauthorized detected, attempting token refresh');
@@ -67,7 +67,7 @@ class ApiClient {
           }
           throw new Error('Network error');
         } catch (err) {
-          console.error('Error in response interceptor:', err.message);
+          console.error('Error in response interceptor:', err.message,"this is another error\n",error.status===HTTP_STATUS.UNAUTHORIZED);
           return Promise.reject(err);
         }
       }
