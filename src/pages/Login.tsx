@@ -22,51 +22,62 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-secondary/5 p-4 relative overflow-hidden">
-      {/* Background decorations */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary/10 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/3 left-1/4 w-32 h-32 bg-accent/10 rounded-full blur-2xl"></div>
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 relative overflow-hidden">
+      {/* Enhanced background with theme-aware gradients */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/10">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-secondary/20 via-transparent to-transparent"></div>
       </div>
       
-      <Card className="w-full max-w-md bg-card border border-border shadow-2xl animate-fade-in relative z-10">
-        <CardHeader className="space-y-4 text-center pb-6">
-          <div className="mx-auto w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
-            <MessageSquare className="h-8 w-8 text-primary-foreground" />
+      {/* Floating background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-float"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary/15 rounded-full blur-3xl animate-float" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/3 left-1/4 w-32 h-32 bg-accent/15 rounded-full blur-2xl animate-float" style={{ animationDelay: '4s' }}></div>
+      </div>
+      
+      <Card className="w-full max-w-md relative z-10 bg-card/95 backdrop-blur-xl border border-border/50 shadow-2xl shadow-primary/10 animate-fade-in">
+        <CardHeader className="space-y-6 text-center pb-8">
+          <div className="mx-auto w-20 h-20 bg-gradient-to-br from-primary via-primary to-primary/80 rounded-3xl flex items-center justify-center shadow-xl shadow-primary/30 animate-glow">
+            <MessageSquare className="h-10 w-10 text-primary-foreground" />
           </div>
-          <div>
-            <CardTitle className="text-3xl font-bold tracking-tight">
+          <div className="space-y-3">
+            <CardTitle className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
               Welcome back
             </CardTitle>
-            <CardDescription className="text-muted-foreground mt-2">
-              Sign in to continue to VynqTalk
+            <CardDescription className="text-muted-foreground text-base leading-relaxed">
+              Sign in to continue your conversations on VynqTalk
             </CardDescription>
           </div>
         </CardHeader>
         
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6 px-8">
           <AuthForm type="login" onSubmit={onSubmit} isLoading={isLoading} />
         </CardContent>
         
-        <CardFooter className="flex flex-col space-y-4 pt-2">
+        <CardFooter className="flex flex-col space-y-6 pt-4 px-8 pb-8">
           <div className="text-sm text-muted-foreground text-center">
             Don&apos;t have an account?{" "}
             <Link 
               to="/signup" 
-              className="text-primary hover:text-primary/80 font-medium hover:underline transition-colors"
+              className="text-primary hover:text-primary/80 font-semibold hover:underline transition-all duration-200 underline-offset-4"
             >
-              Sign up
+              Sign up for free
             </Link>
           </div>
           
-          <div className="w-full p-3 bg-muted rounded-lg border border-border">
-            <p className="text-xs text-muted-foreground text-center font-medium">
-              Demo credentials
+          <div className="w-full p-4 bg-muted/50 rounded-xl border border-border/30 backdrop-blur-sm">
+            <p className="text-xs font-semibold text-muted-foreground text-center mb-2 uppercase tracking-wider">
+              Demo Access
             </p>
-            <p className="text-xs text-muted-foreground text-center mt-1">
-              <span className="font-mono">user@example.com</span> / <span className="font-mono">password</span>
-            </p>
+            <div className="text-center space-y-1">
+              <p className="text-sm text-muted-foreground">
+                <span className="font-mono bg-background/50 px-2 py-1 rounded text-xs">user@example.com</span>
+              </p>
+              <p className="text-sm text-muted-foreground">
+                <span className="font-mono bg-background/50 px-2 py-1 rounded text-xs">password</span>
+              </p>
+            </div>
           </div>
         </CardFooter>
       </Card>
