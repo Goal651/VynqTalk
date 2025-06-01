@@ -4,7 +4,6 @@ export interface User {
   name: string
   email?: string
   avatar: string
-  isOnline?: boolean
   isAdmin: boolean
   role?: 'user' | 'admin' | 'moderator'
 }
@@ -21,6 +20,18 @@ export interface Message {
   replyToMessageId?: Message
 }
 
+export interface GroupMessage {
+  id: number
+  groupId: number
+  edited?: boolean
+  replyToMessageId?: Message
+  senderId: number
+  content: string
+  timestamp: string
+  type: "text" | "image" | "audio" | "file"
+  reactions?: string[]
+}
+
 export interface Reaction {
   id: number
   emoji: string
@@ -33,8 +44,8 @@ export interface Group {
   name: string
   description?: string
   avatar: string
-  members: string[]
-  createdBy: string
+  members: User[]
+  createdBy: User
   createdAt: Date
   isPrivate?: boolean
 }

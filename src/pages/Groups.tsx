@@ -16,6 +16,7 @@ import { Group } from "@/types";
 import { GroupChat } from "@/components/GroupChat";
 import { GroupSettings } from "@/components/GroupSettings";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const createGroupSchema = z.object({
   name: z.string().min(2, { message: "Group name must be at least 2 characters" }),
@@ -23,31 +24,13 @@ const createGroupSchema = z.object({
 });
 
 export const Groups = () => {
-  const [groups, setGroups] = useState<Group[]>([
-    {
-      id: "g1",
-      name: "Team Alpha",
-      avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=team-alpha",
-      members: ["u1", "u2", "u3"],
-      createdBy: "u1",
-      createdAt: new Date(),
-      description: "Main development team"
-    },
-    {
-      id: "g2", 
-      name: "Project Beta",
-      avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=project-beta",
-      members: ["u1", "u4"],
-      createdBy: "u1",
-      createdAt: new Date(),
-      description: "Beta testing group"
-    }
-  ]);
+  const [groups, setGroups] = useState<Group[]>([  ]);
   
-  const [isCreateOpen, setIsCreateOpen] = useState(true);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [currentView, setCurrentView] = useState<"list" | "chat" | "settings">("list");
   const [searchQuery, setSearchQuery] = useState("");
+  const { user } = useAuth();
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof createGroupSchema>>({
@@ -61,11 +44,11 @@ export const Groups = () => {
   const onSubmit = (values: z.infer<typeof createGroupSchema>) => {
     console.log("Creating group with values:", values);
     const newGroup: Group = {
-      id: `g${Date.now()}`,
+      id: Date.now(),
       name: values.name,
       avatar: `https://api.dicebear.com/7.x/shapes/svg?seed=${values.name}`,
-      members: ["current-user"],
-      createdBy: "current-user",
+      members: [],
+      createdBy: user,
       createdAt: new Date(),
       description: values.description,
     };
@@ -232,7 +215,7 @@ export const Groups = () => {
                   <CardDescription>{group.description}</CardDescription>
                 </div>
                 <div className="flex items-center">
-                  {group.createdBy === "current-user" && <Crown className="h-4 w-4 text-yellow-500" />}
+                  {group.createdBy.id === user.id && <Crown className="h-4 w-4 text-yellow-500" />}
                 </div>
               </div>
             </CardHeader>
