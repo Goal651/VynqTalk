@@ -25,7 +25,7 @@ const createGroupSchema = z.object({
 export const Groups = () => {
   const [groups, setGroups] = useState<Group[]>([
     {
-      id: "g1",
+      id: 1,
       name: "Team Alpha",
       avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=team-alpha",
       members: ["u1", "u2", "u3"],
@@ -34,7 +34,7 @@ export const Groups = () => {
       description: "Main development team"
     },
     {
-      id: "g2", 
+      id: 2, 
       name: "Project Beta",
       avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=project-beta",
       members: ["u1", "u4"],
@@ -44,7 +44,7 @@ export const Groups = () => {
     }
   ]);
   
-  const [isCreateOpen, setIsCreateOpen] = useState(true);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [currentView, setCurrentView] = useState<"list" | "chat" | "settings">("list");
   const [searchQuery, setSearchQuery] = useState("");
@@ -61,7 +61,7 @@ export const Groups = () => {
   const onSubmit = (values: z.infer<typeof createGroupSchema>) => {
     console.log("Creating group with values:", values);
     const newGroup: Group = {
-      id: `g${Date.now()}`,
+      id: Date.now(),
       name: values.name,
       avatar: `https://api.dicebear.com/7.x/shapes/svg?seed=${values.name}`,
       members: ["current-user"],
