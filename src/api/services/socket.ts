@@ -1,6 +1,6 @@
 import SockJS from 'sockjs-client';
 import { Client, IMessage } from '@stomp/stompjs';
-import { Message } from '@/types';
+import { Message, User } from '@/types';
 
 class SocketService {
     private stompClient: Client;
@@ -242,13 +242,13 @@ class SocketService {
         }
     }
 
-    public sendMessage(content: string, receiverId: number, type: 'text' | 'image' | 'audio' | 'file', senderId: number) {
+    public sendMessage(content: string, receiver: User, type: 'text' | 'image' | 'audio' | 'file', sender: User) {
         try {
             if (!this.stompClient.connected) {
                 console.warn('Cannot send message: WebSocket not connected');
                 return;
             }
-            const payload = { content, receiverId, type, senderId }; // Match backend
+            const payload = { content, receiver, type, sender }; // Match backend
             this.stompClient.publish({
                 destination: '/app/chat.sendMessage',
                 body: JSON.stringify(payload),

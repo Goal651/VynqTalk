@@ -57,10 +57,10 @@ export const useChat = () => {
     console.log("Sending message:", content, "to user:", activeChat.name, "reply:", replyData)
     const newMessage: Message = {
       id: Date.now(),
-      senderId: user.id,
+      sender: user,
       content: content,
       timestamp: new Date().toISOString(),
-      receiverId: activeChat.id,
+      receiver: activeChat,
       type: "text",
       replyToMessageId: replyData,
       reactions: []
@@ -74,7 +74,7 @@ export const useChat = () => {
     })
     setReplyTo(null)
     if (replyData) socketService.messageReply(newMessage.content, Number(activeChat.id), newMessage.type, Number(user.id), replyData)
-    else socketService.sendMessage(newMessage.content, Number(activeChat.id), newMessage.type, Number(user.id))
+    else socketService.sendMessage(newMessage.content,activeChat, newMessage.type, user)
 
   }
 
@@ -151,8 +151,8 @@ export const useChat = () => {
 
   const filteredMessages = activeChat
     ? messages.filter(message =>
-      (message.senderId == user?.id && message.receiverId == activeChat.id) ||
-      (message.senderId == activeChat.id && message.receiverId == user?.id)
+      (message.sender.id == user?.id && message.receiver.id == activeChat.id) ||
+      (message.sender.id == activeChat.id && message.receiver.id == user?.id)
     )
     : []
 

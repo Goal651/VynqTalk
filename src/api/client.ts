@@ -21,7 +21,7 @@ class ApiClient {
     this.axiosInstance.interceptors.request.use(
       (config) => {
         try {
-          if (config.url?.includes('/auth/login')) {
+          if (config.url?.includes('/auth')) {
             return config;
           }
           const token = this.getAuthToken();
@@ -175,9 +175,10 @@ class ApiClient {
   async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.post<ApiResponse<T>>(endpoint, data);
+      console.log("This is the response",response,"endpoint",endpoint)
       return response.data;
     } catch (error) {
-      console.error(`POST ${endpoint} failed:`, error.message);
+      console.error(`POST ${endpoint} failed:`, error.request);
       if (error.status === HTTP_STATUS.UNAUTHORIZED) {
         await this.handleUnauthorized();
         return this.post<T>(endpoint, data); // Retry

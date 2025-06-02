@@ -80,11 +80,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         name,
         email,
         password,
-        confirmPassword: password,
       };
-      
+     
       const response = await authService.signup(userData);
-      
+      console.log("wigooooooooooooo",response)
       if (response.success && response.data) {
         const apiUser = response.data.user;
         const user: User = {
@@ -119,7 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         description: apiError.message || "An unexpected error occurred",
         variant: "destructive",
       });
-      return false;
+      return true;
     }
   };
 

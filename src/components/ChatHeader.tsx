@@ -63,7 +63,7 @@ export const ChatHeader = ({ users, activeChat, onVoiceCall, onVideoCall }: Chat
                 <img
                   src={activeChat.avatar}
                   alt={activeChat.name}
-                  className="w-9 h-9 rounded-full border-2 border-primary/20 shadow-md ring-2 ring-background"
+                  className="w-9 h-9 rounded-full border-2 border-primary/20 shadow-md ring-2 ring-background overflow-hidden"
                 />
                 {activeChat.isOnline && (
                   <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-background rounded-full shadow-sm"></span>
@@ -121,29 +121,7 @@ export const ChatHeader = ({ users, activeChat, onVoiceCall, onVideoCall }: Chat
           </div>
         )}
 
-        <div className="flex -space-x-2">
-          {users.slice(0, 4).map((user) => (
-            <div
-              key={user.id}
-              className="relative w-8 h-8 rounded-full border-2 border-background overflow-hidden shadow-md hover:scale-110 hover:z-10 transition-all duration-200 cursor-pointer ring-1 ring-primary/10"
-              title={user.name}
-            >
-              <img
-                src={user.avatar}
-                alt={user.name}
-                className="w-full h-full object-cover"
-              />
-              {user.isOnline && (
-                <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-background rounded-full shadow-sm"></span>
-              )}
-            </div>
-          ))}
-          {users.length > 4 && (
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-accent/80 to-primary/20 flex items-center justify-center text-xs font-bold border-2 border-background shadow-md hover:scale-110 transition-all duration-200 cursor-pointer ring-1 ring-primary/10">
-              +{users.length - 4}
-            </div>
-          )}
-        </div>
+   
       </div>
     </div>
   );

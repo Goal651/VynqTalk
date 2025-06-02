@@ -1,4 +1,5 @@
 
+import { Alert } from '@/components/ui/alert';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
 import {
@@ -28,6 +29,7 @@ export class AuthService {
   }
 
   async signup(userData: SignupRequest): Promise<ApiResponse<AuthResponse>> {
+
     const response = await apiClient.post<AuthResponse>(
       API_ENDPOINTS.AUTH.SIGNUP,
       userData

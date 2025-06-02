@@ -11,6 +11,18 @@ export interface User {
 
 export interface Message {
   id: number
+  sender: User // Changed to string and keeping senderId
+  receiver?: User // Made optional and string
+  content: string
+  timestamp: string
+  edited?: boolean
+  type: "text" | "image" | "audio" | "file"
+  reactions?: string[]
+  replyToMessageId?: Message
+}
+
+export interface GroupMessage {
+  id: number
   senderId: number // Changed to string and keeping senderId
   receiverId?: number // Made optional and string
   content: string
@@ -20,7 +32,6 @@ export interface Message {
   reactions?: string[]
   replyToMessageId?: Message
 }
-
 export interface Reaction {
   id: number
   emoji: string

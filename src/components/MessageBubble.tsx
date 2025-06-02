@@ -36,9 +36,7 @@ export const MessageBubble = ({
 }: MessageBubbleProps) => {
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const isCurrentUser = user.id === currentUserId;
-  const formattedTime = formatDistanceToNow(new Date(message.timestamp), {
-    addSuffix: true,
-  });
+  const formattedTime = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   const handleAvatarClick = () => {
     console.log("Avatar clicked:", user.name);
@@ -107,24 +105,19 @@ export const MessageBubble = ({
       )}
 
       <div
-        className={`rounded-lg p-3 max-w-[80%] transition-all hover:shadow-md cursor-pointer select-text ${isCurrentUser
+        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${isCurrentUser
           ? "bg-primary text-primary-foreground"
           : "bg-muted text-foreground"
           }`}
       >
         {!isCurrentUser && (
-          <div className="font-semibold text-sm mb-1">{user.name}</div>
+          <p className="text-xs text-muted-foreground mb-1">User {message.senderId}</p>
         )}
-        <div className="break-words whitespace-pre-wrap">{message.content}</div>
-        <div
-          className={`text-xs mt-1 ${isCurrentUser ? "text-primary-foreground/70" : "text-muted-foreground"
-            }`}
-        >
+
+        <div className="break-words whitespace-pre-wrap ">{message.content}</div>
+        <p className="text-xs opacity-70 mt-1">
           {formattedTime}
-          {message.edited && (
-            <span className="ml-1 italic">(edited)</span>
-          )}
-        </div>
+        </p>
       </div>
 
       {message.reactions && message.reactions.length > 0 && (
@@ -177,15 +170,7 @@ export const MessageBubble = ({
       className={`flex items-start gap-2 animate-fade-in ${isCurrentUser ? "flex-row-reverse" : "flex-row"
         }`}
     >
-      <Avatar
-        className={`cursor-pointer hover:scale-105 transition-transform ${user.isOnline ? "ring-2 ring-green-500 ring-offset-2 ring-offset-background" : ""}`}
-        onClick={handleAvatarClick}
-      >
-        <AvatarImage src={user.avatar} alt={user.name} />
-        <AvatarFallback className="bg-primary/10 text-primary font-medium ">
-          {user.name.substring(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
+
 
       <ContextMenu>
         <ContextMenuTrigger className="focus:outline-none">

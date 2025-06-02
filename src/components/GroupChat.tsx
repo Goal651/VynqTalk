@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowLeft, Send, Phone, Video, MoreVertical, Smile, Paperclip } from "lucide-react";
-import { Group, Message } from "@/types";
+import { Group, GroupMessage, Message } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 
 interface GroupChatProps {
@@ -14,22 +14,7 @@ interface GroupChatProps {
 }
 
 export const GroupChat = ({ group, onBack }: GroupChatProps) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "m1",
-      content: "Hello everyone! Welcome to the group.",
-      senderId: "u1",
-      timestamp: new Date(Date.now() - 3600000),
-      type: "text"
-    },
-    {
-      id: "m2", 
-      content: "Thanks for adding me!",
-      senderId: "u2",
-      timestamp: new Date(Date.now() - 1800000),
-      type: "text"
-    }
-  ]);
+  const [messages, setMessages] = useState<GroupMessage[]>([  ]);
   
   const [newMessage, setNewMessage] = useState("");
   const { toast } = useToast();
@@ -37,11 +22,11 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
   const handleSendMessage = () => {
     if (newMessage.trim()) {
       console.log("Sending group message:", newMessage);
-      const message: Message = {
-        id: `m${Date.now()}`,
+      const message: GroupMessage = {
+        id: Date.now(),
         content: newMessage,
-        senderId: "current-user",
-        timestamp: new Date(),
+        senderId:1 ,
+        timestamp: new Date().toString(),
         type: "text"
       };
       setMessages([...messages, message]);
@@ -169,21 +154,21 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`flex ${message.senderId === "current-user" ? "justify-end" : "justify-start"}`}
+              className={`flex ${message.senderId === 1 ? "justify-end" : "justify-start"}`}
             >
               <div
                 className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                  message.senderId === "current-user"
+                  message.senderId ===1
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted"
                 }`}
               >
-                {message.senderId !== "current-user" && (
+                {message.senderId !== 1 && (
                   <p className="text-xs text-muted-foreground mb-1">User {message.senderId}</p>
                 )}
                 <p className="text-sm">{message.content}</p>
                 <p className="text-xs opacity-70 mt-1">
-                  {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
             </div>

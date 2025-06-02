@@ -5,7 +5,6 @@ import { MessageList } from "./MessageList";
 import { MessageInput } from "./MessageInput";
 import { ChatHeader } from "./ChatHeader";
 import { UserInfo } from "./UserInfo";
-import { CallControls } from "./CallControls";
 import { MessageDialogs } from "./MessageDialogs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
