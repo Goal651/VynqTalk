@@ -96,7 +96,7 @@ export const MessageBubble = ({
         <div className={`mb-2 p-2 rounded-md bg-muted/50 border-l-2 border-primary text-sm ${isCurrentUser ? "mr-4" : "ml-4"
           }`}>
           <div className="font-medium text-muted-foreground">
-            Replying to {message.replyToMessageId.senderId}
+            Replying to {message.replyToMessageId.sender.name}
           </div>
           <div className="text-muted-foreground truncate">
             {message.replyToMessageId.content}
@@ -111,7 +111,7 @@ export const MessageBubble = ({
           }`}
       >
         {!isCurrentUser && (
-          <p className="text-xs text-muted-foreground mb-1">User {message.senderId}</p>
+          <p className="text-xs text-muted-foreground mb-1">User {message.sender.name}</p>
         )}
 
         <div className="break-words whitespace-pre-wrap ">{message.content}</div>

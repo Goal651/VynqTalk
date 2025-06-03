@@ -6,6 +6,8 @@ class SocketService {
     private stompClient: Client;
     private onlineUsers: string[] = [];
     private onlineUserListeners: ((users: string[]) => void)[] = [];
+    private messageListeners: ((message: Message) => void)[] = [];
+    private reactionListeners: ((message: Message) => void)[] = [];
     private logoutListeners: (() => void)[] = [];
     private connectionAttempts: number = 0;
     private maxConnectionAttempts: number = 3;
@@ -210,17 +212,45 @@ class SocketService {
 
     private subscribeToPublic() {
         try {
-            this.stompClient.subscribe('/topic/public', (message) => this.handleMessage(message));
             this.stompClient.subscribe('/topic/onlineUsers', (message) => this.handleOnlineUsers(message));
+
+            // Subscribe to private messages
+            this.stompClient.subscribe('/topic/messages', (message: any) => this.handleMessage(message));
+
+            //subscribe to reactions
+            this.stompClient.subscribe('/topic/reactions', (message: any) => this.handleReaction(message));
         } catch (error) {
             console.error('Error subscribing to public topics:', error.message);
         }
     }
 
+    private handleReaction(message: IMessage) {
+        try {
+            const body = JSON.parse(message.body) as Message;
+            console.log('Received reaction:', body);
+            this.reactionListeners.forEach((callback) => {
+                try {
+                    callback(body);
+                } catch (error) {
+                    console.error('Error in reaction callback:', error.message);
+                }
+            });
+        } catch (error) {
+            console.error('Failed to parse reaction:', error.message);
+        }
+    }
+
     private handleMessage(message: IMessage) {
         try {
-            const body = JSON.parse(message.body);
+            const body = JSON.parse(message.body) as Message;
             console.log('Received message:', body);
+            this.messageListeners.forEach((callback) => {
+                try {
+                    callback(body);
+                } catch (error) {
+                    console.error('Error in message callback:', error.message);
+                }
+            });
         } catch (error) {
             console.error('Failed to parse message:', error.message);
         }
@@ -261,13 +291,13 @@ class SocketService {
         }
     }
 
-    public messageReply(content: string, receiverId: number, type: 'text' | 'image' | 'audio' | 'file', senderId: number,replyToMessage:Message) {
+    public messageReply(content: string, receiverId: number, type: 'text' | 'image' | 'audio' | 'file', senderId: number, replyToMessage: Message) {
         try {
             if (!this.stompClient.connected) {
                 console.warn('Cannot send message: WebSocket not connected');
                 return;
             }
-            const payload = { content, receiverId, type, senderId,replyToMessage }; // Match backend
+            const payload = { content, receiverId, type, senderId, replyToMessage }; // Match backend
             this.stompClient.publish({
                 destination: '/app/chat.sendMessageReply',
                 body: JSON.stringify(payload),
@@ -280,13 +310,13 @@ class SocketService {
         }
     }
 
-    public messageReact(messageId:number,reactions:string[]) {
+    public messageReact(messageId: number, reactions: string[]) {
         try {
             if (!this.stompClient.connected) {
                 console.warn('Cannot send message: WebSocket not connected');
                 return;
             }
-            const payload = { messageId,reactions}; // Match backend
+            const payload = { messageId, reactions }; // Match backend
             this.stompClient.publish({
                 destination: '/app/chat.sendMessageReaction',
                 body: JSON.stringify(payload),
@@ -321,6 +351,38 @@ class SocketService {
             this.onlineUserListeners = this.onlineUserListeners.filter(cb => cb !== callback);
         } catch (error) {
             console.error('Error removing online users listener:', error.message);
+        }
+    }
+
+    public onMessage(callback: (message: Message) => void) {
+        try {
+            this.messageListeners.push(callback);
+        } catch (error) {
+            console.error('Error adding message listener:', error.message);
+        }
+    }
+
+    public removeMessageListener(callback: (message: Message) => void) {
+        try {
+            this.messageListeners = this.messageListeners.filter(cb => cb !== callback);
+        } catch (error) {
+            console.error('Error removing message listener:', error.message);
+        }
+    }
+
+    public onReaction(callback: (message: Message) => void) {
+        try {
+            this.reactionListeners.push(callback);
+        } catch (error) {
+            console.error('Error adding reaction listener:', error.message);
+        }
+    }
+
+    public removeReactionListener(callback: (message: Message) => void) {
+        try {
+            this.reactionListeners = this.reactionListeners.filter(cb => cb !== callback);
+        } catch (error) {
+            console.error('Error removing reaction listener:', error.message);
         }
     }
 }
