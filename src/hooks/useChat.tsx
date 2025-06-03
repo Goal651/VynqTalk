@@ -101,7 +101,7 @@ export const useChat = () => {
       timestamp: new Date().toISOString(),
       receiver: activeChat,
       type: "text",
-      replyToMessageId: replyData,
+      replyToMessage: replyData,
       reactions: []
     }
 

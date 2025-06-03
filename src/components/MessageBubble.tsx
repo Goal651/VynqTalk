@@ -1,4 +1,3 @@
-
 import { formatDistanceToNow } from "date-fns";
 import { Message, User, Reaction } from "../types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -92,15 +91,10 @@ export const MessageBubble = ({
 
   const messageBubble = (
     <div className="relative">
-      {message.replyToMessageId && (
-        <div className={`mb-2 p-2 rounded-md bg-muted/50 border-l-2 border-primary text-sm ${isCurrentUser ? "mr-4" : "ml-4"
-          }`}>
-          <div className="font-medium text-muted-foreground">
-            Replying to {message.replyToMessageId.sender.name}
-          </div>
-          <div className="text-muted-foreground truncate">
-            {message.replyToMessageId.content}
-          </div>
+      {message.replyToMessage && (
+        <div className="text-xs text-muted-foreground mb-1">
+          <span className="font-medium">Replying to {message.replyToMessage.sender.name}</span>
+          <p className="truncate max-w-[200px]">{message.replyToMessage.content}</p>
         </div>
       )}
 

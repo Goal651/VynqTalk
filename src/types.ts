@@ -1,4 +1,3 @@
-
 export interface User {
   id: number // Changed back to string for consistency
   name: string
@@ -18,20 +17,21 @@ export interface Message {
   edited?: boolean
   type: "text" | "image" | "audio" | "file"
   reactions?: string[]
-  replyToMessageId?: Message
+  replyToMessage?: Message
 }
 
 export interface GroupMessage {
   id: number
-  senderId: number // Changed to string and keeping senderId
-  receiverId?: number // Made optional and string
+  senderId: number
+  receiverId?: number
   content: string
   timestamp: string
   edited?: boolean
   type: "text" | "image" | "audio" | "file"
   reactions?: string[]
-  replyToMessageId?: Message
+  replyToMessage?: Message
 }
+
 export interface Reaction {
   id: number
   emoji: string

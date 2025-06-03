@@ -14,8 +14,7 @@ interface GroupChatProps {
 }
 
 export const GroupChat = ({ group, onBack }: GroupChatProps) => {
-  const [messages, setMessages] = useState<GroupMessage[]>([  ]);
-  
+  const [messages, setMessages] = useState<GroupMessage[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const { toast } = useToast();
 
@@ -25,9 +24,10 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
       const message: GroupMessage = {
         id: Date.now(),
         content: newMessage,
-        senderId:1 ,
+        senderId: 1,
         timestamp: new Date().toString(),
-        type: "text"
+        type: "text",
+        replyToMessage: undefined
       };
       setMessages([...messages, message]);
       setNewMessage("");
@@ -98,7 +98,8 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <Button type="button" 
+              <Button 
+                type="button" 
                 variant="ghost" 
                 size="icon"
                 onClick={() => {
@@ -119,7 +120,8 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
               </div>
             </div>
             <div className="flex space-x-2">
-              <Button type="button" 
+              <Button 
+                type="button" 
                 variant="ghost" 
                 size="icon"
                 onClick={handleVoiceCall}
@@ -127,7 +129,8 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
               >
                 <Phone className="h-4 w-4" />
               </Button>
-              <Button type="button" 
+              <Button 
+                type="button" 
                 variant="ghost" 
                 size="icon"
                 onClick={handleVideoCall}
@@ -135,7 +138,8 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
               >
                 <Video className="h-4 w-4" />
               </Button>
-              <Button type="button" 
+              <Button 
+                type="button" 
                 variant="ghost" 
                 size="icon"
                 onClick={handleMoreOptions}
@@ -158,7 +162,7 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
             >
               <div
                 className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                  message.senderId ===1
+                  message.senderId === 1
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted"
                 }`}
@@ -166,9 +170,15 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
                 {message.senderId !== 1 && (
                   <p className="text-xs text-muted-foreground mb-1">User {message.senderId}</p>
                 )}
+                {message.replyToMessage && (
+                  <div className="text-xs text-muted-foreground mb-1">
+                    <span className="font-medium">Replying to {message.replyToMessage.sender.name}</span>
+                    <p className="truncate max-w-[200px]">{message.replyToMessage.content}</p>
+                  </div>
+                )}
                 <p className="text-sm">{message.content}</p>
                 <p className="text-xs opacity-70 mt-1">
-                  {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  {new Date(message.timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
                 </p>
               </div>
             </div>
@@ -176,39 +186,44 @@ export const GroupChat = ({ group, onBack }: GroupChatProps) => {
         </div>
       </ScrollArea>
 
-      {/* Message Input */}
+      {/* Input */}
       <Card className="border-t rounded-none flex-shrink-0">
         <CardContent className="p-4">
           <div className="flex items-center space-x-2">
-            <Button type="button" 
-              variant="ghost" 
-              size="icon"
-              onClick={handleAttachFile}
-              className="cursor-pointer hover:bg-accent"
-            >
-              <Paperclip className="h-4 w-4" />
-            </Button>
-            <Input
-              placeholder="Type a message..."
-              value={newMessage}
-              onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
-              className="flex-1 cursor-text"
-            />
-            <Button type="button" 
-              variant="ghost" 
+            <Button
+              type="button"
+              variant="ghost"
               size="icon"
               onClick={handleEmojiPicker}
               className="cursor-pointer hover:bg-accent"
             >
-              <Smile className="h-4 w-4" />
+              <Smile className="h-5 w-5" />
             </Button>
-            <Button type="button" 
-              onClick={handleSendMessage}
-              disabled={!newMessage.trim()}
-              className="cursor-pointer"
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={handleAttachFile}
+              className="cursor-pointer hover:bg-accent"
             >
-              <Send className="h-4 w-4" />
+              <Paperclip className="h-5 w-5" />
+            </Button>
+            <Input
+              type="text"
+              placeholder="Type a message..."
+              value={newMessage}
+              onChange={handleInputChange}
+              onKeyPress={handleKeyPress}
+              className="flex-1"
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              onClick={handleSendMessage}
+              className="cursor-pointer hover:bg-accent"
+            >
+              <Send className="h-5 w-5" />
             </Button>
           </div>
         </CardContent>

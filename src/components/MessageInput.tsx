@@ -124,28 +124,19 @@ export const MessageInput = ({
   return (
     <form onSubmit={handleSubmit} className="p-4 border-t border-border bg-secondary/50 relative z-10">
       {replyTo && (
-        <div className="mb-3 p-3 bg-muted/50 rounded-md border-l-2 border-primary">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="text-sm font-medium text-muted-foreground mb-1">
-                Replying to {replyTo.senderId === currentUser.id ? "yourself" : "message"}
-              </div>
-              <div className="text-sm text-muted-foreground truncate">
-                {replyTo.content}
-              </div>
-            </div>
-            {onCancelReply && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 ml-2"
-                onClick={onCancelReply}
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            )}
-          </div>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <MessageCircle className="h-4 w-4" />
+          <span>
+            Replying to {replyTo.sender.id === currentUser.id ? "yourself" : replyTo.sender.name}
+          </span>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 w-6 p-0 hover:bg-accent"
+            onClick={onCancelReply}
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </div>
       )}
 
