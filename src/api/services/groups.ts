@@ -1,4 +1,3 @@
-
 import { Group } from '@/types';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
@@ -20,40 +19,54 @@ export interface UpdateGroupRequest {
 }
 
 export class GroupService {
-  async getAllGroups(): Promise<ApiResponse<Group[]>> {
+  async getGroups(): Promise<ApiResponse<Group[]>> {
     return await apiClient.get<Group[]>(API_ENDPOINTS.GROUPS.LIST);
   }
 
-  async getGroupById(id: string): Promise<ApiResponse<Group>> {
+  async getGroup(id: number): Promise<ApiResponse<Group>> {
     return await apiClient.get<Group>(API_ENDPOINTS.GROUPS.BY_ID(id));
+
   }
 
-  async createGroup(groupData: CreateGroupRequest): Promise<ApiResponse<Group>> {
-    return await apiClient.post<Group>(API_ENDPOINTS.GROUPS.CREATE, groupData);
+  async createGroup(data: CreateGroupRequest): Promise<ApiResponse<Group>> {
+    return await apiClient.post<Group>(API_ENDPOINTS.GROUPS.CREATE, data);
+
   }
 
-  async updateGroup(id: string, updates: UpdateGroupRequest): Promise<ApiResponse<Group>> {
-    return await apiClient.put<Group>(API_ENDPOINTS.GROUPS.UPDATE(id), updates);
+  async updateGroup(id: number, data: UpdateGroupRequest): Promise<ApiResponse<Group>> {
+    return await apiClient.put<Group>(API_ENDPOINTS.GROUPS.UPDATE(id), data);
   }
 
-  async deleteGroup(id: string): Promise<ApiResponse<void>> {
+  async deleteGroup(id: number): Promise<ApiResponse<void>> {
     return await apiClient.delete<void>(API_ENDPOINTS.GROUPS.DELETE(id));
   }
 
-  async joinGroup(groupId: string): Promise<ApiResponse<void>> {
+  async addMember(groupId: number, userId: string): Promise<ApiResponse<Group>> {
+    return await apiClient.post<Group>(API_ENDPOINTS.GROUPS.MEMBERS(groupId), { userId });
+
+  }
+
+  async removeMember(groupId: number, userId: string): Promise<ApiResponse<Group>> {
+    return await apiClient.delete<Group>(`${API_ENDPOINTS.GROUPS.MEMBERS(groupId)}/${userId}`);
+
+  }
+
+  async joinGroup(groupId: number): Promise<ApiResponse<void>> {
     return await apiClient.post<void>(API_ENDPOINTS.GROUPS.JOIN, { groupId });
+
   }
 
-  async leaveGroup(groupId: string): Promise<ApiResponse<void>> {
+  async leaveGroup(groupId: number): Promise<ApiResponse<void>> {
     return await apiClient.post<void>(API_ENDPOINTS.GROUPS.LEAVE, { groupId });
+
   }
 
-  async getGroupMembers(id: string): Promise<ApiResponse<any[]>> {
-    return await apiClient.get<any[]>(API_ENDPOINTS.GROUPS.MEMBERS(id));
+  async getGroupMembers(id: number): Promise<ApiResponse<Group['members']>> {
+    return await apiClient.get<Group['members']>(API_ENDPOINTS.GROUPS.MEMBERS(id));
   }
 
-  async getGroupMessages(id: string): Promise<ApiResponse<any[]>> {
-    return await apiClient.get<any[]>(API_ENDPOINTS.GROUPS.MESSAGES(id));
+  async getGroupMessages(id: number): Promise<ApiResponse<any[]>> {
+    return await apiClient.get(API_ENDPOINTS.GROUPS.MESSAGES(id));
   }
 }
 

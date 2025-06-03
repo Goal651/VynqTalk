@@ -46,13 +46,13 @@ export const API_ENDPOINTS = {
   GROUPS: {
     LIST: '/groups',
     CREATE: '/groups',
-    BY_ID: (id: string) => `/groups/${id}`,
-    UPDATE: (id: string) => `/groups/${id}`,
-    DELETE: (id: string) => `/groups/${id}`,
+    BY_ID: (id: number) => `/groups/${id}`,
+    UPDATE: (id: number) => `/groups/${id}`,
+    DELETE: (id: number) => `/groups/${id}`,
     JOIN: '/groups/join',
     LEAVE: '/groups/leave',
-    MEMBERS: (id: string) => `/groups/${id}/members`,
-    MESSAGES: (id: string) => `/groups/${id}/messages`,
+    MEMBERS: (id: number) => `/groups/${id}/members`,
+    MESSAGES: (id: number) => `/groups/${id}/messages`,
   },
   NOTIFICATIONS: {
     LIST: '/notifications',

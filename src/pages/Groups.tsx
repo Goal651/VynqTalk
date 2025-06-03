@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +15,8 @@ import { Group } from "@/types";
 import { GroupChat } from "@/components/GroupChat";
 import { GroupSettings } from "@/components/GroupSettings";
 import { useToast } from "@/hooks/use-toast";
+import { groupService } from "@/api/services/groups";
+import { useAuth } from "@/contexts/AuthContext";
 
 const createGroupSchema = z.object({
   name: z.string().min(2, { message: "Group name must be at least 2 characters" }),
@@ -23,32 +24,14 @@ const createGroupSchema = z.object({
 });
 
 export const Groups = () => {
-  const [groups, setGroups] = useState<Group[]>([
-    {
-      id: 1,
-      name: "Team Alpha",
-      avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=team-alpha",
-      members: ["u1", "u2", "u3"],
-      createdBy: "u1",
-      createdAt: new Date(),
-      description: "Main development team"
-    },
-    {
-      id: 2, 
-      name: "Project Beta",
-      avatar: "https://api.dicebear.com/7.x/shapes/svg?seed=project-beta",
-      members: ["u1", "u4"],
-      createdBy: "u1",
-      createdAt: new Date(),
-      description: "Beta testing group"
-    }
-  ]);
-  
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [currentView, setCurrentView] = useState<"list" | "chat" | "settings">("list");
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const form = useForm<z.infer<typeof createGroupSchema>>({
     resolver: zodResolver(createGroupSchema),
@@ -58,59 +41,103 @@ export const Groups = () => {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof createGroupSchema>) => {
-    console.log("Creating group with values:", values);
-    const newGroup: Group = {
-      id: Date.now(),
-      name: values.name,
-      avatar: `https://api.dicebear.com/7.x/shapes/svg?seed=${values.name}`,
-      members: ["current-user"],
-      createdBy: "current-user",
-      createdAt: new Date(),
-      description: values.description,
-    };
-    setGroups([...groups, newGroup]);
-    setIsCreateOpen(false);
-    form.reset();
-    
-    toast({
-      title: "Group created",
-      description: `${values.name} has been created successfully`,
-    });
+  // Fetch groups on component mount
+  useEffect(() => {
+    fetchGroups();
+  }, []);
+
+  const fetchGroups = async () => {
+    try {
+      setIsLoading(true);
+      const fetchedGroups = await groupService.getGroups();
+      setGroups(fetchedGroups.data);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch groups",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onSubmit = async (values: z.infer<typeof createGroupSchema>) => {
+    try {
+      const newGroup = await groupService.createGroup({
+        name: values.name,
+        description: values.description,
+        isPrivate: false,
+        members: []
+      });
+
+      setGroups([...groups, newGroup.data]);
+      setIsCreateOpen(false);
+      form.reset();
+
+      toast({
+        title: "Group created",
+        description: `${values.name} has been created successfully`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create group",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleGroupChat = (group: Group) => {
-    console.log("Opening chat for group:", group.name);
     setSelectedGroup(group);
     setCurrentView("chat");
   };
 
   const handleGroupSettings = (group: Group) => {
-    console.log("Opening settings for group:", group.name);
     setSelectedGroup(group);
     setCurrentView("settings");
   };
 
   const handleBackToList = () => {
-    console.log("Returning to groups list");
     setCurrentView("list");
     setSelectedGroup(null);
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("Search query changed:", e.target.value);
     setSearchQuery(e.target.value);
   };
 
   const handleCreateGroupClick = () => {
-    console.log("Create group button clicked");
     setIsCreateOpen(true);
   };
 
   const handleCancelCreate = () => {
-    console.log("Create group cancelled");
     setIsCreateOpen(false);
     form.reset();
+  };
+
+  const handleUpdateGroup = async (updatedGroup: Group) => {
+    try {
+      const result = await groupService.updateGroup(updatedGroup.id, {
+        name: updatedGroup.name,
+        description: updatedGroup.description,
+      });
+      const updatedGroups = groups.map(g => g.id === result.data.id ? result.data : g);
+
+      setGroups(updatedGroups);
+      setCurrentView("list");
+
+      toast({
+        title: "Success",
+        description: "Group updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update group",
+        variant: "destructive",
+      });
+    }
   };
 
   const filteredGroups = groups.filter(group =>
@@ -123,11 +150,21 @@ export const Groups = () => {
   }
 
   if (currentView === "settings" && selectedGroup) {
-    return <GroupSettings group={selectedGroup} onBack={handleBackToList} onSave={(updatedGroup) => {
-      console.log("Saving updated group:", updatedGroup);
-      setGroups(groups.map(g => g.id === updatedGroup.id ? updatedGroup : g));
-      setCurrentView("list");
-    }} />;
+    return (
+      <GroupSettings
+        group={selectedGroup}
+        onBack={handleBackToList}
+        onSave={handleUpdateGroup}
+      />
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-pulse text-primary">Loading groups...</div>
+      </div>
+    );
   }
 
   return (
@@ -139,7 +176,7 @@ export const Groups = () => {
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button type="button" className="cursor-wait hover:bg-red-500" onClick={handleCreateGroupClick}>
+            <Button onClick={handleCreateGroupClick}>
               <Plus className="h-4 w-4 mr-2" />
               Create Group
             </Button>
@@ -157,15 +194,7 @@ export const Groups = () => {
                     <FormItem>
                       <FormLabel>Group Name</FormLabel>
                       <FormControl>
-                        <Input 
-                          placeholder="Enter group name" 
-                          {...field} 
-                          className="cursor-text"
-                          onChange={(e) => {
-                            console.log("Group name input:", e.target.value);
-                            field.onChange(e);
-                          }}
-                        />
+                        <Input placeholder="Enter group name" {...field} />
                       </FormControl>
                     </FormItem>
                   )}
@@ -177,28 +206,16 @@ export const Groups = () => {
                     <FormItem>
                       <FormLabel>Description (Optional)</FormLabel>
                       <FormControl>
-                        <Textarea 
-                          placeholder="Describe your group" 
-                          {...field} 
-                          className="cursor-text resize-none"
-                          onChange={(e) => {
-                            console.log("Group description input:", e.target.value);
-                            field.onChange(e);
-                          }}
-                        />
+                        <Textarea placeholder="Describe your group" {...field} />
                       </FormControl>
                     </FormItem>
                   )}
                 />
                 <div className="flex justify-end space-x-2">
-                  <Button type="button" 
-                    variant="outline" 
-                    onClick={handleCancelCreate}
-                    className="cursor-pointer"
-                  >
+                  <Button type="button" variant="outline" onClick={handleCancelCreate}>
                     Cancel
                   </Button>
-                  <Button type="button" className="cursor-pointer">Create Group</Button>
+                  <Button type="submit">Create Group</Button>
                 </div>
               </form>
             </Form>
@@ -206,62 +223,57 @@ export const Groups = () => {
         </Dialog>
       </div>
 
-      <div className="flex items-center space-x-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search groups..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            className="pl-8 cursor-text"
-          />
-        </div>
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <Input
+          placeholder="Search groups..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="pl-9"
+        />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid gap-4">
         {filteredGroups.map((group) => (
-          <Card key={group.id} className="hover:shadow-md transition-shadow">
-            <CardHeader className="pb-2">
-              <div className="flex items-center space-x-3">
-                <Avatar className="cursor-pointer">
-                  <AvatarImage src={group.avatar} alt={group.name} />
-                  <AvatarFallback>{group.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <CardTitle className="text-lg">{group.name}</CardTitle>
-                  <CardDescription>{group.description}</CardDescription>
-                </div>
-                <div className="flex items-center">
-                  {group.createdBy === "current-user" && <Crown className="h-4 w-4 text-yellow-500" />}
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
+          <Card key={group.id} className="hover:bg-accent/50 transition-colors">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                  <Badge variant="secondary">{group.members.length} members</Badge>
+                <div className="flex items-center space-x-4">
+                  <Avatar>
+                    <AvatarImage src={group.avatar} />
+                    <AvatarFallback>{group.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <CardTitle className="text-lg">{group.name}</CardTitle>
+                    <CardDescription className="text-sm">
+                      {group.description || "No description"}
+                    </CardDescription>
+                    <div className="flex items-center space-x-2 mt-1">
+                      <Badge variant="secondary" className="text-xs">
+                        <Users className="h-3 w-3 mr-1" />
+                        {group.members.length} members
+                      </Badge>
+                      {group.createdBy.id === user?.id && (
+                        <Badge variant="outline" className="text-xs">
+                          <Crown className="h-3 w-3 mr-1" />
+                          Admin
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
                 </div>
-                <div className="flex space-x-1">
-                  <Button type="button" 
-                    size="sm" 
-                    variant="outline"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleGroupChat(group);
-                    }}
-                    className="cursor-pointer hover:bg-accent transition-colors"
+                <div className="flex space-x-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleGroupChat(group)}
                   >
                     <MessageCircle className="h-4 w-4" />
                   </Button>
-                  <Button type="button" 
-                    size="sm" 
-                    variant="outline"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleGroupSettings(group);
-                    }}
-                    className="cursor-pointer hover:bg-accent transition-colors"
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleGroupSettings(group)}
                   >
                     <Settings className="h-4 w-4" />
                   </Button>
@@ -271,14 +283,6 @@ export const Groups = () => {
           </Card>
         ))}
       </div>
-
-      {filteredGroups.length === 0 && (
-        <div className="text-center py-8">
-          <p className="text-muted-foreground">
-            {searchQuery ? `No groups found matching "${searchQuery}"` : "No groups created yet. Create your first group!"}
-          </p>
-        </div>
-      )}
     </div>
   );
 };

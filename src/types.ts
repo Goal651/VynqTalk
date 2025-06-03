@@ -44,8 +44,8 @@ export interface Group {
   name: string
   description?: string
   avatar: string
-  members: string[]
-  createdBy: string
+  members: User[]
+  createdBy: User
   createdAt: Date
   isPrivate?: boolean
 }
