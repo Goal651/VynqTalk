@@ -92,9 +92,15 @@ export const MessageBubble = ({
   const messageBubble = (
     <div className="relative">
       {message.replyToMessage && (
-        <div className="text-xs text-muted-foreground mb-1">
-          <span className="font-medium">Replying to {message.replyToMessage.sender.name}</span>
-          <p className="truncate max-w-[200px]">{message.replyToMessage.content}</p>
+        <div className="flex items-center mb-2">
+          <div className="border-l-4 border-primary bg-muted/60 px-3 py-1 rounded-md w-full">
+            <span className="block text-xs font-semibold text-primary mb-0.5">
+              Replying to {message.replyToMessage.sender.name}
+            </span>
+            <span className="block text-xs text-muted-foreground truncate max-w-[200px]">
+              {message.replyToMessage.content}
+            </span>
+          </div>
         </div>
       )}
 

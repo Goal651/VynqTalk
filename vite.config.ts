@@ -22,4 +22,12 @@ export default defineConfig(({ mode }) => ({
   define: {
     global: 'globalThis', 
   },
+  build: {
+    sourcemap: true,
+  },
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'esnext',
+    },
+  },
 }));

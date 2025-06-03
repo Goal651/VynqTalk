@@ -124,11 +124,15 @@ export const MessageInput = ({
   return (
     <form onSubmit={handleSubmit} className="p-4 border-t border-border bg-secondary/50 relative z-10">
       {replyTo && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <MessageCircle className="h-4 w-4" />
-          <span>
-            Replying to {replyTo.sender.id === currentUser.id ? "yourself" : replyTo.sender.name}
-          </span>
+        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+          <div className="border-l-4 border-primary bg-muted/60 px-3 py-1 rounded-md flex-1">
+            <span className="block text-xs font-semibold text-primary mb-0.5">
+              Replying to {replyTo.sender.id === currentUser.id ? "yourself" : replyTo.sender.name}
+            </span>
+            <span className="block text-xs text-muted-foreground truncate max-w-[200px]">
+              {replyTo.content}
+            </span>
+          </div>
           <Button
             variant="ghost"
             size="sm"
