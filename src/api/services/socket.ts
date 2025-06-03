@@ -291,13 +291,13 @@ class SocketService {
         }
     }
 
-    public messageReply(content: string, receiverId: number, type: 'text' | 'image' | 'audio' | 'file', senderId: number, replyToMessage: Message) {
+    public messageReply(content: string, receiver: User, type: 'text' | 'image' | 'audio' | 'file', sender: User, replyToMessage: Message) {
         try {
             if (!this.stompClient.connected) {
                 console.warn('Cannot send message: WebSocket not connected');
                 return;
             }
-            const payload = { content, receiverId, type, senderId, replyToMessage }; // Match backend
+            const payload = { content, receiver, type, sender, replyToMessage }; // Match backend
             this.stompClient.publish({
                 destination: '/app/chat.sendMessageReply',
                 body: JSON.stringify(payload),

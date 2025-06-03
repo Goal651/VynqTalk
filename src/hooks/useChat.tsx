@@ -108,7 +108,7 @@ export const useChat = () => {
     setMessages(prevMessages => [...prevMessages, newMessage])
 
     if (replyData) {
-      socketService.messageReply(newMessage.content, Number(activeChat.id), newMessage.type, Number(user.id), replyData)
+      socketService.messageReply(newMessage.content,activeChat, newMessage.type, user, replyData)
     } else {
       socketService.sendMessage(newMessage.content, activeChat, newMessage.type, user)
     }
@@ -161,10 +161,13 @@ export const useChat = () => {
     console.log("React to message:", messageId, "with emoji:", emoji)
 
     setMessages(prevMessages => {
+      let hasExistingReaction = false
+      
       const updatedMessages = prevMessages.map(message => {
         if (message.id === messageId) {
           const reactions = message.reactions || []
           const existingReaction = reactions.find(r => r === emoji)
+          hasExistingReaction = !!existingReaction
 
           let updatedReactions: string[]
           if (existingReaction) {
@@ -185,12 +188,12 @@ export const useChat = () => {
         return message
       })
 
-      return updatedMessages
-    })
+      toast({
+        title: hasExistingReaction ? "Reaction removed" : "Reaction added",
+        description: hasExistingReaction ? `Removed ${emoji}` : `Reacted with ${emoji}`,
+      })
 
-    toast({
-      title: existingReaction ? "Reaction removed" : "Reaction added",
-      description: existingReaction ? `Removed ${emoji}` : `Reacted with ${emoji}`,
+      return updatedMessages
     })
   }
 
