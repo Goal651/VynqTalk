@@ -17,6 +17,7 @@ import { GroupSettings } from "@/components/GroupSettings";
 import { useToast } from "@/hooks/use-toast";
 import { groupService } from "@/api/services/groups";
 import { useAuth } from "@/contexts/AuthContext";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const createGroupSchema = z.object({
   name: z.string().min(2, { message: "Group name must be at least 2 characters" }),
@@ -233,7 +234,8 @@ export const Groups = () => {
         />
       </div>
 
-      <div className="grid gap-4">
+      <ScrollArea
+        className="grid gap-4 h-[calc(100vh-200px)]">
         {filteredGroups.map((group) => (
           <Card key={group.id} className="hover:bg-accent/50 transition-colors">
             <CardContent className="p-4">
@@ -282,7 +284,8 @@ export const Groups = () => {
             </CardContent>
           </Card>
         ))}
-      </div>
+
+      </ScrollArea>
     </div>
   );
 };

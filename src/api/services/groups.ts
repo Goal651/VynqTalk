@@ -1,4 +1,4 @@
-import { Group } from '@/types';
+import { Group, User } from '@/types';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
 import { ApiResponse } from '../types';
@@ -41,8 +41,8 @@ export class GroupService {
     return await apiClient.delete<void>(API_ENDPOINTS.GROUPS.DELETE(id));
   }
 
-  async addMember(groupId: number, userId: string): Promise<ApiResponse<Group>> {
-    return await apiClient.post<Group>(API_ENDPOINTS.GROUPS.MEMBERS(groupId), { userId });
+  async addMember(groupId: number, user: User): Promise<ApiResponse<Group>> {
+    return await apiClient.post<Group>(API_ENDPOINTS.GROUPS.MEMBERS(groupId), user );
 
   }
 
