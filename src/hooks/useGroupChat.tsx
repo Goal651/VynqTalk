@@ -90,7 +90,7 @@ export const useGroupChat = (group: Group) => {
 
     setMessages(prevMessages => [...prevMessages, newMessage])
 
-    socketService.sendGroupMessage(newMessage.content, group.id, newMessage.type, user)
+    socketService.sendGroupMessage(newMessage.content, group, newMessage.type, user)
 
     toast({
       title: "Message sent",

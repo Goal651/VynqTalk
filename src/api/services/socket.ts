@@ -1,6 +1,6 @@
 import SockJS from 'sockjs-client';
 import { Client, IMessage } from '@stomp/stompjs';
-import { Message, User, GroupMessage } from '@/types';
+import { Message, User, GroupMessage, Group } from '@/types';
 
 class SocketService {
     private stompClient: Client;
@@ -400,13 +400,13 @@ class SocketService {
         }
     }
 
-    public sendGroupMessage(content: string, groupId: number, type: 'text' | 'image' | 'audio' | 'file', sender: User) {
+    public sendGroupMessage(content: string, group: Group, type: 'text' | 'image' | 'audio' | 'file', sender: User) {
         try {
             if (!this.stompClient.connected) {
                 console.warn('Cannot send group message: WebSocket not connected');
                 return;
             }
-            const payload = { content, groupId, type, sender };
+            const payload = { content, group, type, sender };
             this.stompClient.publish({
                 destination: '/app/group.sendMessage',
                 body: JSON.stringify(payload),
