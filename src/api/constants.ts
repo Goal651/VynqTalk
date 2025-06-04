@@ -52,7 +52,14 @@ export const API_ENDPOINTS = {
     JOIN: '/groups/join',
     LEAVE: '/groups/leave',
     MEMBERS: (id: number) => `/groups/${id}/members`,
-    MESSAGES: (id: number) => `/groups/${id}/messages`,
+  },
+  GROUP_MESSAGES: {
+    ALL: (groupId: number) => `/group_messages/conv/${groupId}`,
+    BY_ID: (id: number) => `/group_messages/${id}`,
+    UPDATE: (id: number) => `/group_messages/${id}`,
+    DELETE: (id: number) => `/group_messages/${id}`,
+    REACT: (id: number) => `/group_messages/${id}/react`,
+    REMOVE_REACTION: (id: number) => `/group_messages/${id}/reactions`,
   },
   NOTIFICATIONS: {
     LIST: '/notifications',

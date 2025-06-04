@@ -3,7 +3,7 @@ import { Group, GroupMessage, User } from "@/types"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 import { socketService } from "@/api/services/socket"
-import { groupService } from "@/api/services/groups"
+import { groupMessageService } from "@/api/services/groupMessages"
 
 export const useGroupChat = (group: Group) => {
   const { user } = useAuth()
@@ -16,7 +16,7 @@ export const useGroupChat = (group: Group) => {
       if (!user || !group) return
 
       try {
-        const response = await groupService.getGroupMessages(group.id)
+        const response = await groupMessageService.getMessages(group.id)
         if (response.success && response.data) {
           setMessages(response.data)
           console.log("Loaded group messages:", response.data)

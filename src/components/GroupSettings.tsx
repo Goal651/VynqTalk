@@ -192,8 +192,13 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
   const handleUpdateMember = async (user: User) => {
     try {
       const res = await groupService.addMember(group.id, user)
-      console.log(res)
-      toast({ title: "Member added", description: `${user.name} has been added.` })
+      if (res.success) {
+        setMembers([...members, user])
+        setSearchResults([])
+        setSearchQuery("")
+        setShowAddMember(false)
+        toast({ title: "Member added", description: `${user.name} has been added.` })
+      }
     } catch (err) {
       toast({ title: "Error", description: err.message, variant: "destructive" })
     }

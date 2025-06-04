@@ -65,9 +65,6 @@ export class GroupService {
     return await apiClient.get<Group['members']>(API_ENDPOINTS.GROUPS.MEMBERS(id));
   }
 
-  async getGroupMessages(id: number): Promise<ApiResponse<any[]>> {
-    return await apiClient.get(API_ENDPOINTS.GROUPS.MESSAGES(id));
-  }
 }
 
 export const groupService = new GroupService();

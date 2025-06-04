@@ -12,7 +12,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Users, Settings, MessageCircle, Search, Crown } from "lucide-react";
 import { Group } from "@/types";
-import { GroupChat } from "@/components/GroupChat";
+import { GroupChatView } from "@/components/GroupChatView";
 import { GroupSettings } from "@/components/GroupSettings";
 import { useToast } from "@/hooks/use-toast";
 import { groupService } from "@/api/services/groups";
@@ -147,7 +147,14 @@ export const Groups = () => {
   );
 
   if (currentView === "chat" && selectedGroup) {
-    return <GroupChat group={selectedGroup} users={groups.flatMap(group => group.members)} />;
+    return (
+      <GroupChatView
+        group={selectedGroup}
+        users={groups.flatMap(group => group.members)}
+        onBack={handleBackToList}
+        onSettings={() => handleGroupSettings(selectedGroup)}
+      />
+    );
   }
 
   if (currentView === "settings" && selectedGroup) {
