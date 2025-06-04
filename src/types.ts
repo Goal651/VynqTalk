@@ -22,14 +22,14 @@ export interface Message {
 
 export interface GroupMessage {
   id: number
-  senderId: number
-  receiverId?: number
+  sender: User
+  group: Group
   content: string
   timestamp: string
   edited?: boolean
   type: "text" | "image" | "audio" | "file"
   reactions?: string[]
-  replyToMessage?: Message
+  replyToMessage?: GroupMessage
 }
 
 export interface Reaction {

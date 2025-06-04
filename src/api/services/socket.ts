@@ -1,12 +1,13 @@
 import SockJS from 'sockjs-client';
 import { Client, IMessage } from '@stomp/stompjs';
-import { Message, User } from '@/types';
+import { Message, User, GroupMessage } from '@/types';
 
 class SocketService {
     private stompClient: Client;
     private onlineUsers: string[] = [];
     private onlineUserListeners: ((users: string[]) => void)[] = [];
     private messageListeners: ((message: Message) => void)[] = [];
+    private groupMessageListeners: ((message: GroupMessage) => void)[] = [];
     private reactionListeners: ((message: Message) => void)[] = [];
     private logoutListeners: (() => void)[] = [];
     private connectionAttempts: number = 0;
@@ -213,12 +214,9 @@ class SocketService {
     private subscribeToPublic() {
         try {
             this.stompClient.subscribe('/topic/onlineUsers', (message) => this.handleOnlineUsers(message));
-
-            // Subscribe to private messages
             this.stompClient.subscribe('/topic/messages', (message: any) => this.handleMessage(message));
-
-            //subscribe to reactions
             this.stompClient.subscribe('/topic/reactions', (message: any) => this.handleReaction(message));
+            this.stompClient.subscribe('/topic/groupMessages', (message: any) => this.handleGroupMessage(message));
         } catch (error) {
             console.error('Error subscribing to public topics:', error.message);
         }
@@ -269,6 +267,22 @@ class SocketService {
             });
         } catch (error) {
             console.error('Failed to parse online users:', error.message);
+        }
+    }
+
+    private handleGroupMessage(message: IMessage) {
+        try {
+            const body = JSON.parse(message.body) as GroupMessage;
+            console.log('Received group message:', body);
+            this.groupMessageListeners.forEach((callback) => {
+                try {
+                    callback(body);
+                } catch (error) {
+                    console.error('Error in group message callback:', error.message);
+                }
+            });
+        } catch (error) {
+            console.error('Failed to parse group message:', error.message);
         }
     }
 
@@ -383,6 +397,41 @@ class SocketService {
             this.reactionListeners = this.reactionListeners.filter(cb => cb !== callback);
         } catch (error) {
             console.error('Error removing reaction listener:', error.message);
+        }
+    }
+
+    public sendGroupMessage(content: string, groupId: number, type: 'text' | 'image' | 'audio' | 'file', sender: User) {
+        try {
+            if (!this.stompClient.connected) {
+                console.warn('Cannot send group message: WebSocket not connected');
+                return;
+            }
+            const payload = { content, groupId, type, sender };
+            this.stompClient.publish({
+                destination: '/app/group.sendMessage',
+                body: JSON.stringify(payload),
+            });
+        } catch (error) {
+            console.error('Error sending group message:', error.message);
+            if (error.message?.includes('Unauthorized') || error.message?.includes('401')) {
+                this.handleUnauthorized();
+            }
+        }
+    }
+
+    public onGroupMessage(callback: (message: GroupMessage) => void) {
+        try {
+            this.groupMessageListeners.push(callback);
+        } catch (error) {
+            console.error('Error adding group message listener:', error.message);
+        }
+    }
+
+    public removeGroupMessageListener(callback: (message: GroupMessage) => void) {
+        try {
+            this.groupMessageListeners = this.groupMessageListeners.filter(cb => cb !== callback);
+        } catch (error) {
+            console.error('Error removing group message listener:', error.message);
         }
     }
 }

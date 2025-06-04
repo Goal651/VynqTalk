@@ -8,12 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Camera, UserPlus, UserMinus, Crown, Shield, Trash2 } from "lucide-react"
+import { ArrowLeft, Camera, UserPlus, UserMinus, Crown, Shield, Trash2, Plus, X, Search } from "lucide-react"
 import { Group, User } from "@/types"
 import { useToast } from "@/hooks/use-toast"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { userService } from "@/api/services/users"
 import { groupService } from "@/api/services/groups"
+import { useAuth } from "@/contexts/AuthContext"
+import { GroupChat } from "./GroupChat"
 
 interface GroupSettingsProps {
   group: Group
@@ -22,6 +24,8 @@ interface GroupSettingsProps {
 }
 
 export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => {
+  const { user } = useAuth()
+  const { toast } = useToast()
   const [groupData, setGroupData] = useState({
     name: group.name,
     description: group.description || "",
@@ -35,13 +39,16 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
     messageHistory: true,
   })
 
-  const { toast } = useToast()
-
   const [showAddMember, setShowAddMember] = useState(false)
   const [newMember, setNewMember] = useState<User | null>(null)
   const [isAdding, setIsAdding] = useState(false)
   const [suggestions, setSuggestions] = useState<User[]>([])
   const [users, setUsers] = useState<User[]>([])
+  const [members, setMembers] = useState<User[]>([])
+  const [searchQuery, setSearchQuery] = useState("")
+  const [searchResults, setSearchResults] = useState<User[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [activeTab, setActiveTab] = useState<"chat" | "settings">("chat")
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -54,6 +61,25 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
     };
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    const loadMembers = async () => {
+      try {
+        const response = await groupService.getGroupMembers(group.id)
+        if (response.success && response.data) {
+          setMembers(response.data)
+        }
+      } catch (error) {
+        console.error("Failed to load group members:", error)
+        toast({
+          title: "Error",
+          description: "Failed to load group members",
+          variant: "destructive"
+        })
+      }
+    }
+    loadMembers()
+  }, [group.id, toast])
 
   const getSuggestions = (value: string) => {
     const inputValue = value.trim().toLowerCase();
@@ -135,267 +161,207 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
     setGroupData(prev => ({ ...prev, description: e.target.value }))
   }
 
-  const handleUpdateMember = async (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.preventDefault()
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query)
+    if (!query.trim()) {
+      setSearchResults([])
+      return
+    }
+
+    setIsLoading(true)
     try {
-      const res = await groupService.addMember(group.id, newMember)
+      const response = await userService.searchUsers(query)
+      if (response.success && response.data) {
+        const filteredResults = response.data.filter(
+          (user) => !members.some((member) => member.id === user.id)
+        )
+        setSearchResults(filteredResults)
+      }
+    } catch (error) {
+      console.error("Failed to search users:", error)
+      toast({
+        title: "Error",
+        description: "Failed to search users",
+        variant: "destructive"
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleUpdateMember = async (user: User) => {
+    try {
+      const res = await groupService.addMember(group.id, user)
       console.log(res)
-      toast({ title: "Member added", description: `${newMember.name} has been added.` })
+      toast({ title: "Member added", description: `${user.name} has been added.` })
     } catch (err) {
       toast({ title: "Error", description: err.message, variant: "destructive" })
     }
   }
+
+  const handleRemoveMember = async (memberId: number) => {
+    try {
+      const response = await groupService.removeMember(group.id, memberId)
+      if (response.success) {
+        setMembers(members.filter((member) => member.id !== memberId))
+        toast({
+          title: "Success",
+          description: "Member removed from the group",
+        })
+      }
+    } catch (error) {
+      console.error("Failed to remove member:", error)
+      toast({
+        title: "Error",
+        description: "Failed to remove member from the group",
+        variant: "destructive"
+      })
+    }
+  }
+
   return (
-    <ScrollArea className="h-[calc(100vh-100px)]">
-      <div className="p-6 max-w-4xl mx-auto space-y-6">
-        <div className="flex items-center space-x-4">
-          <Button type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              console.log("Back button clicked")
-              onBack()
-            }}
-            className="cursor-pointer hover:bg-accent"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div>
-            <h1 className="text-2xl font-bold">Group Settings</h1>
-            <p className="text-muted-foreground">Manage {group.name} settings and members</p>
-          </div>
-        </div>
-
-
-        {/* Group Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Group Information</CardTitle>
-            <CardDescription>Update group details and appearance</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Avatar className="h-20 w-20">
-                  <AvatarImage src={groupData.avatar} alt={groupData.name} />
-                  <AvatarFallback>{groupData.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-                </Avatar>
-                <Button type="button"
-                  size="sm"
-                  variant="outline"
-                  className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0 cursor-pointer"
-                  onClick={handleChangeAvatar}
-                >
-                  <Camera className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="space-y-2 flex-1">
-                <div>
-                  <Label htmlFor="groupName">Group Name</Label>
-                  <Input
-                    id="groupName"
-                    value={groupData.name}
-                    onChange={handleNameChange}
-                    className="cursor-text"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="groupDescription">Description</Label>
-                  <Textarea
-                    id="groupDescription"
-                    value={groupData.description}
-                    onChange={handleDescriptionChange}
-                    placeholder="Describe your group"
-                    className="cursor-text resize-none"
-                  />
-                </div>
-              </div>
-            </div>
-            <Button type="button" onClick={handleSave} className="cursor-pointer">
-              Save Changes
-            </Button>
-          </CardContent>
-        </Card>
-
-        {/* Group Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Group Settings</CardTitle>
-            <CardDescription>Configure group behavior and permissions</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Allow Member Invites</Label>
-                <p className="text-sm text-muted-foreground">Let members invite others to the group</p>
-              </div>
-              <Switch
-                checked={settings.allowMemberInvites}
-                onCheckedChange={(checked) => handleSettingChange('allowMemberInvites', checked)}
-              />
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Mute Notifications</Label>
-                <p className="text-sm text-muted-foreground">Turn off notifications for this group</p>
-              </div>
-              <Switch
-                checked={settings.muteNotifications}
-                onCheckedChange={(checked) => handleSettingChange('muteNotifications', checked)}
-              />
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Read Receipts</Label>
-                <p className="text-sm text-muted-foreground">Show when messages are read</p>
-              </div>
-              <Switch
-                checked={settings.readReceipts}
-                onCheckedChange={(checked) => handleSettingChange('readReceipts', checked)}
-              />
-            </div>
-            <Separator />
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label>Message History</Label>
-                <p className="text-sm text-muted-foreground">Keep message history for new members</p>
-              </div>
-              <Switch
-                checked={settings.messageHistory}
-                onCheckedChange={(checked) => handleSettingChange('messageHistory', checked)}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Members Management */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
+    <div className="flex flex-col h-full">
+      <Card className="border-b rounded-none flex-shrink-0">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                onClick={onBack}
+                className="cursor-pointer hover:bg-accent"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </Button>
+              <Avatar>
+                <AvatarImage src={group.avatar} alt={group.name} />
+                <AvatarFallback>{group.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+              </Avatar>
               <div>
-                <CardTitle>Members ({group.members.length})</CardTitle>
-                <CardDescription>Manage group members and their roles</CardDescription>
+                <h2 className="font-semibold">{group.name}</h2>
+                <p className="text-sm text-muted-foreground">{members.length} members</p>
               </div>
-              <Button type="button" className="cursor-pointer" onClick={handleAddMember}>
-                <UserPlus className="h-4 w-4 mr-2" />
-                Add Member
+            </div>
+            <div className="flex space-x-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setActiveTab(activeTab === "chat" ? "settings" : "chat")}
+              >
+                {activeTab === "chat" ? "Settings" : "Chat"}
               </Button>
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {group.members.map((member) => (
-                <div key={member.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div className="flex items-center space-x-3">
-                    <Avatar>
-                      <AvatarImage src={member.avatar} alt={member.name} />
-                      <AvatarFallback>{member.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{member.name}</p>
-                      <div className="flex items-center space-x-2">
-                        <Badge variant={member.role === "admin" ? "default" : "secondary"}>
-                          {member.role}
-                        </Badge>
-                        {member.role === "admin" && <Crown className="h-3 w-3 text-yellow-500" />}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleMemberAction("promote", member.id, member.name)}
-                      className="cursor-pointer hover:bg-accent"
-                    >
-                      <Shield className="h-4 w-4" />
-                    </Button>
-                    <Button type="button"
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleMemberAction("remove", member.id, member.name)}
-                      className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground"
-                    >
-                      <UserMinus className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {showAddMember && (
-              <div className="my-4 p-4 bg-muted rounded-lg shadow-sm border">
-                <Label htmlFor="add-member-email" className="mb-2 block text-sm font-medium">
-                  Add a new member by email
-                </Label>
-                <div className="flex flex-col sm:flex-row gap-2">
-                  <div className="relative flex-1">
-                    <Input
-                      id="add-member-email"
-                      placeholder="Enter member email"
-                      value={newMember?.email}
-                      onChange={handleInputChange}
-                      disabled={isAdding}
-                      className="w-full"
-                    />
-                    {suggestions.length > 0 && (
-                      <ul className="absolute z-10 w-full bg-white border rounded-md shadow-lg mt-1">
-                        {suggestions.map((user) => (
-                          <li
-                            key={user.id}
-                            className="p-2 hover:bg-gray-100 cursor-pointer"
-                            onClick={() => {
-                              setNewMember(user);
-                              setSuggestions([]);
-                            }}
-                          >
-                            {user.name} ({user.email})
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                  <Button
-                    onClick={handleUpdateMember}
-                    disabled={!newMember?.email || isAdding}
-                    className="sm:w-auto"
-                  >
-                    Add
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => setShowAddMember(false)}
-                    disabled={isAdding}
-                    className="sm:w-auto"
-                  >
-                    Cancel
-                  </Button>
-                </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      {activeTab === "chat" ? (
+        <GroupChat group={group} users={members} />
+      ) : (
+        <div className="flex-1 overflow-hidden">
+          <Card className="border-b rounded-none">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold">Group Members</h3>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowAddMember(true)}
+                  className="cursor-pointer hover:bg-accent"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Member
+                </Button>
               </div>
-            )}
-          </CardContent>
-        </Card>
 
-        {/* Danger Zone */}
-        <Card className="border-destructive">
-          <CardHeader>
-            <CardTitle className="text-destructive">Danger Zone</CardTitle>
-            <CardDescription>Irreversible actions for this group</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button type="button"
-              variant="destructive"
-              onClick={handleDeleteGroup}
-              className="cursor-pointer"
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete Group
-            </Button>
-          </CardContent>
-        </Card>
+              {showAddMember && (
+                <div className="mb-4">
+                  <div className="relative">
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      type="text"
+                      placeholder="Search users..."
+                      value={searchQuery}
+                      onChange={(e) => handleSearch(e.target.value)}
+                      className="pl-8"
+                    />
+                  </div>
+                  {isLoading ? (
+                    <p className="text-sm text-muted-foreground mt-2">Searching...</p>
+                  ) : searchResults.length > 0 ? (
+                    <ScrollArea className="h-32 mt-2">
+                      <div className="space-y-2">
+                        {searchResults.map((user) => (
+                          <div
+                            key={user.id}
+                            className="flex items-center justify-between p-2 hover:bg-accent rounded-md"
+                          >
+                            <div className="flex items-center space-x-2">
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage src={user.avatar} alt={user.name} />
+                                <AvatarFallback>{user.name[0]}</AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium">{user.name}</p>
+                                <p className="text-sm text-muted-foreground">{user.email}</p>
+                              </div>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleUpdateMember(user)}
+                            >
+                              Add
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  ) : searchQuery ? (
+                    <p className="text-sm text-muted-foreground mt-2">No users found</p>
+                  ) : null}
+                </div>
+              )}
 
-      </div>
-    </ScrollArea>
+              <ScrollArea className="h-[calc(100vh-300px)]">
+                <div className="space-y-2">
+                  {members.map((member) => (
+                    <div
+                      key={member.id}
+                      className="flex items-center justify-between p-2 hover:bg-accent rounded-md"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={member.avatar} alt={member.name} />
+                          <AvatarFallback>{member.name[0]}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium">{member.name}</p>
+                          <p className="text-sm text-muted-foreground">{member.email}</p>
+                        </div>
+                      </div>
+                      {member.id !== user?.id && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveMember(member.id)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+    </div>
   )
 }

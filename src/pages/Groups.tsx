@@ -147,7 +147,7 @@ export const Groups = () => {
   );
 
   if (currentView === "chat" && selectedGroup) {
-    return <GroupChat group={selectedGroup} onBack={handleBackToList} />;
+    return <GroupChat group={selectedGroup} users={groups.flatMap(group => group.members)} />;
   }
 
   if (currentView === "settings" && selectedGroup) {

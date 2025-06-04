@@ -1,239 +1,177 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, Send, Phone, Video, MoreVertical, Smile, Paperclip } from "lucide-react";
-import { Group, GroupMessage, Message } from "@/types";
-import { useToast } from "@/hooks/use-toast";
+import { useState, useRef, useEffect } from "react"
+import { Group, GroupMessage, User } from "@/types"
+import { useGroupChat } from "@/hooks/useGroupChat"
+import { useAuth } from "@/contexts/AuthContext"
+import { useToast } from "@/hooks/use-toast"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { format } from "date-fns"
+import { Send, Smile, X } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { EmojiPicker } from "@/components/EmojiPicker"
 
 interface GroupChatProps {
-  group: Group;
-  onBack: () => void;
+  group: Group
+  users: User[]
 }
 
-export const GroupChat = ({ group, onBack }: GroupChatProps) => {
-  const [messages, setMessages] = useState<GroupMessage[]>([]);
-  const [newMessage, setNewMessage] = useState("");
-  const { toast } = useToast();
+export const GroupChat = ({ group, users }: GroupChatProps) => {
+  const { user } = useAuth()
+  const { toast } = useToast()
+  const [message, setMessage] = useState("")
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
+  const {
+    messages,
+    replyTo,
+    handleSendMessage,
+    handleReplyMessage,
+    handleCancelReply,
+    handleReactToMessage
+  } = useGroupChat(group)
 
-  const handleSendMessage = () => {
-    if (newMessage.trim()) {
-      console.log("Sending group message:", newMessage);
-      const message: GroupMessage = {
-        id: Date.now(),
-        content: newMessage,
-        senderId: 1,
-        timestamp: new Date().toString(),
-        type: "text",
-        replyToMessage: undefined
-      };
-      setMessages([...messages, message]);
-      setNewMessage("");
-      
-      toast({
-        title: "Message sent",
-        description: `Message sent to ${group.name}`,
-      });
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  };
+  }, [messages])
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
-    }
-  };
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!message.trim()) return
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("Message input changed:", e.target.value);
-    setNewMessage(e.target.value);
-  };
+    handleSendMessage(message, replyTo || undefined)
+    setMessage("")
+  }
 
-  const handleVoiceCall = () => {
-    console.log("Voice call initiated for group:", group.name);
-    toast({
-      title: "Voice call",
-      description: `Starting voice call in ${group.name}`,
-    });
-  };
+  const getSenderName = (senderId: number) => {
+    const sender = users.find(u => u.id === senderId)
+    return sender ? sender.name : "Unknown User"
+  }
 
-  const handleVideoCall = () => {
-    console.log("Video call initiated for group:", group.name);
-    toast({
-      title: "Video call", 
-      description: `Starting video call in ${group.name}`,
-    });
-  };
+  const getSenderAvatar = (senderId: number) => {
+    const sender = users.find(u => u.id === senderId)
+    return sender?.avatar || ""
+  }
 
-  const handleMoreOptions = () => {
-    console.log("More options clicked for group:", group.name);
-    toast({
-      title: "More options",
-      description: "Group options menu coming soon!",
-    });
-  };
+  const renderMessage = (message: GroupMessage) => {
+    const isCurrentUser = message.sender.id === user?.id
+    const senderName = getSenderName(message.sender.id)
+    const senderAvatar = getSenderAvatar(message.sender.id)
 
-  const handleAttachFile = () => {
-    console.log("Attach file clicked");
-    toast({
-      title: "File attachment",
-      description: "File upload feature coming soon!",
-    });
-  };
-
-  const handleEmojiPicker = () => {
-    console.log("Emoji picker clicked");
-    toast({
-      title: "Emoji picker",
-      description: "Emoji selection coming soon!",
-    });
-  };
+    return (
+      <div
+        key={message.id}
+        className={`flex ${isCurrentUser ? "justify-end" : "justify-start"} mb-4`}
+      >
+        {!isCurrentUser && (
+          <Avatar className="h-8 w-8 mr-2">
+            <AvatarImage src={senderAvatar} alt={senderName} />
+            <AvatarFallback>{senderName[0]}</AvatarFallback>
+          </Avatar>
+        )}
+        <div className={`flex flex-col ${isCurrentUser ? "items-end" : "items-start"}`}>
+          {!isCurrentUser && (
+            <span className="text-sm text-gray-500 mb-1">{senderName}</span>
+          )}
+          <div
+            className={`rounded-lg px-4 py-2 max-w-[70%] ${
+              isCurrentUser
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted"
+            }`}
+          >
+            {message.replyToMessage && (
+              <div className="text-xs opacity-70 mb-1 border-l-2 pl-2 border-current">
+                Replying to {getSenderName(message.replyToMessage.sender.id)}:{" "}
+                {message.replyToMessage.content}
+              </div>
+            )}
+            <p>{message.content}</p>
+            <div className="flex items-center gap-1 mt-1">
+              {message.reactions?.map((reaction, index) => (
+                <span
+                  key={index}
+                  className="text-xs cursor-pointer hover:bg-muted/50 rounded px-1"
+                  onClick={() => handleReactToMessage(message.id, reaction)}
+                >
+                  {reaction}
+                </span>
+              ))}
+            </div>
+          </div>
+          <span className="text-xs text-gray-500 mt-1">
+            {format(new Date(message.timestamp), "HH:mm")}
+          </span>
+        </div>
+        {isCurrentUser && (
+          <Avatar className="h-8 w-8 ml-2">
+            <AvatarImage src={senderAvatar} alt={senderName} />
+            <AvatarFallback>{senderName[0]}</AvatarFallback>
+          </Avatar>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <Card className="border-b rounded-none flex-shrink-0">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Button 
-                type="button" 
-                variant="ghost" 
-                size="icon"
-                onClick={() => {
-                  console.log("Back button clicked");
-                  onBack();
-                }}
-                className="cursor-pointer hover:bg-accent"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <Avatar>
-                <AvatarImage src={group.avatar} alt={group.name} />
-                <AvatarFallback>{group.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-              </Avatar>
-              <div>
-                <h2 className="font-semibold">{group.name}</h2>
-                <p className="text-sm text-muted-foreground">{group.members.length} members</p>
-              </div>
-            </div>
-            <div className="flex space-x-2">
-              <Button 
-                type="button" 
-                variant="ghost" 
-                size="icon"
-                onClick={handleVoiceCall}
-                className="cursor-pointer hover:bg-accent"
-              >
-                <Phone className="h-4 w-4" />
-              </Button>
-              <Button 
-                type="button" 
-                variant="ghost" 
-                size="icon"
-                onClick={handleVideoCall}
-                className="cursor-pointer hover:bg-accent"
-              >
-                <Video className="h-4 w-4" />
-              </Button>
-              <Button 
-                type="button" 
-                variant="ghost" 
-                size="icon"
-                onClick={handleMoreOptions}
-                className="cursor-pointer hover:bg-accent"
-              >
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
+      <div className="flex-1 overflow-hidden">
+        <ScrollArea ref={scrollRef} className="h-full p-4">
+          {messages.map(renderMessage)}
+        </ScrollArea>
+      </div>
 
-      {/* Messages */}
-      <ScrollArea className="flex-1">
-        <div className="p-4 space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.senderId === 1 ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                  message.senderId === 1
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted"
-                }`}
-              >
-                {message.senderId !== 1 && (
-                  <p className="text-xs text-muted-foreground mb-1">User {message.senderId}</p>
-                )}
-                {message.replyToMessage && (
-                  <div className="flex items-center mb-2">
-                    <div className="border-l-4 border-primary bg-muted/60 px-3 py-1 rounded-md w-full">
-                      <span className="block text-xs font-semibold text-primary mb-0.5">
-                        Replying to {message.replyToMessage.sender.name}
-                      </span>
-                      <span className="block text-xs text-muted-foreground truncate max-w-[200px]">
-                        {message.replyToMessage.content}
-                      </span>
-                    </div>
-                  </div>
-                )}
-                <p className="text-sm">{message.content}</p>
-                <p className="text-xs opacity-70 mt-1">
-                  {new Date(message.timestamp).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-                </p>
-              </div>
-            </div>
-          ))}
+      {replyTo && (
+        <div className="px-4 py-2 bg-muted/50 flex items-center justify-between">
+          <div className="text-sm">
+            Replying to {getSenderName(replyTo.sender.id)}: {replyTo.content}
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleCancelReply}
+            className="h-6 w-6 p-0"
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </div>
-      </ScrollArea>
+      )}
 
-      {/* Input */}
-      <Card className="border-t rounded-none flex-shrink-0">
-        <CardContent className="p-4">
-          <div className="flex items-center space-x-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={handleEmojiPicker}
-              className="cursor-pointer hover:bg-accent"
-            >
-              <Smile className="h-5 w-5" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={handleAttachFile}
-              className="cursor-pointer hover:bg-accent"
-            >
-              <Paperclip className="h-5 w-5" />
-            </Button>
-            <Input
-              type="text"
-              placeholder="Type a message..."
-              value={newMessage}
-              onChange={handleInputChange}
-              onKeyPress={handleKeyPress}
-              className="flex-1"
-            />
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={handleSendMessage}
-              className="cursor-pointer hover:bg-accent"
-            >
-              <Send className="h-5 w-5" />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <form onSubmit={handleSubmit} className="p-4 border-t">
+        <div className="flex gap-2">
+          <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
+            <PopoverTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10"
+              >
+                <Smile className="h-5 w-5" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0" align="start">
+              <EmojiPicker onEmojiSelect={(emoji) => {
+                setMessage(prev => prev + emoji)
+                setShowEmojiPicker(false)
+              }} />
+            </PopoverContent>
+          </Popover>
+
+          <Input
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Type a message..."
+            className="flex-1"
+          />
+          <Button type="submit" size="icon" className="h-10 w-10">
+            <Send className="h-5 w-5" />
+          </Button>
+        </div>
+      </form>
     </div>
-  );
-};
+  )
+}

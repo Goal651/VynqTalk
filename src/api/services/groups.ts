@@ -46,7 +46,7 @@ export class GroupService {
 
   }
 
-  async removeMember(groupId: number, userId: string): Promise<ApiResponse<Group>> {
+  async removeMember(groupId: number, userId: number): Promise<ApiResponse<Group>> {
     return await apiClient.delete<Group>(`${API_ENDPOINTS.GROUPS.MEMBERS(groupId)}/${userId}`);
 
   }
