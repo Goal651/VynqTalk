@@ -85,25 +85,16 @@ export const GroupChatView = ({ group, users, onBack, onSettings }: GroupChatVie
             </div>
 
             <div className="flex items-center space-x-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={onSettings}
-                      className="cursor-pointer hover:bg-accent/50 transition-colors rounded-full px-3"
-                    >
-                      <Settings className="h-4 w-4 mr-2" />
-                      Settings
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Group settings</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={onSettings}
+                className="cursor-pointer hover:bg-accent"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Settings
+              </Button>
             </div>
           </div>
         </div>

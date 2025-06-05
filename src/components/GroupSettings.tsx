@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -44,11 +44,10 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
   const [isAdding, setIsAdding] = useState(false)
   const [suggestions, setSuggestions] = useState<User[]>([])
   const [users, setUsers] = useState<User[]>([])
-  const [members, setMembers] = useState<User[]>([])
   const [searchQuery, setSearchQuery] = useState("")
   const [searchResults, setSearchResults] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState<"chat" | "settings">("chat")
+  const [activeTab, setActiveTab] = useState<"chat" | "settings">("settings")
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -61,39 +60,6 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
     };
     fetchUsers();
   }, []);
-
-  useEffect(() => {
-    const loadMembers = async () => {
-      try {
-        const response = await groupService.getGroupMembers(group.id)
-        if (response.success && response.data) {
-          setMembers(response.data)
-        }
-      } catch (error) {
-        console.error("Failed to load group members:", error)
-        toast({
-          title: "Error",
-          description: "Failed to load group members",
-          variant: "destructive"
-        })
-      }
-    }
-    loadMembers()
-  }, [group.id, toast])
-
-  const getSuggestions = (value: string) => {
-    const inputValue = value.trim().toLowerCase();
-    const inputLength = inputValue.length;
-    return inputLength === 0
-      ? []
-      : users.filter(user => user.email.toLowerCase().slice(0, inputLength) === inputValue);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setNewMember(users.find(user => user.email === value) || null)
-    setSuggestions(getSuggestions(value))
-  }
 
   const handleSave = () => {
     console.log("Saving group settings:", groupData)
@@ -119,6 +85,91 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
       title: "Setting updated",
       description: `${key.replace(/([A-Z])/g, ' $1').toLowerCase()} has been ${value ? 'enabled' : 'disabled'}`,
     })
+  }
+
+  const handleSearch = async (query: string) => {
+    setSearchQuery(query)
+    if (!query.trim()) {
+      setSearchResults([])
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      const response = await userService.searchUsers(query)
+      if (response.success && response.data) {
+        const filteredResults = response.data.filter(
+          (user) => !group.members.some((member) => member.id === user.id)
+        )
+        setSearchResults(filteredResults)
+      }
+    } catch (error) {
+      console.error("Failed to search users:", error)
+      toast({
+        title: "Error",
+        description: "Failed to search users",
+        variant: "destructive"
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleUpdateMember = async (user: User) => {
+    try {
+      const res = await groupService.addMember(group.id, user)
+      if (res.success) {
+        const updatedGroup = {
+          ...group,
+          members: [...group.members, user]
+        }
+        onSave(updatedGroup)
+        setSearchResults([])
+        setSearchQuery("")
+        setShowAddMember(false)
+        toast({ title: "Member added", description: `${user.name} has been added.` })
+      }
+    } catch (err) {
+      toast({ title: "Error", description: err.message, variant: "destructive" })
+    }
+  }
+
+  const handleRemoveMember = async (memberId: number) => {
+    try {
+      const response = await groupService.removeMember(group.id, memberId)
+      if (response.success) {
+        const updatedGroup = {
+          ...group,
+          members: group.members.filter((member) => member.id !== memberId)
+        }
+        onSave(updatedGroup)
+        toast({
+          title: "Success",
+          description: "Member removed from the group",
+        })
+      }
+    } catch (error) {
+      console.error("Failed to remove member:", error)
+      toast({
+        title: "Error",
+        description: "Failed to remove member from the group",
+        variant: "destructive"
+      })
+    }
+  }
+
+  const getSuggestions = (value: string) => {
+    const inputValue = value.trim().toLowerCase();
+    const inputLength = inputValue.length;
+    return inputLength === 0
+      ? []
+      : users.filter(user => user.email.toLowerCase().slice(0, inputLength) === inputValue);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value
+    setNewMember(users.find(user => user.email === value) || null)
+    setSuggestions(getSuggestions(value))
   }
 
   const handleMemberAction = (action: string, memberId: number, memberName: string) => {
@@ -161,75 +212,12 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
     setGroupData(prev => ({ ...prev, description: e.target.value }))
   }
 
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query)
-    if (!query.trim()) {
-      setSearchResults([])
-      return
-    }
-
-    setIsLoading(true)
-    try {
-      const response = await userService.searchUsers(query)
-      if (response.success && response.data) {
-        const filteredResults = response.data.filter(
-          (user) => !members.some((member) => member.id === user.id)
-        )
-        setSearchResults(filteredResults)
-      }
-    } catch (error) {
-      console.error("Failed to search users:", error)
-      toast({
-        title: "Error",
-        description: "Failed to search users",
-        variant: "destructive"
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleUpdateMember = async (user: User) => {
-    try {
-      const res = await groupService.addMember(group.id, user)
-      if (res.success) {
-        setMembers([...members, user])
-        setSearchResults([])
-        setSearchQuery("")
-        setShowAddMember(false)
-        toast({ title: "Member added", description: `${user.name} has been added.` })
-      }
-    } catch (err) {
-      toast({ title: "Error", description: err.message, variant: "destructive" })
-    }
-  }
-
-  const handleRemoveMember = async (memberId: number) => {
-    try {
-      const response = await groupService.removeMember(group.id, memberId)
-      if (response.success) {
-        setMembers(members.filter((member) => member.id !== memberId))
-        toast({
-          title: "Success",
-          description: "Member removed from the group",
-        })
-      }
-    } catch (error) {
-      console.error("Failed to remove member:", error)
-      toast({
-        title: "Error",
-        description: "Failed to remove member from the group",
-        variant: "destructive"
-      })
-    }
-  }
-
   return (
     <div className="flex flex-col h-full">
-      <Card className="border-b rounded-none flex-shrink-0">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
+      <div className="flex-1 overflow-hidden">
+        <ScrollArea className="h-full">
+          <div className="p-6 space-y-6">
+            <div className="flex items-center space-x-4">
               <Button
                 type="button"
                 variant="ghost"
@@ -239,65 +227,133 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>
-              <Avatar>
-                <AvatarImage src={group.avatar} alt={group.name} />
-                <AvatarFallback>{group.name.substring(0, 2).toUpperCase()}</AvatarFallback>
-              </Avatar>
               <div>
-                <h2 className="font-semibold">{group.name}</h2>
-                <p className="text-sm text-muted-foreground">{members.length} members</p>
+                <h1 className="text-2xl font-bold">Group Settings</h1>
+                <p className="text-muted-foreground">Manage your group settings and preferences</p>
               </div>
             </div>
-            <div className="flex space-x-2">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => setActiveTab(activeTab === "chat" ? "settings" : "chat")}
-              >
-                {activeTab === "chat" ? "Settings" : "Chat"}
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-      </Card>
 
-      {activeTab === "chat" ? (
-        <GroupChat group={group} users={members} />
-      ) : (
-        <div className="flex-1 overflow-hidden">
-          <Card className="border-b rounded-none">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold">Group Members</h3>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowAddMember(true)}
-                  className="cursor-pointer hover:bg-accent"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Member
-                </Button>
-              </div>
-
-              {showAddMember && (
-                <div className="mb-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Group Information</CardTitle>
+                <CardDescription>Update your group's basic information</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center space-x-4">
                   <div className="relative">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      type="text"
-                      placeholder="Search users..."
-                      value={searchQuery}
-                      onChange={(e) => handleSearch(e.target.value)}
-                      className="pl-8"
-                    />
+                    <Avatar className="h-20 w-20">
+                      <AvatarImage src={groupData.avatar} alt={groupData.name} />
+                      <AvatarFallback>{groupData.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                    </Avatar>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="icon"
+                      className="absolute bottom-0 right-0 h-8 w-8 rounded-full"
+                      onClick={() => {}}
+                    >
+                      <Camera className="h-4 w-4" />
+                    </Button>
                   </div>
-                  {isLoading ? (
-                    <p className="text-sm text-muted-foreground mt-2">Searching...</p>
-                  ) : searchResults.length > 0 ? (
-                    <ScrollArea className="h-32 mt-2">
+                  <div className="flex-1 space-y-4">
+                    <div className="space-y-2">
+                      <Label>Group Name</Label>
+                      <Input
+                        value={groupData.name}
+                        onChange={(e) => setGroupData(prev => ({ ...prev, name: e.target.value }))}
+                        placeholder="Enter group name"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Description</Label>
+                      <Textarea
+                        value={groupData.description}
+                        onChange={(e) => setGroupData(prev => ({ ...prev, description: e.target.value }))}
+                        placeholder="Enter group description"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <Button onClick={handleSave}>Save Changes</Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Group Settings</CardTitle>
+                <CardDescription>Manage your group's settings and preferences</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Allow Member Invites</Label>
+                    <p className="text-sm text-muted-foreground">Let members invite others to the group</p>
+                  </div>
+                  <Switch
+                    checked={settings.allowMemberInvites}
+                    onCheckedChange={(checked) => handleSettingChange('allowMemberInvites', checked)}
+                  />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Mute Notifications</Label>
+                    <p className="text-sm text-muted-foreground">Stop receiving notifications from this group</p>
+                  </div>
+                  <Switch
+                    checked={settings.muteNotifications}
+                    onCheckedChange={(checked) => handleSettingChange('muteNotifications', checked)}
+                  />
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label>Read Receipts</Label>
+                    <p className="text-sm text-muted-foreground">Show when messages have been read</p>
+                  </div>
+                  <Switch
+                    checked={settings.readReceipts}
+                    onCheckedChange={(checked) => handleSettingChange('readReceipts', checked)}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Group Members</CardTitle>
+                    <CardDescription>Manage your group's members</CardDescription>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowAddMember(true)}
+                    className="cursor-pointer hover:bg-accent"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Member
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {showAddMember && (
+                  <div className="space-y-4">
+                    <div className="relative">
+                      <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        type="text"
+                        placeholder="Search users..."
+                        value={searchQuery}
+                        onChange={(e) => handleSearch(e.target.value)}
+                        className="pl-8"
+                      />
+                    </div>
+                    {isLoading ? (
+                      <p className="text-sm text-muted-foreground">Searching...</p>
+                    ) : searchResults.length > 0 ? (
                       <div className="space-y-2">
                         {searchResults.map((user) => (
                           <div
@@ -325,16 +381,14 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
                           </div>
                         ))}
                       </div>
-                    </ScrollArea>
-                  ) : searchQuery ? (
-                    <p className="text-sm text-muted-foreground mt-2">No users found</p>
-                  ) : null}
-                </div>
-              )}
+                    ) : searchQuery ? (
+                      <p className="text-sm text-muted-foreground">No users found</p>
+                    ) : null}
+                  </div>
+                )}
 
-              <ScrollArea className="h-[calc(100vh-300px)]">
                 <div className="space-y-2">
-                  {members.map((member) => (
+                  {group.members.map((member) => (
                     <div
                       key={member.id}
                       className="flex items-center justify-between p-2 hover:bg-accent rounded-md"
@@ -362,11 +416,36 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
                     </div>
                   ))}
                 </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+              </CardContent>
+            </Card>
+
+            <Card className="border-destructive/50">
+              <CardHeader>
+                <CardTitle className="text-destructive">Danger Zone</CardTitle>
+                <CardDescription>Irreversible and destructive actions</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="text-destructive">Delete Group</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Permanently delete this group and all of its content
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={handleDeleteGroup}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete Group
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </ScrollArea>
+      </div>
     </div>
   )
 }
