@@ -87,33 +87,21 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
     })
   }
 
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query)
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
     if (!query.trim()) {
-      setSearchResults([])
-      return
+      setSearchResults([]);
+      return;
     }
 
-    setIsLoading(true)
-    try {
-      const response = await userService.searchUsers(query)
-      if (response.success && response.data) {
-        const filteredResults = response.data.filter(
-          (user) => !group.members.some((member) => member.id === user.id)
-        )
-        setSearchResults(filteredResults)
-      }
-    } catch (error) {
-      console.error("Failed to search users:", error)
-      toast({
-        title: "Error",
-        description: "Failed to search users",
-        variant: "destructive"
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+    const filteredResults = users.filter(
+      (user) => 
+        !group.members.some((member) => member.id === user.id) &&
+        (user.name.toLowerCase().includes(query.toLowerCase()) ||
+         user.email.toLowerCase().includes(query.toLowerCase()))
+    );
+    setSearchResults(filteredResults);
+  };
 
   const handleUpdateMember = async (user: User) => {
     try {

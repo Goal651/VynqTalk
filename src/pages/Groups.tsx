@@ -119,10 +119,7 @@ export const Groups = () => {
 
   const handleUpdateGroup = async (updatedGroup: Group) => {
     try {
-      const result = await groupService.updateGroup(updatedGroup.id, {
-        name: updatedGroup.name,
-        description: updatedGroup.description,
-      });
+      const result = await groupService.updateGroup(updatedGroup.id, updatedGroup);
       const updatedGroups = groups.map(g => g.id === result.data.id ? result.data : g);
 
       setGroups(updatedGroups);
