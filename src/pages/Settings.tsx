@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,9 +10,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Camera, Save, Bell, Shield, Palette, User, Download, Upload, Trash2 } from "lucide-react";
+import { Camera, Save, Bell, Shield, Palette, Download, Upload, Trash2, UserCircle } from "lucide-react";
 import { useCamera } from "@/hooks/use-camera";
 import { useToast } from "@/hooks/use-toast";
+import { userService } from "@/api/services/users";
+import { settingsService } from "@/api/services/settings";
+import { User, UserSettings } from "@/types";
 
 export const Settings = () => {
   const { user } = useAuth();
@@ -23,116 +26,256 @@ export const Settings = () => {
   const [profileData, setProfileData] = useState({
     name: user?.name || "",
     email: user?.email || "",
-    bio: "",
-    location: "",
   });
   
-  const [settings, setSettings] = useState({
-    notifications: {
-      pushEnabled: true,
-      soundEnabled: true,
-      emailNotifications: false,
-      desktopNotifications: true,
-    },
-    privacy: {
-      showOnlineStatus: true,
-      readReceipts: true,
-      allowGroupInvites: true,
-      showLastSeen: false,
-    },
-    appearance: {
-      fontSize: "medium",
-      language: "en",
-      compactMode: false,
-    },
-    security: {
-      twoFactorAuth: false,
-      loginAlerts: true,
-      dataDownload: false,
-    }
+  const [settings, setSettings] = useState<UserSettings>({
+    id: user?.id || 0,
+    user: user as User,
+    theme: theme,
+    language: 'en',
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    emailNotifications: false,
+    pushNotifications: true,
+    soundEnabled: true,
+    autoStatus: true,
+    showOnlineStatus: true,
+    readReceipts: true,
+    profileVisibility: 'public'
   });
 
-  const handleProfileSave = () => {
-    console.log("Saving profile data:", profileData);
-    toast({
-      title: "Profile Updated",
-      description: "Your profile has been successfully updated.",
-    });
-  };
+  useEffect(() => {
+    if (user?.id) {
+      fetchSettings();
+    }
+  }, [user?.id]);
 
-  const handleNotificationChange = (key: string, value: boolean) => {
-    console.log(`Notification setting ${key} changed to:`, value);
-    setSettings(prev => ({
-      ...prev,
-      notifications: {
-        ...prev.notifications,
-        [key]: value
+  useEffect(() => {
+    if (settings.theme !== theme) {
+      setSettings(prev => ({ ...prev, theme }));
+    }
+  }, [theme]);
+
+  const fetchSettings = async () => {
+    if (!user?.id) return;
+    try {
+      const response = await settingsService.getSettings(user.id);
+      if (response.success && response.data) {
+        setSettings(response.data);
+        if (response.data.theme && response.data.theme !== theme) {
+          setTheme(response.data.theme);
+        }
       }
-    }));
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to fetch settings",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handlePrivacyChange = (key: string, value: boolean) => {
-    console.log(`Privacy setting ${key} changed to:`, value);
-    setSettings(prev => ({
-      ...prev,
-      privacy: {
-        ...prev.privacy,
-        [key]: value
+  const handleProfileSave = async () => {
+    if (!user?.id) return;
+    try {
+      const response = await userService.updateProfile({
+        name: profileData.name,
+        email: profileData.email,
+      });
+
+      if (response.success && response.data) {
+        toast({
+          title: "Profile Updated",
+          description: "Your profile has been successfully updated.",
+        });
       }
-    }));
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleAppearanceChange = (key: string, value: string | boolean) => {
-    console.log(`Appearance setting ${key} changed to:`, value);
-    setSettings(prev => ({
-      ...prev,
-      appearance: {
-        ...prev.appearance,
-        [key]: value
+  const handleAvatarUpload = async (file: File) => {
+    if (!user?.id) return;
+    try {
+      const response = await userService.uploadAvatar(file);
+      if (response.success && response.data) {
+        toast({
+          title: "Avatar Updated",
+          description: "Your profile picture has been updated successfully.",
+        });
       }
-    }));
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to upload avatar",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleSecurityChange = (key: string, value: boolean) => {
-    console.log(`Security setting ${key} changed to:`, value);
-    setSettings(prev => ({
-      ...prev,
-      security: {
-        ...prev.security,
+  const handleNotificationChange = async (key: string, value: boolean) => {
+    if (!user?.id) return;
+    try {
+      const updatedSettings = {
+        ...settings,
         [key]: value
+      };
+      const response = await settingsService.updateSettings(user.id, updatedSettings);
+      
+      if (response.success) {
+        setSettings(updatedSettings);
+        toast({
+          title: "Settings Updated",
+          description: "Your notification settings have been updated.",
+        });
       }
-    }));
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update notification settings",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleThemeChange = (newTheme: "blue" | "dark" | "cyberpunk") => {
-    console.log("Theme changed to:", newTheme);
-    setTheme(newTheme);
-    toast({
-      title: "Theme Updated",
-      description: `Switched to ${newTheme} theme.`,
-    });
+  const handlePrivacyChange = async (key: string, value: boolean | 'public' | 'friends' | 'private') => {
+    if (!user?.id) return;
+    try {
+      const updatedSettings = {
+        ...settings,
+        [key]: value
+      };
+      const response = await settingsService.updateSettings(user.id, updatedSettings);
+      
+      if (response.success) {
+        setSettings(updatedSettings);
+        toast({
+          title: "Settings Updated",
+          description: "Your privacy settings have been updated.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update privacy settings",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAppearanceChange = async (key: string, value: string | boolean) => {
+    if (!user?.id) return;
+    try {
+      const updatedSettings = {
+        ...settings,
+        [key]: value
+      };
+      const response = await settingsService.updateSettings(user.id, updatedSettings);
+      
+      if (response.success) {
+        setSettings(updatedSettings);
+        toast({
+          title: "Settings Updated",
+          description: "Your appearance settings have been updated.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update appearance settings",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSecurityChange = async (key: string, value: boolean) => {
+    if (!user?.id) return;
+    try {
+      const updatedSettings = {
+        ...settings,
+        [key]: value
+      };
+      const response = await settingsService.updateSettings(user.id, updatedSettings);
+      
+      if (response.success) {
+        setSettings(updatedSettings);
+        toast({
+          title: "Settings Updated",
+          description: "Your security settings have been updated.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update security settings",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleThemeChange = async (newTheme: "blue" | "dark" | "cyberpunk" | "neon" | "ocean" | "sunset") => {
+    if (!user?.id) return;
+    try {
+      const updatedSettings = {
+        ...settings,
+        theme: newTheme
+      };
+      const response = await settingsService.updateSettings(user.id, updatedSettings);
+      if (response.success) {
+        setTheme(newTheme);
+        setSettings(updatedSettings);
+        toast({
+          title: "Theme Updated",
+          description: `Switched to ${newTheme} theme.`,
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update theme",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleCameraClick = () => {
-    console.log("Camera button clicked");
     openCamera();
   };
 
-  const handleDataExport = () => {
-    console.log("Exporting user data");
-    toast({
-      title: "Data Export Started",
-      description: "Your data export will be ready shortly.",
-    });
+  const handleDataExport = async () => {
+    try {
+      // Implement data export functionality
+      toast({
+        title: "Data Export Started",
+        description: "Your data export will be ready shortly.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to export data",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleAccountDelete = () => {
-    console.log("Account deletion requested");
-    toast({
-      title: "Account Deletion",
-      description: "Please contact support to delete your account.",
-      variant: "destructive",
-    });
+  const handleAccountDelete = async () => {
+    try {
+      // Implement account deletion functionality
+      toast({
+        title: "Account Deletion",
+        description: "Please contact support to delete your account.",
+        variant: "destructive",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to process account deletion request",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -148,7 +291,7 @@ export const Settings = () => {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
+                <UserCircle className="h-5 w-5" />
                 Profile
               </CardTitle>
               <CardDescription>Update your personal information</CardDescription>
@@ -195,19 +338,6 @@ export const Settings = () => {
                       className="cursor-text"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="bio">Bio</Label>
-                    <Input 
-                      id="bio" 
-                      value={profileData.bio}
-                      onChange={(e) => {
-                        console.log("Bio input changed:", e.target.value);
-                        setProfileData(prev => ({ ...prev, bio: e.target.value }));
-                      }}
-                      placeholder="Tell us about yourself"
-                      className="cursor-text"
-                    />
-                  </div>
                 </div>
               </div>
               <Button type="button" onClick={handleProfileSave} className="cursor-pointer">
@@ -231,38 +361,42 @@ export const Settings = () => {
                 <Label>Theme</Label>
                 <Select 
                   value={theme} 
-                  onValueChange={(value: "blue" | "dark" | "cyberpunk") => handleThemeChange(value)}
+                  onValueChange={(value: "blue" | "dark" | "cyberpunk" | "neon" | "ocean" | "sunset") => handleThemeChange(value)}
                 >
                   <SelectTrigger className="cursor-pointer">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="blue">Blue</SelectItem>
+                    <SelectItem value="blue">Classic</SelectItem>
                     <SelectItem value="dark">Dark</SelectItem>
                     <SelectItem value="cyberpunk">Cyberpunk</SelectItem>
+                    <SelectItem value="neon">Neon</SelectItem>
+                    <SelectItem value="ocean">Ocean</SelectItem>
+                    <SelectItem value="sunset">Sunset</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
                 <Label>Font Size</Label>
                 <Select 
-                  value={settings.appearance.fontSize} 
-                  onValueChange={(value) => handleAppearanceChange("fontSize", value)}
+                  value={settings.language} 
+                  onValueChange={(value) => handleAppearanceChange("language", value)}
                 >
                   <SelectTrigger className="cursor-pointer">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="small">Small</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="large">Large</SelectItem>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="es">Spanish</SelectItem>
+                    <SelectItem value="fr">French</SelectItem>
+                    <SelectItem value="de">German</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
                 <Label>Language</Label>
                 <Select 
-                  value={settings.appearance.language} 
+                  value={settings.language} 
                   onValueChange={(value) => handleAppearanceChange("language", value)}
                 >
                   <SelectTrigger className="cursor-pointer">
@@ -279,12 +413,12 @@ export const Settings = () => {
               <Separator />
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
-                  <Label>Compact Mode</Label>
-                  <p className="text-sm text-muted-foreground">Use a more compact interface</p>
+                  <Label>Auto Status</Label>
+                  <p className="text-sm text-muted-foreground">Automatically update your status</p>
                 </div>
                 <Switch
-                  checked={settings.appearance.compactMode}
-                  onCheckedChange={(checked) => handleAppearanceChange("compactMode", checked)}
+                  checked={settings.autoStatus}
+                  onCheckedChange={(checked) => handleAppearanceChange("autoStatus", checked)}
                 />
               </div>
             </CardContent>
@@ -306,8 +440,8 @@ export const Settings = () => {
                   <p className="text-sm text-muted-foreground">Receive notifications on this device</p>
                 </div>
                 <Switch
-                  checked={settings.notifications.pushEnabled}
-                  onCheckedChange={(checked) => handleNotificationChange('pushEnabled', checked)}
+                  checked={settings.pushNotifications}
+                  onCheckedChange={(checked) => handleNotificationChange('pushNotifications', checked)}
                 />
               </div>
               <Separator />
@@ -317,7 +451,7 @@ export const Settings = () => {
                   <p className="text-sm text-muted-foreground">Play sounds for new messages</p>
                 </div>
                 <Switch
-                  checked={settings.notifications.soundEnabled}
+                  checked={settings.soundEnabled}
                   onCheckedChange={(checked) => handleNotificationChange('soundEnabled', checked)}
                 />
               </div>
@@ -328,19 +462,8 @@ export const Settings = () => {
                   <p className="text-sm text-muted-foreground">Receive email summaries</p>
                 </div>
                 <Switch
-                  checked={settings.notifications.emailNotifications}
+                  checked={settings.emailNotifications}
                   onCheckedChange={(checked) => handleNotificationChange('emailNotifications', checked)}
-                />
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Desktop Notifications</Label>
-                  <p className="text-sm text-muted-foreground">Show notifications on desktop</p>
-                </div>
-                <Switch
-                  checked={settings.notifications.desktopNotifications}
-                  onCheckedChange={(checked) => handleNotificationChange('desktopNotifications', checked)}
                 />
               </div>
             </CardContent>
@@ -362,7 +485,7 @@ export const Settings = () => {
                   <p className="text-sm text-muted-foreground">Let others see when you're online</p>
                 </div>
                 <Switch
-                  checked={settings.privacy.showOnlineStatus}
+                  checked={settings.showOnlineStatus}
                   onCheckedChange={(checked) => handlePrivacyChange('showOnlineStatus', checked)}
                 />
               </div>
@@ -373,42 +496,26 @@ export const Settings = () => {
                   <p className="text-sm text-muted-foreground">Let others see when you've read their messages</p>
                 </div>
                 <Switch
-                  checked={settings.privacy.readReceipts}
+                  checked={settings.readReceipts}
                   onCheckedChange={(checked) => handlePrivacyChange('readReceipts', checked)}
                 />
               </div>
               <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Group Invites</Label>
-                  <p className="text-sm text-muted-foreground">Allow others to add you to groups</p>
-                </div>
-                <Switch
-                  checked={settings.privacy.allowGroupInvites}
-                  onCheckedChange={(checked) => handlePrivacyChange('allowGroupInvites', checked)}
-                />
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Show Last Seen</Label>
-                  <p className="text-sm text-muted-foreground">Let others see when you were last online</p>
-                </div>
-                <Switch
-                  checked={settings.privacy.showLastSeen}
-                  onCheckedChange={(checked) => handlePrivacyChange('showLastSeen', checked)}
-                />
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Two-Factor Authentication</Label>
-                  <p className="text-sm text-muted-foreground">Add extra security to your account</p>
-                </div>
-                <Switch
-                  checked={settings.security.twoFactorAuth}
-                  onCheckedChange={(checked) => handleSecurityChange('twoFactorAuth', checked)}
-                />
+              <div className="space-y-2">
+                <Label>Profile Visibility</Label>
+                <Select 
+                  value={settings.profileVisibility} 
+                  onValueChange={(value: 'public' | 'friends' | 'private') => handlePrivacyChange('profileVisibility', value)}
+                >
+                  <SelectTrigger className="cursor-pointer">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="public">Public</SelectItem>
+                    <SelectItem value="friends">Friends Only</SelectItem>
+                    <SelectItem value="private">Private</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </CardContent>
           </Card>

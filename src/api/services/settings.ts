@@ -1,20 +1,10 @@
 
+import { UserSettings } from '@/types';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
 import { ApiResponse } from '../types';
 
-export interface UserSettings {
-  theme: 'light' | 'dark' | 'system';
-  language: string;
-  timezone: string;
-  emailNotifications: boolean;
-  pushNotifications: boolean;
-  soundEnabled: boolean;
-  autoStatus: boolean;
-  showOnlineStatus: boolean;
-  readReceipts: boolean;
-  profileVisibility: 'public' | 'friends' | 'private';
-}
+
 
 export interface PrivacySettings {
   profileVisibility: 'public' | 'friends' | 'private';
@@ -25,32 +15,32 @@ export interface PrivacySettings {
 }
 
 export class SettingsService {
-  async getSettings(): Promise<ApiResponse<UserSettings>> {
-    return await apiClient.get<UserSettings>(API_ENDPOINTS.SETTINGS.GET);
+  async getSettings(userId: number): Promise<ApiResponse<UserSettings>> {
+    return await apiClient.get<UserSettings>(API_ENDPOINTS.SETTINGS.GET(userId));
   }
 
-  async updateSettings(settings: Partial<UserSettings>): Promise<ApiResponse<UserSettings>> {
-    return await apiClient.put<UserSettings>(API_ENDPOINTS.SETTINGS.UPDATE, settings);
+  async updateSettings(userId: number, settings: UserSettings): Promise<ApiResponse<UserSettings>> {
+    return await apiClient.put<UserSettings>(API_ENDPOINTS.SETTINGS.UPDATE(userId), settings);
   }
 
-  async getPrivacySettings(): Promise<ApiResponse<PrivacySettings>> {
-    return await apiClient.get<PrivacySettings>(API_ENDPOINTS.SETTINGS.PRIVACY);
+  async getPrivacySettings(userId: number): Promise<ApiResponse<PrivacySettings>> {
+    return await apiClient.get<PrivacySettings>(API_ENDPOINTS.SETTINGS.PRIVACY(userId));
   }
 
-  async updatePrivacySettings(settings: Partial<PrivacySettings>): Promise<ApiResponse<PrivacySettings>> {
-    return await apiClient.put<PrivacySettings>(API_ENDPOINTS.SETTINGS.PRIVACY, settings);
+  async updatePrivacySettings(userId: number, settings: Partial<PrivacySettings>): Promise<ApiResponse<PrivacySettings>> {
+    return await apiClient.put<PrivacySettings>(API_ENDPOINTS.SETTINGS.PRIVACY(userId), settings);
   }
 
-  async updateTheme(theme: 'light' | 'dark' | 'system'): Promise<ApiResponse<void>> {
-    return await apiClient.put<void>(API_ENDPOINTS.SETTINGS.THEME, { theme });
+  async updateTheme(userId: number, theme: "blue" | "dark" | "cyberpunk" | "neon" | "ocean" | "sunset"): Promise<ApiResponse<void>> {
+    return await apiClient.put<void>(API_ENDPOINTS.SETTINGS.THEME(userId), { theme });
   }
 
-  async blockUser(userId: string): Promise<ApiResponse<void>> {
-    return await apiClient.post<void>('/settings/block-user', { userId });
+  async blockUser(userId: number): Promise<ApiResponse<void>> {
+    return await apiClient.post<void>(API_ENDPOINTS.SETTINGS.BLOCK_USER(userId), { userId });
   }
 
-  async unblockUser(userId: string): Promise<ApiResponse<void>> {
-    return await apiClient.post<void>('/settings/unblock-user', { userId });
+  async unblockUser(userId: number): Promise<ApiResponse<void>> {
+    return await apiClient.post<void>(API_ENDPOINTS.SETTINGS.UNBLOCK_USER(userId), { userId });
   }
 }
 

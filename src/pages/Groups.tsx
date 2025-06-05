@@ -11,7 +11,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Users, Settings, MessageCircle, Search, Crown } from "lucide-react";
-import { Group } from "@/types";
+import { Group, User, GroupMessage } from "@/types";
 import { GroupChatView } from "@/components/GroupChatView";
 import { GroupSettings } from "@/components/GroupSettings";
 import { useToast } from "@/hooks/use-toast";

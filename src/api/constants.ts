@@ -82,11 +82,13 @@ export const API_ENDPOINTS = {
     METRICS: '/admin/metrics',
   },
   SETTINGS: {
-    GET: '/settings',
-    UPDATE: '/settings',
-    PRIVACY: '/settings/privacy',
-    NOTIFICATIONS: '/settings/notifications',
-    THEME: '/settings/theme',
+    GET: (userId: number) => `/user-settings/${userId}`,
+    UPDATE: (userId: number) => `/user-settings/${userId}`,
+    PRIVACY: (userId: number) => `/user-settings/${userId}/privacy`,
+    NOTIFICATIONS: (userId: number) => `/user-settings/${userId}/notifications`,
+    THEME: (userId: number) => `/user-settings/${userId}/theme`,
+    BLOCK_USER: (userId: number) => `/user-settings/${userId}/block-user`,
+    UNBLOCK_USER: (userId: number) => `/user-settings/${userId}/unblock-user`,
   },
 };
 

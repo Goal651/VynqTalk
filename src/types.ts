@@ -8,6 +8,22 @@ export interface User {
   role?: 'user' | 'admin' | 'moderator'
 }
 
+export interface UserSettings {
+  id: number;
+  user:User;
+  theme?:  "blue" | "dark" | "cyberpunk" | "neon" | "ocean" | "sunset"
+  language?: string;
+  timezone? : string;
+  notificationEnabled?: boolean;
+  emailNotifications?: boolean;
+  pushNotifications?: boolean;
+  soundEnabled?: boolean;
+  autoStatus?: boolean;
+  showOnlineStatus?: boolean;
+  readReceipts?: boolean;
+  profileVisibility?: 'public' | 'friends' | 'private';
+}
+
 export interface Message {
   id: number
   sender: User // Changed to string and keeping senderId
@@ -46,7 +62,7 @@ export interface Group {
   avatar: string
   members: User[]
   createdBy: User
-  createdAt: Date
+  createdAt: string
   isPrivate?: boolean
 }
 

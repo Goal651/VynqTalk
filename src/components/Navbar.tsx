@@ -1,7 +1,5 @@
-
-import { Home, Users, Settings, Bell, Moon, Sun, Laptop, LogOut, Shield, Palette, Zap, Waves, Sunset } from "lucide-react";
+import { Home, Users, Settings, Bell, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useTheme } from "../contexts/ThemeContext";
 import { User } from "@/types";
 
 interface NavbarProps {
@@ -12,8 +10,6 @@ interface NavbarProps {
 }
 
 export const Navbar = ({ currentView, onViewChange, onLogout, user }: NavbarProps) => {
-  const { theme, setTheme } = useTheme();
-
   const navItems = [
     { id: "chat", label: "Chat", icon: Home },
     { id: "group", label: "Groups", icon: Users },
@@ -22,23 +18,9 @@ export const Navbar = ({ currentView, onViewChange, onLogout, user }: NavbarProp
     { id: "admin", label: "Admin", icon: Shield },
   ] as const;
 
-  const themeItems = [
-    { id: "blue", label: "Classic", icon: Laptop, color: "bg-blue-500" },
-    { id: "dark", label: "Dark", icon: Moon, color: "bg-gray-800" },
-    { id: "cyberpunk", label: "Cyberpunk", icon: Zap, color: "bg-purple-600" },
-    { id: "neon", label: "Neon", icon: Palette, color: "bg-pink-500" },
-    { id: "ocean", label: "Ocean", icon: Waves, color: "bg-cyan-500" },
-    { id: "sunset", label: "Sunset", icon: Sunset, color: "bg-orange-500" },
-  ] as const;
-
   const handleNavClick = (viewId: "chat" | "group" | "settings" | "notifications" | "admin") => {
     console.log("Navigation clicked:", viewId);
     onViewChange(viewId);
-  };
-
-  const handleThemeChange = (newTheme: "blue" | "dark" | "cyberpunk" | "neon" | "ocean" | "sunset") => {
-    console.log("Theme changed:", newTheme);
-    setTheme(newTheme);
   };
 
   const handleLogout = () => {
@@ -88,27 +70,6 @@ export const Navbar = ({ currentView, onViewChange, onLogout, user }: NavbarProp
               Hi, <span className="font-medium ml-1">{user.name}</span>
             </div>
           )}
-          
-          <div className="flex border border-border rounded-lg bg-background/80 backdrop-blur-sm overflow-hidden">
-            {themeItems.map((themeItem) => (
-              <Button 
-                type="button"
-                key={themeItem.id}
-                variant="ghost"
-                size="icon"
-                className={`h-8 w-8 cursor-pointer transition-all duration-200 relative group ${
-                  theme === themeItem.id ? "bg-primary/20 shadow-inner" : "hover:bg-accent/50"
-                }`}
-                onClick={() => handleThemeChange(themeItem.id as any)}
-                title={`${themeItem.label} theme`}
-              >
-                <themeItem.icon className="h-3.5 w-3.5" />
-                <div className={`absolute inset-x-0 bottom-0 h-0.5 ${themeItem.color} ${
-                  theme === themeItem.id ? "opacity-100" : "opacity-0 group-hover:opacity-50"
-                } transition-opacity`} />
-              </Button>
-            ))}
-          </div>
           
           {onLogout && (
             <Button 
