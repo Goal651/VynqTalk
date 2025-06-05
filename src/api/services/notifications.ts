@@ -13,32 +13,32 @@ export interface NotificationSettings {
 }
 
 export class NotificationService {
-  async getAllNotifications(): Promise<ApiResponse<Notification[]>> {
-    return await apiClient.get<Notification[]>(API_ENDPOINTS.NOTIFICATIONS.LIST);
+  async getAllNotifications(userId: number): Promise<ApiResponse<Notification[]>> {
+    return await apiClient.get<Notification[]>(API_ENDPOINTS.NOTIFICATIONS.LIST(userId));
   }
 
-  async getNotificationById(id: string): Promise<ApiResponse<Notification>> {
+  async getNotificationById(id: number): Promise<ApiResponse<Notification>> {
     return await apiClient.get<Notification>(API_ENDPOINTS.NOTIFICATIONS.BY_ID(id));
   }
 
-  async markAsRead(id: string): Promise<ApiResponse<void>> {
+  async markAsRead(id: number): Promise<ApiResponse<void>> {
     return await apiClient.put<void>(API_ENDPOINTS.NOTIFICATIONS.MARK_READ(id));
   }
 
-  async markAllAsRead(): Promise<ApiResponse<void>> {
-    return await apiClient.put<void>(API_ENDPOINTS.NOTIFICATIONS.MARK_ALL_READ);
+  async markAllAsRead(userId: number): Promise<ApiResponse<void>> {
+    return await apiClient.put<void>(API_ENDPOINTS.NOTIFICATIONS.MARK_ALL_READ(userId));
   }
 
-  async deleteNotification(id: string): Promise<ApiResponse<void>> {
+  async deleteNotification(id: number): Promise<ApiResponse<void>> {
     return await apiClient.delete<void>(API_ENDPOINTS.NOTIFICATIONS.DELETE(id));
   }
 
-  async getNotificationSettings(): Promise<ApiResponse<NotificationSettings>> {
-    return await apiClient.get<NotificationSettings>(API_ENDPOINTS.NOTIFICATIONS.SETTINGS);
+  async getNotificationSettings(userId: number): Promise<ApiResponse<NotificationSettings>> {
+    return await apiClient.get<NotificationSettings>(API_ENDPOINTS.NOTIFICATIONS.SETTINGS(userId));
   }
 
-  async updateNotificationSettings(settings: Partial<NotificationSettings>): Promise<ApiResponse<NotificationSettings>> {
-    return await apiClient.put<NotificationSettings>(API_ENDPOINTS.NOTIFICATIONS.SETTINGS, settings);
+  async updateNotificationSettings(userId: number, settings: Partial<NotificationSettings>): Promise<ApiResponse<NotificationSettings>> {
+    return await apiClient.put<NotificationSettings>(API_ENDPOINTS.NOTIFICATIONS.SETTINGS(userId), settings);
   }
 }
 

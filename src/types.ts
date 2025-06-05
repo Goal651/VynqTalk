@@ -51,8 +51,9 @@ export interface Group {
 }
 
 export interface Notification {
-  id: string
+  id: number
   title: string
+  user: User
   message: string
   timestamp: Date
   isRead: boolean

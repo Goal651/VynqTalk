@@ -214,9 +214,9 @@ class SocketService {
     private subscribeToPublic() {
         try {
             this.stompClient.subscribe('/topic/onlineUsers', (message) => this.handleOnlineUsers(message));
-            this.stompClient.subscribe('/topic/messages', (message: any) => this.handleMessage(message));
-            this.stompClient.subscribe('/topic/reactions', (message: any) => this.handleReaction(message));
-            this.stompClient.subscribe('/topic/groupMessages', (message: any) => this.handleGroupMessage(message));
+            this.stompClient.subscribe('/topic/messages', (message) => this.handleMessage(message));
+            this.stompClient.subscribe('/topic/reactions', (message) => this.handleReaction(message));
+            this.stompClient.subscribe('/topic/groupMessages', (message) => this.handleGroupMessage(message));
         } catch (error) {
             console.error('Error subscribing to public topics:', error.message);
         }

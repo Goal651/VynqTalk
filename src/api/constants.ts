@@ -62,12 +62,12 @@ export const API_ENDPOINTS = {
     REMOVE_REACTION: (id: number) => `/group_messages/${id}/reactions`,
   },
   NOTIFICATIONS: {
-    LIST: '/notifications',
-    BY_ID: (id: string) => `/notifications/${id}`,
-    MARK_READ: (id: string) => `/notifications/${id}/read`,
-    MARK_ALL_READ: '/notifications/mark-all-read',
-    DELETE: (id: string) => `/notifications/${id}`,
-    SETTINGS: '/notifications/settings',
+    LIST: (userId: number) => `/notifications/user/${userId}`,
+    BY_ID: (id: number) => `/notifications/${id}`,
+    MARK_READ: (id: number) => `/notifications/${id}/read`,
+    MARK_ALL_READ: (userId: number) => `/notifications/user/${userId}/mark-all-read`,
+    DELETE: (id: number) => `/notifications/${id}`,
+    SETTINGS: (userId: number) => `/notifications/user/${userId}/settings`,
   },
   ADMIN: {
     USERS: '/admin/users',
