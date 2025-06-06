@@ -1,6 +1,7 @@
 import SockJS from 'sockjs-client';
 import { Client, IMessage } from '@stomp/stompjs';
 import { Message, User, GroupMessage, Group } from '@/types';
+import { API_CONFIG } from '../constants';
 
 class SocketService {
     private stompClient: Client;
@@ -23,7 +24,7 @@ class SocketService {
                         this.logout();
                         throw new Error('Missing access token');
                     }
-                    return new SockJS(`http://localhost:4000/ws?token=${encodeURIComponent(token)}`, null, {
+                    return new SockJS(`${API_CONFIG.BASE_URL}/ws?token=${encodeURIComponent(token)}`, null, {
                         transports: ['websocket', 'xhr-polling', 'eventsource'],
                         timeout: 10000
                     });
@@ -88,7 +89,7 @@ class SocketService {
             if (!refreshToken) {
                 throw new Error('No refresh token available');
             }
-            const response = await fetch('http://localhost:4000/api/auth/refresh', {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/api/v1/auth/refresh`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ refreshToken })

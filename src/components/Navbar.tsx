@@ -2,6 +2,12 @@ import { Home, Users, Settings, Bell, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { User } from "@/types";
 
+type NavItem = {
+  id: "chat" | "group" | "settings" | "notifications" | "admin";
+  label: string;
+  icon: React.ElementType;
+};
+
 interface NavbarProps {
   currentView: "chat" | "group" | "settings" | "notifications" | "admin";
   onViewChange: (view: "chat" | "group" | "settings" | "notifications" | "admin") => void;
@@ -10,13 +16,16 @@ interface NavbarProps {
 }
 
 export const Navbar = ({ currentView, onViewChange, onLogout, user }: NavbarProps) => {
-  const navItems = [
+  const baseNavItems: NavItem[] = [
     { id: "chat", label: "Chat", icon: Home },
     { id: "group", label: "Groups", icon: Users },
     { id: "settings", label: "Settings", icon: Settings },
     { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "admin", label: "Admin", icon: Shield },
-  ] as const;
+  ];
+
+  const adminNavItem: NavItem = { id: "admin", label: "Admin", icon: Shield };
+  
+  const navItems = user?.isAdmin ? [...baseNavItems, adminNavItem] : baseNavItems;
 
   const handleNavClick = (viewId: "chat" | "group" | "settings" | "notifications" | "admin") => {
     console.log("Navigation clicked:", viewId);

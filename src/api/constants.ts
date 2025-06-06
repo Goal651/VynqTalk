@@ -1,6 +1,6 @@
 // API Configuration Constants
 export const API_CONFIG = {
-  BASE_URL: 'http://localhost:4000',
+  BASE_URL: 'https://vynqtalk-server-production.up.railway.app',
   API_VERSION: 'v1',
   TIMEOUT: 10000,
 };
