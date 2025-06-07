@@ -1,6 +1,6 @@
 // API Configuration Constants
 export const API_CONFIG = {
-  BASE_URL: 'https://vynqtalk-server-production.up.railway.app',
+  BASE_URL:'https://vynqtalk-server-production.up.railway.app',
   API_VERSION: 'v1',
   TIMEOUT: 10000,
 };
@@ -71,13 +71,13 @@ export const API_ENDPOINTS = {
   },
   ADMIN: {
     USERS: '/admin/users',
-    USER_BY_ID: (id: string) => `/admin/users/${id}`,
-    UPDATE_USER: (id: string) => `/admin/users/${id}`,
-    DELETE_USER: (id: string) => `/admin/users/${id}`,
+    USER_BY_ID: (id: number) => `/admin/users/${id}`,
+    UPDATE_USER: (id: number) => `/admin/users/${id}`,
+    DELETE_USER: (id: number) => `/admin/users/${id}`,
     GROUPS: '/admin/groups',
-    GROUP_BY_ID: (id: string) => `/admin/groups/${id}`,
+    GROUP_BY_ID: (id: number) => `/admin/groups/${id}`,
     MESSAGES: '/admin/messages',
-    MESSAGE_BY_ID: (id: string) => `/admin/messages/${id}`,
+    MESSAGE_BY_ID: (id: number) => `/admin/messages/${id}`,
     ANALYTICS: '/admin/analytics',
     METRICS: '/admin/metrics',
   },
@@ -90,6 +90,7 @@ export const API_ENDPOINTS = {
     BLOCK_USER: (userId: number) => `/user-settings/${userId}/block-user`,
     UNBLOCK_USER: (userId: number) => `/user-settings/${userId}/unblock-user`,
   },
+  
 };
 
 export const HTTP_STATUS = {

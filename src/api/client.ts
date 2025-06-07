@@ -54,7 +54,7 @@ class ApiClient {
               message: error?.message || 'An error occurred',
               errors: error.errors,
             };
-            if (apiError.status === HTTP_STATUS.UNAUTHORIZED) {
+            if (apiError.status === HTTP_STATUS.UNAUTHORIZED||apiError.status === HTTP_STATUS.FORBIDDEN) {
               console.warn('401 Unauthorized detected, attempting token refresh');
               await this.handleUnauthorized();
               // Retry the original request after refresh

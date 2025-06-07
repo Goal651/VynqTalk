@@ -2,32 +2,17 @@ import { User } from "../types";
 import { Button } from "@/components/ui/button";
 import { Phone, Video, MoreVertical, MessageSquare } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { socketService } from "@/api/services/socket"
-import { useEffect, useState } from "react";
 
 interface ChatHeaderProps {
-  users: User[];
+  onlineUsers: Map<string, string>;
+  onUserClick?: (user: User) => void;
   activeChat?: User | null;
   onVoiceCall?: () => void;
   onVideoCall?: () => void;
 }
 
 
-export const ChatHeader = ({ users, activeChat, onVoiceCall, onVideoCall }: ChatHeaderProps) => {
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([])
-  useEffect(() => {
-    socketService.connect()
-    const handleUsers = (users: string[]) => {
-      setOnlineUsers(users);
-    };
-  
-    socketService.onOnlineUsersChange(handleUsers);
-    return () => {
-      socketService.disconnect()
-    }
-  }, [])
-
-
+export const ChatHeader = ({ onlineUsers, activeChat, onVoiceCall, onVideoCall, onUserClick }: ChatHeaderProps) => {
   const handleVoiceCall = () => {
     console.log("Voice call initiated");
     if (onVoiceCall) onVoiceCall();
@@ -38,34 +23,29 @@ export const ChatHeader = ({ users, activeChat, onVoiceCall, onVideoCall }: Chat
     if (onVideoCall) onVideoCall();
   };
 
+  const isOnline = onlineUsers.has(activeChat?.email)
+
+  const handleUserClick = () => {
+    console.log("User avatar clicked:", activeChat?.name)
+    if (onUserClick) onUserClick(activeChat)
+  }
+
   return (
     <div className="p-4 border-b border-border/30 flex items-center justify-between bg-gradient-to-r from-card/80 via-card to-card/80 backdrop-blur-sm sticky top-0 z-10 shadow-sm">
       <div className="flex items-center space-x-4">
-        <div className="flex items-center space-x-3">
-          <div className="flex items-center space-x-2">
-            <MessageSquare className="h-6 w-6 text-primary" />
-            <h1 className="text-xl font-bold bg-gradient-to-r from-primary via-primary/80 to-secondary bg-clip-text text-transparent">
-              Chat
-            </h1>
-          </div>
-          <div className="px-3 py-1.5 rounded-full bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/30 text-xs font-medium text-green-700 dark:text-green-300 shadow-sm">
-            <div className="flex items-center space-x-1">
-              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
-              <span>{onlineUsers.length} online</span>
-            </div>
-          </div>
-        </div>
 
         {activeChat && (
-          <div className="flex items-center space-x-3 ml-6 pl-4 border-l border-border/50">
-            <div className="flex items-center space-x-3">
-              <div className="relative">
+          <div className="flex items-center space-x-3 ">
+            <div className="flex items-center space-x-3 cursor-pointer"   onClick={ handleUserClick}>
+              <div className="relative"
+              
+              >
                 <img
-                  src={activeChat.avatar}
+                  src={activeChat.avatar||''}
                   alt={activeChat.name}
                   className="w-9 h-9 rounded-full border-2 border-primary/20 shadow-md ring-2 ring-background overflow-hidden"
                 />
-                {activeChat.isOnline && (
+                {isOnline && (
                   <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-background rounded-full shadow-sm"></span>
                 )}
               </div>
@@ -73,7 +53,7 @@ export const ChatHeader = ({ users, activeChat, onVoiceCall, onVideoCall }: Chat
                 <div className="font-semibold text-sm text-foreground">{activeChat.name}</div>
                 <div className="text-xs text-muted-foreground flex items-center">
                   <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${activeChat.isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
-                  {activeChat.isOnline ? "Active now" : "Offline"}
+                  {isOnline ? "Active now" : "Offline"}
                 </div>
               </div>
             </div>
@@ -121,7 +101,7 @@ export const ChatHeader = ({ users, activeChat, onVoiceCall, onVideoCall }: Chat
           </div>
         )}
 
-   
+
       </div>
     </div>
   );

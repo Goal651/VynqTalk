@@ -6,18 +6,18 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Eye, Trash2, UserX, UserPlus, CheckCircle, Clock, Users } from "lucide-react";
 import { useAdminData } from "../hooks/useAdminData";
-import { AdminUser } from "../types";
+import { User } from "@/types";
 
 export const UserManagement = () => {
   const { users, updateUser, deleteUser } = useAdminData();
 
-  const handleUserAction = async (action: string, userId: string) => {
+  const handleUserAction = async (action: string, userId: number) => {
     console.log(`User action: ${action} for user ${userId}`);
     
     if (action === "block") {
-      await updateUser(userId, { status: "blocked" });
+      await updateUser(userId, { ...users.find(user => user.id === userId), status: "blocked" });
     } else if (action === "enable") {
-      await updateUser(userId, { status: "active" });
+      await updateUser(userId, { ...users.find(user => user.id === userId), status: "active" });
     } else if (action === "delete") {
       await deleteUser(userId);
     }
@@ -58,8 +58,7 @@ export const UserManagement = () => {
               <TableHead>Email</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Last Active</TableHead>
-              <TableHead>Messages</TableHead>
-              <TableHead>Join Date</TableHead>
+              <TableHead>Created At</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -85,9 +84,8 @@ export const UserManagement = () => {
                     {user.status}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground">{user.lastActive}</TableCell>
-                <TableCell className="text-sm">{user.messageCount}</TableCell>
-                <TableCell className="text-sm text-muted-foreground">{user.joinDate}</TableCell>
+                <TableCell className="text-sm text-muted-foreground">{new Date(user.lastActive).toLocaleString()}</TableCell>
+                <TableCell className="text-sm text-muted-foreground">{new Date(user.createdAt).toLocaleString()}</TableCell>
                 <TableCell>
                   <div className="flex space-x-1">
                     <Button type="button" 

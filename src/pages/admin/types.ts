@@ -1,28 +1,10 @@
+import { Message, User } from "@/types";
 
-export interface AdminUser {
-  id: string;
-  name: string;
-  email: string;
-  status: "active" | "blocked" | "suspended";
-  joinDate: string;
-  lastActive: string;
+export interface AdminUser extends User {
   messageCount: number;
-  role: string;
 }
 
-export interface AdminGroup {
-  id: string;
-  name: string;
-  members: number;
-  created: string;
-  status: "active" | "suspended";
-}
-
-export interface AdminMessage {
-  id: string;
-  user: string;
-  content: string;
-  timestamp: string;
+export interface AdminMessage extends Message {
   status: "approved" | "flagged" | "pending";
 }
 

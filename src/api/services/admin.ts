@@ -1,6 +1,6 @@
 
-import { User } from '@/types';
-import { AdminUser, AdminGroup, AdminMessage } from '@/pages/admin/types';
+import { Group, User } from '@/types';
+import { AdminMessage } from '@/pages/admin/types';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
 import { ApiResponse } from '../types';
@@ -24,44 +24,37 @@ export interface SystemMetrics {
 
 export class AdminService {
   // User Management
-  async getAllUsers(): Promise<ApiResponse<AdminUser[]>> {
-    return await apiClient.get<AdminUser[]>(API_ENDPOINTS.ADMIN.USERS);
+  async getAllUsers(): Promise<ApiResponse<User[]>> {
+    return await apiClient.get<User[]>(API_ENDPOINTS.ADMIN.USERS);
   }
 
-  async getUserById(id: string): Promise<ApiResponse<AdminUser>> {
-    return await apiClient.get<AdminUser>(API_ENDPOINTS.ADMIN.USER_BY_ID(id));
+  async getUserById(id: number): Promise<ApiResponse<User>> {
+    return await apiClient.get<User>(API_ENDPOINTS.ADMIN.USER_BY_ID(id));
   }
 
-  async updateUser(id: string, updates: Partial<AdminUser>): Promise<ApiResponse<AdminUser>> {
-    return await apiClient.put<AdminUser>(API_ENDPOINTS.ADMIN.UPDATE_USER(id), updates);
+  async updateUser(id: number, updates: User): Promise<ApiResponse<User>> {
+    return await apiClient.put<User>(API_ENDPOINTS.ADMIN.UPDATE_USER(id), updates);
   }
 
-  async deleteUser(id: string): Promise<ApiResponse<void>> {
+  async deleteUser(id: number): Promise<ApiResponse<void>> {
     return await apiClient.delete<void>(API_ENDPOINTS.ADMIN.DELETE_USER(id));
   }
 
-  async blockUser(id: string): Promise<ApiResponse<void>> {
-    return await apiClient.put<void>(`${API_ENDPOINTS.ADMIN.UPDATE_USER(id)}/block`);
-  }
-
-  async unblockUser(id: string): Promise<ApiResponse<void>> {
-    return await apiClient.put<void>(`${API_ENDPOINTS.ADMIN.UPDATE_USER(id)}/unblock`);
-  }
 
   // Group Management
-  async getAllGroups(): Promise<ApiResponse<AdminGroup[]>> {
-    return await apiClient.get<AdminGroup[]>(API_ENDPOINTS.ADMIN.GROUPS);
+  async getAllGroups(): Promise<ApiResponse<Group[]>> {
+    return await apiClient.get<Group[]>(API_ENDPOINTS.ADMIN.GROUPS);
   }
 
-  async getGroupById(id: string): Promise<ApiResponse<AdminGroup>> {
-    return await apiClient.get<AdminGroup>(API_ENDPOINTS.ADMIN.GROUP_BY_ID(id));
+  async getGroupById(id: number): Promise<ApiResponse<Group>> {
+    return await apiClient.get<Group>(API_ENDPOINTS.ADMIN.GROUP_BY_ID(id));
   }
 
-  async suspendGroup(id: string): Promise<ApiResponse<void>> {
+  async suspendGroup(id: number): Promise<ApiResponse<void>> {
     return await apiClient.put<void>(`${API_ENDPOINTS.ADMIN.GROUP_BY_ID(id)}/suspend`);
   }
 
-  async activateGroup(id: string): Promise<ApiResponse<void>> {
+  async activateGroup(id: number): Promise<ApiResponse<void>> {
     return await apiClient.put<void>(`${API_ENDPOINTS.ADMIN.GROUP_BY_ID(id)}/activate`);
   }
 
@@ -70,19 +63,19 @@ export class AdminService {
     return await apiClient.get<AdminMessage[]>(API_ENDPOINTS.ADMIN.MESSAGES);
   }
 
-  async getMessageById(id: string): Promise<ApiResponse<AdminMessage>> {
+  async getMessageById(id: number): Promise<ApiResponse<AdminMessage>> {
     return await apiClient.get<AdminMessage>(API_ENDPOINTS.ADMIN.MESSAGE_BY_ID(id));
   }
 
-  async approveMessage(id: string): Promise<ApiResponse<void>> {
+  async approveMessage(id: number): Promise<ApiResponse<void>> {
     return await apiClient.put<void>(`${API_ENDPOINTS.ADMIN.MESSAGE_BY_ID(id)}/approve`);
   }
 
-  async flagMessage(id: string): Promise<ApiResponse<void>> {
+  async flagMessage(id: number): Promise<ApiResponse<void>> {
     return await apiClient.put<void>(`${API_ENDPOINTS.ADMIN.MESSAGE_BY_ID(id)}/flag`);
   }
 
-  async deleteMessage(id: string): Promise<ApiResponse<void>> {
+  async deleteMessage(id: number): Promise<ApiResponse<void>> {
     return await apiClient.delete<void>(API_ENDPOINTS.ADMIN.MESSAGE_BY_ID(id));
   }
 

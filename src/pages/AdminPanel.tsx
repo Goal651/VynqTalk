@@ -11,7 +11,6 @@ import { Navigate } from "react-router-dom";
 import { AdminDashboard } from "./admin/components/AdminDashboard";
 import { UserManagement } from "./admin/components/UserManagement";
 import { GroupManagement } from "./admin/components/GroupManagement";
-import { ContentModeration } from "./admin/components/ContentModeration";
 import { Analytics } from "./admin/components/Analytics";
 import { SystemMetrics } from "./admin/components/SystemMetrics";
 import { toast } from "@/hooks/use-toast";
@@ -106,10 +105,6 @@ export const AdminPanel = () => {
                 <Users className="h-4 w-4" />
                 <span className="hidden sm:inline">Groups</span>
               </TabsTrigger>
-              <TabsTrigger value="content" className="flex items-center gap-2 cursor-pointer hover:bg-accent transition-colors data-[state=active]:bg-background data-[state=active]:shadow-sm">
-                <MessageSquare className="h-4 w-4" />
-                <span className="hidden sm:inline">Content</span>
-              </TabsTrigger>
               <TabsTrigger value="analytics" className="flex items-center gap-2 cursor-pointer hover:bg-accent transition-colors data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 <TrendingUp className="h-4 w-4" />
                 <span className="hidden sm:inline">Analytics</span>
@@ -132,9 +127,6 @@ export const AdminPanel = () => {
               <GroupManagement />
             </TabsContent>
 
-            <TabsContent value="content" className="mt-6">
-              <ContentModeration />
-            </TabsContent>
 
             <TabsContent value="analytics" className="space-y-6 mt-6">
               <Analytics />

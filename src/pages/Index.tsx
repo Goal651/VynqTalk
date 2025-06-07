@@ -12,6 +12,7 @@ import { Message, User } from "@/types"
 import { useAuth } from "@/contexts/AuthContext"
 import { userService } from "@/api/services/users"
 import { messageService } from "@/api/services/messages"
+import { socketService } from "@/api/services/socket"
 
 
 const Index = () => {
@@ -19,6 +20,7 @@ const Index = () => {
   const { toast } = useToast()
   const { user, logout } = useAuth()
   const [users, setUsers] = useState<User[]>([])
+  const [onlineUsers, setOnlineUsers] = useState<Map<string, string>>(new Map())
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -38,6 +40,18 @@ const Index = () => {
       }
     }
     fetchUsers()
+  }, [])
+
+  useEffect(() => {
+    socketService.connect()
+    const handleUsers = (users: Map<string, string>) => {
+      setOnlineUsers(users);
+    };
+
+    socketService.onOnlineUsersChange(handleUsers);
+    return () => {
+      socketService.disconnect()
+    }
   }, [])
 
   const handleMessageDeleted = async (messageId: number) => {
@@ -78,6 +92,10 @@ const Index = () => {
     logout()
   }
 
+  const handleUserClick = (user: User) => {
+    console.log("User clicked:", user.name)
+  }
+
   const renderCurrentView = () => {
     switch (currentView) {
       case "chat":
@@ -86,6 +104,7 @@ const Index = () => {
             onMessageDelete={handleMessageDeleted}
             onMessageEdit={handleMessageEdit}
             users={users}
+            onlineUsers={onlineUsers}
           />
         )
       case "group":
@@ -102,7 +121,8 @@ const Index = () => {
             onMessageDelete={handleMessageDeleted}
             onMessageEdit={handleMessageEdit}
             users={users}
-          />
+            onlineUsers={onlineUsers}
+            />
         )
     }
   }

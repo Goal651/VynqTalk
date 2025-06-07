@@ -5,8 +5,8 @@ import { API_CONFIG } from '../constants';
 
 class SocketService {
     private stompClient: Client;
-    private onlineUsers: string[] = [];
-    private onlineUserListeners: ((users: string[]) => void)[] = [];
+    private onlineUsers: Map<string, string> = new Map();
+    private onlineUserListeners: ((users: Map<string, string>) => void)[] = [];
     private messageListeners: ((message: Message) => void)[] = [];
     private groupMessageListeners: ((message: GroupMessage) => void)[] = [];
     private reactionListeners: ((message: Message) => void)[] = [];
@@ -137,10 +137,10 @@ class SocketService {
             localStorage.removeItem("access_token");
             localStorage.removeItem("refresh_token");
             await this.stompClient.deactivate();
-            this.onlineUsers = [];
+            this.onlineUsers = new Map();
             this.onlineUserListeners.forEach((callback) => {
                 try {
-                    callback([]);
+                    callback(new Map());
                 } catch (error) {
                     console.error('Error in online users callback:', error.message);
                 }
@@ -199,10 +199,10 @@ class SocketService {
     public async disconnect() {
         try {
             await this.stompClient.deactivate();
-            this.onlineUsers = [];
+            this.onlineUsers = new Map();
             this.onlineUserListeners.forEach((callback) => {
                 try {
-                    callback([]);
+                    callback(new Map());
                 } catch (error) {
                     console.error('Error in online users callback:', error.message);
                 }
@@ -257,7 +257,9 @@ class SocketService {
 
     private handleOnlineUsers(message: IMessage) {
         try {
-            const users = JSON.parse(message.body) as string[];
+            const res = JSON.parse(message.body) 
+            const users = new Map<string, string>(Object.entries(res));
+            console.log('Received online users:', users);
             this.onlineUsers = users;
             this.onlineUserListeners.forEach((callback) => {
                 try {
@@ -353,7 +355,7 @@ class SocketService {
         }
     }
 
-    public onOnlineUsersChange(callback: (users: string[]) => void) {
+    public onOnlineUsersChange(callback: (users: Map<string, string>) => void) {
         try {
             this.onlineUserListeners.push(callback);
         } catch (error) {
@@ -361,7 +363,7 @@ class SocketService {
         }
     }
 
-    public removeOnlineUsersListener(callback: (users: string[]) => void) {
+    public removeOnlineUsersListener(callback: (users: Map<string, string>) => void) {
         try {
             this.onlineUserListeners = this.onlineUserListeners.filter(cb => cb !== callback);
         } catch (error) {

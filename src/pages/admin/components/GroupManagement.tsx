@@ -12,7 +12,7 @@ export const GroupManagement = () => {
   const { groups } = useAdminData();
   const { toast } = useToast();
 
-  const handleGroupAction = (action: string, groupId: string) => {
+  const handleGroupAction = (action: string, groupId: number) => {
     console.log(`Group action: ${action} for group ${groupId}`);
     toast({
       title: "Group Action",
@@ -47,8 +47,8 @@ export const GroupManagement = () => {
                   </Avatar>
                   <span>{group.name}</span>
                 </TableCell>
-                <TableCell>{group.members}</TableCell>
-                <TableCell>{group.created}</TableCell>
+                <TableCell>{group.members.length}</TableCell>
+                <TableCell>{new Date(group.createdAt).toLocaleString()}</TableCell>
                 <TableCell>
                   <Badge variant={group.status === "active" ? "default" : "destructive"}>
                     {group.status}

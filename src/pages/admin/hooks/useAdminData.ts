@@ -1,63 +1,70 @@
 
 import { useState, useEffect } from "react";
-import { AdminUser, AdminGroup, AdminMessage, SystemMetric, Alert, ChartData, ContentModerationData } from "../types";
 import { useToast } from "@/hooks/use-toast";
 import { apiClient } from "@/api";
+import { adminService } from "@/api/services/admin";
+import { Group, User } from "@/types";
+import { AdminMessage, SystemMetric, ContentModerationData, Alert, ChartData } from "../types";
 
 export const useAdminData = () => {
-  const [users, setUsers] = useState<AdminUser[]>([]);
-  const [groups, setGroups] = useState<AdminGroup[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
   const [messages, setMessages] = useState<AdminMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  // Mock data - replace with actual API calls
-  const mockUsers: AdminUser[] = [
-    { id: "1", name: "Alice Johnson", email: "alice@example.com", status: "active", joinDate: "2024-01-15", lastActive: "2 min ago", messageCount: 245, role: "user" },
-    { id: "2", name: "Bob Smith", email: "bob@example.com", status: "blocked", joinDate: "2024-01-10", lastActive: "1 hour ago", messageCount: 89, role: "user" },
-    { id: "3", name: "Charlie Brown", email: "charlie@example.com", status: "active", joinDate: "2024-01-20", lastActive: "5 min ago", messageCount: 156, role: "user" },
-    { id: "4", name: "Diana Wilson", email: "diana@example.com", status: "suspended", joinDate: "2024-01-18", lastActive: "1 day ago", messageCount: 67, role: "user" },
-    { id: "5", name: "Eve Davis", email: "eve@example.com", status: "active", joinDate: "2024-01-22", lastActive: "Just now", messageCount: 334, role: "user" },
-  ];
-
-  const mockGroups: AdminGroup[] = [
-    { id: "1", name: "General Chat", members: 150, created: "2024-01-01", status: "active" },
-    { id: "2", name: "Dev Team", members: 25, created: "2024-01-05", status: "active" },
-    { id: "3", name: "Random", members: 75, created: "2024-01-10", status: "suspended" },
-  ];
-
-  const mockMessages: AdminMessage[] = [
-    { id: "1", user: "Alice Johnson", content: "Hello everyone!", timestamp: "2024-01-25 10:30", status: "approved" },
-    { id: "2", user: "Bob Smith", content: "This is suspicious content...", timestamp: "2024-01-25 11:00", status: "flagged" },
-    { id: "3", user: "Charlie Brown", content: "Great conversation!", timestamp: "2024-01-25 11:15", status: "approved" },
-  ];
 
   useEffect(() => {
-    setUsers(mockUsers);
-    setGroups(mockGroups);
-    setMessages(mockMessages);
+    setLoading(true);
+    fetchUsers();
+    fetchGroups();
+    // fetchMessages();
+    setLoading(false);
   }, []);
 
   const fetchUsers = async () => {
     try {
-      setLoading(true);
-      const response = await apiClient.get<AdminUser[]>('/admin/users');
+      const response = await adminService.getAllUsers();
       if (response.success && response.data) {
         setUsers(response.data);
       }
     } catch (error) {
       console.error('Failed to fetch users:', error);
-      setUsers(mockUsers);
-    } finally {
-      setLoading(false);
+      setUsers([]);
     }
   };
 
-  const updateUser = async (userId: string, updates: Partial<AdminUser>) => {
+  const fetchGroups = async () => {
     try {
-      const response = await apiClient.put(`/admin/users/${userId}`, updates);
+      const response = await adminService.getAllGroups();
+      if (response.success && response.data) {
+        setGroups(response.data);
+      }
+    }
+    catch (error) {
+      console.error('Failed to fetch groups:', error);
+      setGroups([]);
+    }
+  }
+
+  const fetchMessages = async () => {
+    try {
+      const response = await adminService.getAllMessages();
+      if (response.success && response.data) {
+        setMessages(response.data);
+      }
+    }
+    catch (error) {
+      console.error('Failed to fetch messages:', error);
+      setMessages([]);
+    }
+  }
+
+  const updateUser = async (userId: number, updates: User) => {
+    try {
+      const response = await adminService.updateUser(userId, updates);
       if (response.success) {
-        setUsers(prev => prev.map(user => 
+        setUsers(prev => prev.map(user =>
           user.id === userId ? { ...user, ...updates } : user
         ));
         toast({
@@ -69,7 +76,7 @@ export const useAdminData = () => {
     } catch (error) {
       console.error('Failed to update user:', error);
       // Fallback to local update for demo
-      setUsers(prev => prev.map(user => 
+      setUsers(prev => prev.map(user =>
         user.id === userId ? { ...user, ...updates } : user
       ));
       toast({
@@ -81,9 +88,9 @@ export const useAdminData = () => {
     return false;
   };
 
-  const deleteUser = async (userId: string) => {
+  const deleteUser = async (userId: number) => {
     try {
-      const response = await apiClient.delete(`/admin/users/${userId}`);
+      const response = await adminService.deleteUser(userId);
       if (response.success) {
         setUsers(prev => prev.filter(user => user.id !== userId));
         toast({

@@ -1,6 +1,9 @@
 export interface User {
   id: number // Changed back to string for consistency
   name: string
+  status: "active" | "blocked" | "suspended"
+  createdAt: string
+  lastActive: string
   email?: string
   avatar: string
   isOnline?: boolean
@@ -10,10 +13,10 @@ export interface User {
 
 export interface UserSettings {
   id: number;
-  user:User;
-  theme?:  "blue" | "dark" | "cyberpunk" | "neon" | "ocean" | "sunset"
+  user: User;
+  theme?: "blue" | "dark" | "cyberpunk" | "neon" | "ocean" | "sunset"
   language?: string;
-  timezone? : string;
+  timezone?: string;
   notificationEnabled?: boolean;
   emailNotifications?: boolean;
   pushNotifications?: boolean;
@@ -61,6 +64,7 @@ export interface Group {
   description?: string
   avatar: string
   members: User[]
+  status: "active" | "suspended"
   createdBy: User
   createdAt: string
   isPrivate?: boolean
