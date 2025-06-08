@@ -1,6 +1,6 @@
 
 import { Group, User } from '@/types';
-import { AdminMessage } from '@/pages/admin/types';
+import { AdminMessage, SystemMetric } from '@/pages/admin/types';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
 import { ApiResponse } from '../types';
@@ -11,15 +11,6 @@ export interface AdminStats {
   totalGroups: number;
   totalMessages: number;
   flaggedContent: number;
-}
-
-export interface SystemMetrics {
-  serverUptime: string;
-  responseTime: string;
-  activeConnections: number;
-  storageUsed: number;
-  memoryUsage: number;
-  cpuUsage: number;
 }
 
 export class AdminService {
@@ -80,12 +71,12 @@ export class AdminService {
   }
 
   // Analytics & Metrics
-  async getAnalytics(): Promise<ApiResponse<any>> {
-    return await apiClient.get<any>(API_ENDPOINTS.ADMIN.ANALYTICS);
+  async getAnalytics(): Promise<ApiResponse<unknown>> {
+    return await apiClient.get<unknown>(API_ENDPOINTS.ADMIN.ANALYTICS);
   }
 
-  async getSystemMetrics(): Promise<ApiResponse<SystemMetrics>> {
-    return await apiClient.get<SystemMetrics>(API_ENDPOINTS.ADMIN.METRICS);
+  async getSystemMetrics(): Promise<ApiResponse<SystemMetric[]>> {
+    return await apiClient.get<SystemMetric[]>(API_ENDPOINTS.ADMIN.METRICS);
   }
 
   async getAdminStats(): Promise<ApiResponse<AdminStats>> {

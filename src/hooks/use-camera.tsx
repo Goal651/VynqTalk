@@ -53,7 +53,7 @@ export function useCamera() {
       const ctx = canvas.getContext("2d");
       if (ctx) {
         ctx.drawImage(video, 0, 0, width, height);
-        const imageData = canvas.toDataURL("image/png");
+              const imageData = canvas.toDataURL("image/png");
         setCapturedImage(imageData);
         closeCamera();
       }

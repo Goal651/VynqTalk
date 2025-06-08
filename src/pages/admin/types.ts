@@ -7,12 +7,12 @@ export interface AdminUser extends User {
 export interface AdminMessage extends Message {
   status: "approved" | "flagged" | "pending";
 }
-
 export interface SystemMetric {
   metric: string;
   value: string;
-  status: "good" | "warning" | "error";
+  status: string;
 }
+
 
 export interface Alert {
   id: number;

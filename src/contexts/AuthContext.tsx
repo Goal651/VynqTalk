@@ -42,21 +42,24 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const credentials: LoginRequest = { email, password };
       const response = await authService.login(credentials);
-      
+
       if (response.success && response.data) {
         const apiUser = response.data.user;
         const user: User = {
           id: apiUser.id,
+          lastActive: apiUser.lastActive,
+          createdAt: apiUser.createdAt,
+          status: apiUser.status,
           name: apiUser.name,
           email: apiUser.email,
           avatar: apiUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${apiUser.name}`,
           isOnline: apiUser.isOnline,
           isAdmin: apiUser.isAdmin || false
         };
-        
+
         setUser(user);
         setIsAuthenticated(true);
-        
+
         toast({
           title: "Login successful",
           description: "Welcome back!",
@@ -88,11 +91,14 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         email,
         password,
       };
-     
+
       const response = await authService.signup(userData);
       if (response.success && response.data) {
         const apiUser = response.data.user;
         const user: User = {
+          status: 'active',
+          createdAt: Date(),
+          lastActive: Date.now().toString(),
           id: apiUser.id,
           name: apiUser.name,
           email: apiUser.email,
@@ -100,10 +106,10 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
           isOnline: apiUser.isOnline,
           isAdmin: apiUser.isAdmin || false
         };
-        
+
         setUser(user);
         setIsAuthenticated(true);
-        
+
         toast({
           title: "Signup successful",
           description: "Welcome to PulseChat!",

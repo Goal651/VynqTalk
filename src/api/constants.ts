@@ -1,6 +1,8 @@
 // API Configuration Constants
+//DEDPLOY_URL=https://vynqtalk-server-production.up.railway.app
+
 export const API_CONFIG = {
-  BASE_URL:'https://vynqtalk-server-production.up.railway.app',
+  BASE_URL:'http://localhost:8080',
   API_VERSION: 'v1',
   TIMEOUT: 10000,
 };
@@ -18,7 +20,7 @@ export const API_ENDPOINTS = {
   USER: {
     PROFILE: '/user/profile',
     UPDATE_PROFILE: '/user/profile',
-    UPLOAD_AVATAR: '/user/avatar',
+    UPLOAD_AVATAR: '/upload/avatar',
     UPDATE_SETTINGS: '/user/settings',
     GET_SETTINGS: '/user/settings',
   },

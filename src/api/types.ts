@@ -1,6 +1,7 @@
+import { User } from "@/types";
 
 // Base API Response Types
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   message: string;
@@ -32,17 +33,7 @@ export interface SignupRequest {
 
 export interface AuthResponse {
   accessToken: string;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-    avatar?: string;
-    isOnline: boolean;
-    isAdmin: boolean; 
-    emailVerified: boolean;
-    createdAt: string;
-    updatedAt: string;
-  }
+  user: User
 }
 
 export interface RefreshTokenRequest {

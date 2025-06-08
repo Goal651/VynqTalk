@@ -229,15 +229,10 @@ class ApiClient {
     }
   }
 
-  async uploadFile<T>(endpoint: string, file: File, additionalData?: Record<string, any>): Promise<ApiResponse<T>> {
+  async uploadFile<T>(endpoint: string, file: File): Promise<ApiResponse<T>> {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      if (additionalData) {
-        Object.keys(additionalData).forEach(key => {
-          formData.append(key, additionalData[key]);
-        });
-      }
       const response = await this.axiosInstance.post<ApiResponse<T>>(endpoint, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -248,7 +243,7 @@ class ApiClient {
       console.error(`UPLOAD ${endpoint} failed:`, error.message);
       if (error.status === HTTP_STATUS.UNAUTHORIZED) {
         await this.handleUnauthorized();
-        return this.uploadFile<T>(endpoint, file, additionalData); // Retry
+        return this.uploadFile<T>(endpoint, file); // Retry
       }
       throw error;
     }
