@@ -158,7 +158,7 @@ class ApiClient {
     }
   }
 
-  async get<T>(endpoint: string, params?: Record<string, any>): Promise<ApiResponse<T>> {
+  async get<T>(endpoint: string, params?: Record<string, unknown>): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.get<ApiResponse<T>>(endpoint, { params });
       return response.data;
@@ -172,7 +172,7 @@ class ApiClient {
     }
   }
 
-  async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async post<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.post<ApiResponse<T>>(endpoint, data);
       console.log("This is the response",response,"endpoint",endpoint)
@@ -187,7 +187,7 @@ class ApiClient {
     }
   }
 
-  async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async put<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.put<ApiResponse<T>>(endpoint, data);
       return response.data;
@@ -201,7 +201,7 @@ class ApiClient {
     }
   }
 
-  async patch<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async patch<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.patch<ApiResponse<T>>(endpoint, data);
       return response.data;

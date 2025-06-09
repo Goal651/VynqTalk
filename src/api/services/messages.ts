@@ -24,10 +24,8 @@ export class MessageService {
   }
 
   // Update a message by ID
-  async updateMessage(messageId: number, updatedContent: string): Promise<ApiResponse<Message>> {
-    return await apiClient.put<Message>(API_ENDPOINTS.MESSAGES.UPDATE(messageId), {
-      content: updatedContent,
-    });
+  async updateMessage(messageId: number, newMessage: Message): Promise<ApiResponse<Message>> {
+    return await apiClient.put<Message>(API_ENDPOINTS.MESSAGES.UPDATE(messageId), newMessage);
   }
 
   // Delete a message by ID
