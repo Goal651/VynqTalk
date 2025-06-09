@@ -158,7 +158,7 @@ class ApiClient {
     }
   }
 
-  async get<T>(endpoint: string, params?: Record<string, any>): Promise<ApiResponse<T>> {
+  async get<T>(endpoint: string, params?: Record<string, unknown>): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.get<ApiResponse<T>>(endpoint, { params });
       return response.data;
@@ -172,7 +172,7 @@ class ApiClient {
     }
   }
 
-  async post<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async post<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.post<ApiResponse<T>>(endpoint, data);
       console.log("This is the response",response,"endpoint",endpoint)
@@ -187,7 +187,7 @@ class ApiClient {
     }
   }
 
-  async put<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async put<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.put<ApiResponse<T>>(endpoint, data);
       return response.data;
@@ -201,7 +201,7 @@ class ApiClient {
     }
   }
 
-  async patch<T>(endpoint: string, data?: any): Promise<ApiResponse<T>> {
+  async patch<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.patch<ApiResponse<T>>(endpoint, data);
       return response.data;
@@ -229,15 +229,10 @@ class ApiClient {
     }
   }
 
-  async uploadFile<T>(endpoint: string, file: File, additionalData?: Record<string, any>): Promise<ApiResponse<T>> {
+  async uploadFile<T>(endpoint: string, file: File): Promise<ApiResponse<T>> {
     try {
       const formData = new FormData();
       formData.append('file', file);
-      if (additionalData) {
-        Object.keys(additionalData).forEach(key => {
-          formData.append(key, additionalData[key]);
-        });
-      }
       const response = await this.axiosInstance.post<ApiResponse<T>>(endpoint, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -248,7 +243,7 @@ class ApiClient {
       console.error(`UPLOAD ${endpoint} failed:`, error.message);
       if (error.status === HTTP_STATUS.UNAUTHORIZED) {
         await this.handleUnauthorized();
-        return this.uploadFile<T>(endpoint, file, additionalData); // Retry
+        return this.uploadFile<T>(endpoint, file); // Retry
       }
       throw error;
     }

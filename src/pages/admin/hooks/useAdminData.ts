@@ -125,6 +125,15 @@ export const useAdminData = () => {
 };
 
 export const useAdminMetrics = () => {
+  const [systemMetrics, setSystemMetrics] = useState<SystemMetric[]>([])
+
+  useEffect(() => {
+    const fetchSystemMetrics = async () => {
+      const response = await adminService.getSystemMetrics()
+      setSystemMetrics(response.data)
+    }
+    fetchSystemMetrics()
+  }, [])
   const userActivityData: ChartData[] = [
     { date: "Jan 1", activeUsers: 120, newUsers: 15, messages: 450 },
     { date: "Jan 2", activeUsers: 135, newUsers: 22, messages: 520 },
@@ -142,14 +151,7 @@ export const useAdminMetrics = () => {
     { name: "Deleted", value: 25, color: "#6b7280" },
   ];
 
-  const systemMetrics: SystemMetric[] = [
-    { metric: "Server Uptime", value: "99.9%", status: "good" },
-    { metric: "Response Time", value: "120ms", status: "good" },
-    { metric: "Active Connections", value: "1,247", status: "good" },
-    { metric: "Storage Used", value: "68%", status: "warning" },
-    { metric: "Memory Usage", value: "45%", status: "good" },
-    { metric: "CPU Usage", value: "32%", status: "good" },
-  ];
+
 
   const recentAlerts: Alert[] = [
     { id: 1, type: "warning", message: "High storage usage detected", time: "5 min ago" },

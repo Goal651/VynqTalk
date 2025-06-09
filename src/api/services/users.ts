@@ -33,8 +33,8 @@ export class UserService {
     return await apiClient.get<User[]>(API_ENDPOINTS.USERS.SEARCH, { q: query });
   }
 
-  async updateProfile(updates: UpdateProfileRequest): Promise<ApiResponse<User>> {
-    return await apiClient.put<User>(API_ENDPOINTS.USER.UPDATE_PROFILE, updates);
+  async updateProfile(id:number,updates:User): Promise<ApiResponse<User>> {
+    return await apiClient.put<User>(API_ENDPOINTS.USERS.UPDATE(id),updates);
   }
 
   async uploadAvatar(file: File): Promise<ApiResponse<{ avatarUrl: string }>> {

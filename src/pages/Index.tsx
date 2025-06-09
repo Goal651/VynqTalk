@@ -73,7 +73,7 @@ const Index = () => {
 
   const handleMessageEdit = async(message: Message) => {
     try {
-      await messageService.updateMessage(message.id, message.content)
+      await messageService.updateMessage(message.id, message)
       toast({
         title: "Message updated",
         description: "Your message has been updated successfully.",
