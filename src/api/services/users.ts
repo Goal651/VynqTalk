@@ -2,7 +2,7 @@
 import { User } from '@/types';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
-import { ApiResponse, UpdateProfileRequest } from '../types';
+import { ApiResponse } from '../types';
 
 export interface UpdateUserRequest {
   name?: string;
@@ -37,8 +37,8 @@ export class UserService {
     return await apiClient.put<User>(API_ENDPOINTS.USERS.UPDATE(id),updates);
   }
 
-  async uploadAvatar(file: File): Promise<ApiResponse<{ avatarUrl: string }>> {
-    return await apiClient.uploadFile<{ avatarUrl: string }>(API_ENDPOINTS.USER.UPLOAD_AVATAR, file);
+  async uploadAvatar(file: File): Promise<ApiResponse<string>> {
+    return await apiClient.uploadFile<string>(API_ENDPOINTS.USER.UPLOAD_AVATAR, file);
   }
 
   async blockUser(userId: string): Promise<ApiResponse<void>> {

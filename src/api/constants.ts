@@ -2,7 +2,7 @@
 //DEDPLOY_URL=https://vynqtalk-server-production.up.railway.app
 
 export const API_CONFIG = {
-  BASE_URL:'https://vynqtalk-server-production.up.railway.app',
+  BASE_URL:'http://localhost:8080',
   API_VERSION: 'v1',
   TIMEOUT: 10000,
 };
@@ -84,13 +84,13 @@ export const API_ENDPOINTS = {
     METRICS: '/admin/metrics',
   },
   SETTINGS: {
-    GET: (userId: number) => `/user-settings/${userId}`,
-    UPDATE: (userId: number) => `/user-settings/${userId}`,
-    PRIVACY: (userId: number) => `/user-settings/${userId}/privacy`,
-    NOTIFICATIONS: (userId: number) => `/user-settings/${userId}/notifications`,
-    THEME: (userId: number) => `/user-settings/${userId}/theme`,
-    BLOCK_USER: (userId: number) => `/user-settings/${userId}/block-user`,
-    UNBLOCK_USER: (userId: number) => `/user-settings/${userId}/unblock-user`,
+    GET: (userId: number) => `/user_settings/${userId}`,
+    UPDATE: (userId: number) => `/user_settings/${userId}`,
+    PRIVACY: (userId: number) => `/user_settings/${userId}/privacy`,
+    NOTIFICATIONS: (userId: number) => `/user_settings/${userId}/notifications`,
+    THEME: (userId: number) => `/user_settings/${userId}/theme`,
+    BLOCK_USER: (userId: number) => `/user_settings/${userId}/block-user`,
+    UNBLOCK_USER: (userId: number) => `/user_settings/${userId}/unblock-user`,
   },
   
 };

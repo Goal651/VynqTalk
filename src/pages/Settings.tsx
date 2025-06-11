@@ -46,6 +46,24 @@ export const Settings = () => {
 
   useEffect(() => {
     if (user?.id) {
+      const fetchSettings = async () => {
+        if (!user?.id) return
+        try {
+          const response = await settingsService.getSettings(user.id)
+          if (response.success && response.data) {
+            setSettings(response.data)
+            if (response.data.theme && response.data.theme !== theme) {
+              setTheme(response.data.theme)
+            }
+          }
+        } catch (error) {
+          toast({
+            title: "Error",
+            description: "Failed to fetch settings",
+            variant: "destructive",
+          })
+        }
+      }
       fetchSettings()
     }
   }, [user?.id])
@@ -56,24 +74,7 @@ export const Settings = () => {
     }
   }, [theme])
 
-  const fetchSettings = async () => {
-    if (!user?.id) return
-    try {
-      const response = await settingsService.getSettings(user.id)
-      if (response.success && response.data) {
-        setSettings(response.data)
-        if (response.data.theme && response.data.theme !== theme) {
-          setTheme(response.data.theme)
-        }
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to fetch settings",
-        variant: "destructive",
-      })
-    }
-  }
+
 
   const handleProfileSave = async () => {
     if (!user?.id) return
@@ -109,6 +110,14 @@ export const Settings = () => {
             description: "Your profile picture has been updated successfully.",
           })
         }
+        setSettings((prev) => ({
+          ...prev,
+          user: {
+            ...prev.user,
+            avatar: response.data
+          }
+        }))
+      await  handleProfileSave()
       } catch (error) {
         toast({
           title: "Error",
