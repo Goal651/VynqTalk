@@ -103,7 +103,7 @@ export const Settings = () => {
       if (!user?.id || !capturedImage) return
       try {
         const file = base64ToFile(capturedImage, 'profile.png')
-        const response = await userService.uploadAvatar(file)
+        const response = await userService.uploadAvatar(user.id,file)
         if (response.success && response.data) {
           toast({
             title: "Avatar Updated",
@@ -129,7 +129,7 @@ export const Settings = () => {
     handleAvatarUpload()
   }, [capturedImage, toast, user?.id])
 
-  const handleNotificationChange = async (key: string, value: boolean) => {
+  const handleNotificationChange = async (key : string, value: boolean) => {
     if (!user?.id) return
     try {
       const updatedSettings = {

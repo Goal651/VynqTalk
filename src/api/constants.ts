@@ -2,7 +2,7 @@
 //DEDPLOY_URL=https://vynqtalk-server-production.up.railway.app
 
 export const API_CONFIG = {
-  BASE_URL:'http://localhost:8080',
+  BASE_URL: 'http://localhost:8080',
   API_VERSION: 'v1',
   TIMEOUT: 10000,
 };
@@ -19,8 +19,8 @@ export const API_ENDPOINTS = {
   },
   USER: {
     PROFILE: '/user/profile',
-    UPDATE_PROFILE: '/user/profile',
-    UPLOAD_AVATAR: '/upload/avatar',
+    UPDATE_PROFILE: (id: number) => `/user/profile/${id}`,
+    UPLOAD_AVATAR: (id: number) =>`/upload/avatar/${id}`,
     UPDATE_SETTINGS: '/user/settings',
     GET_SETTINGS: '/user/settings',
   },
@@ -92,7 +92,7 @@ export const API_ENDPOINTS = {
     BLOCK_USER: (userId: number) => `/user_settings/${userId}/block-user`,
     UNBLOCK_USER: (userId: number) => `/user_settings/${userId}/unblock-user`,
   },
-  
+
 };
 
 export const HTTP_STATUS = {

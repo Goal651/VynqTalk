@@ -1,72 +1,44 @@
-# VynqTalk
+# VynqTalk Front-end
 
-**VynqTalk** is a vibrant, modern chat application designed for seamless and dynamic communication. Whether for personal, gaming, or professional use, VynqTalk aims to deliver a fast, secure, and engaging messaging experience.
+Welcome to the front-end of VynqTalk, a real-time chat application built with React and TypeScript. This repository handles the user interface and client-side logic, connecting to the VynqTalk back-end for messaging and authentication.
+Features
 
-## Table of Contents
-- [About](#about)
-- [Features](#features)
-- [Getting Started](#getting-started)
-- [Installation](#installation)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+Real-time chat interface
+User authentication (login/signup)
+Responsive design with React Router for navigation
 
-## About
-VynqTalk is a real-time chat app built to connect users with a sleek, intuitive interface. Our goal is to create a platform that prioritizes speed, security, and user engagement. This project is in early development, and we welcome contributions to shape its future!
+Prerequisites
 
-## Features
-- Real-time messaging (planned)
-- End-to-end encryption (planned)
-- Group chats and private messaging (planned)
-- Customizable user profiles (planned)
-- Cross-platform support (planned)
+Node.js (v18 or higher)
+npm (v8 or higher)
+A running instance of the VynqTalk back-end
 
-*Note*: Features are under development and will be updated as progress continues.
+Setup Instructions
 
-## Getting Started
-To get a local copy of VynqTalk up and running, follow these steps.
+Clone the repository:
+git clone <https://github.com/goal651/vynqtalk.git>
+cd vynqtalk
 
-### Prerequisites
-- [Node.js](https://nodejs.org/) (or specify your tech stack, e.g., Python, Flutter)
-- [Git](https://git-scm.com/)
-- A package manager like [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/) (adjust based on your stack)
+Install dependencies:
+Pnpm install
 
-### Installation
-1. Clone the repository:
-   bash
-   git clone https://github.com/your-username/VynqTalk.git
-   
-2. Navigate to the project directory:
-   bash
-   cd VynqTalk
-   
-3. Install dependencies:
-   bash
-   npm install
-   
+Configure environment variables:
 
-4. Start the development server:
-   bash
-   npm start
-   
-   
+Create a .env file in the project root.
+Add the back-end API URL (replace <http://localhost:8080> with your back-end URL if different)
 
-## Contributing
-We welcome contributions to make VynqTalk better! To contribute:
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/your-feature`).
-3. Commit your changes (`git commit -m "Add your feature"`).
-4. Push to the branch (`git push origin feature/your-feature`).
-5. Open a Pull Request.
+Run the application:
+npm start
 
-Please read our [Contributing Guidelines](CONTRIBUTING.md) (coming soon) for more details.
+The app will open at <http://localhost:8000> in your browser.
 
+Troubleshooting
 
-## Contact
-For questions or feedback, reach out via:
-- GitHub Issues: [VynqTalk Issues](https://github.com/goal651/VynqTalk/issues)
-- Email: bugiriwilson651@gmail.com 
+Ensure the back-end server is running before starting the front-end.
+Check the console for errors related to API connectivity.
+Verify Node.js and npm versions with node -v and npm -v.
 
----
-*Project maintained by [Wilson Goal](https://github.com/goal651).*
-```
+Contributing
+Feel free to fork the repo, submit pull requests, or open issues for bugs or features!
+Support
+If you like this project, please give it a ⭐ on GitHub!

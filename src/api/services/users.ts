@@ -37,8 +37,8 @@ export class UserService {
     return await apiClient.put<User>(API_ENDPOINTS.USERS.UPDATE(id),updates);
   }
 
-  async uploadAvatar(file: File): Promise<ApiResponse<string>> {
-    return await apiClient.uploadFile<string>(API_ENDPOINTS.USER.UPLOAD_AVATAR, file);
+  async uploadAvatar(id:number,file: File): Promise<ApiResponse<string>> {
+    return await apiClient.uploadFile<string>(API_ENDPOINTS.USER.UPLOAD_AVATAR(id), file);
   }
 
   async blockUser(userId: string): Promise<ApiResponse<void>> {
