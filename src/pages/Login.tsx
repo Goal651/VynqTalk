@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
@@ -8,16 +8,15 @@ import { AuthForm } from "@/components/auth/AuthForm";
 
 const Login = () => {
   const { login } = useAuth();
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (values: { email: string; password: string }) => {
     setIsLoading(true);
     const success = await login(values.email, values.password);
     setIsLoading(false);
-    
+
     if (success) {
-      navigate("/");
+      window.window.location.href = '/'
     }
   };
 
@@ -29,7 +28,7 @@ const Login = () => {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary/10 rounded-full blur-3xl"></div>
         <div className="absolute top-1/3 left-1/4 w-32 h-32 bg-accent/10 rounded-full blur-2xl"></div>
       </div>
-      
+
       <Card className="w-full max-w-md bg-card border border-border shadow-2xl animate-fade-in relative z-10">
         <CardHeader className="space-y-4 text-center pb-6">
           <div className="mx-auto w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg">
@@ -44,22 +43,22 @@ const Login = () => {
             </CardDescription>
           </div>
         </CardHeader>
-        
+
         <CardContent className="space-y-4">
           <AuthForm type="login" onSubmit={onSubmit} isLoading={isLoading} />
         </CardContent>
-        
+
         <CardFooter className="flex flex-col space-y-4 pt-2">
           <div className="text-sm text-muted-foreground text-center">
             Don&apos;t have an account?{" "}
-            <Link 
-              to="/signup" 
+            <Link
+              to="/signup"
               className="text-primary hover:text-primary/80 font-medium hover:underline transition-colors"
             >
               Sign up
             </Link>
           </div>
-          
+
           <div className="w-full p-3 bg-muted rounded-lg border border-border">
             <p className="text-xs text-muted-foreground text-center font-medium">
               Demo credentials
