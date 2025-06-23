@@ -1,6 +1,6 @@
 
-import { FormEvent, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import {  useState } from "react";
+import {  Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquare, Camera, User } from "lucide-react";
@@ -9,7 +9,6 @@ import { AuthForm } from "@/components/auth/AuthForm";
 
 const Signup = () => {
   const { signup } = useAuth();
-  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const { openCamera, capturedImage, CameraDialog } = useCamera();
 
@@ -19,7 +18,7 @@ const Signup = () => {
     setIsLoading(false);
 
     if (success) {
-      navigate("/");
+      window.window.location.href = '/'
     }
   };
 
