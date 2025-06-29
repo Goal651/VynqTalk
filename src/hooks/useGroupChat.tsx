@@ -2,12 +2,13 @@ import { useState, useEffect } from "react"
 import { Group, GroupMessage, User } from "@/types"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
-import { socketService } from "@/api/services/socket"
+import { useSocket } from "@/contexts/SocketContext"
 import { groupMessageService } from "@/api/services/groupMessages"
 
 export const useGroupChat = (group: Group) => {
   const { user } = useAuth()
   const { toast } = useToast()
+  const socket = useSocket();
   const [messages, setMessages] = useState<GroupMessage[]>([])
   const [replyTo, setReplyTo] = useState<GroupMessage | null>(null)
 
@@ -34,9 +35,9 @@ export const useGroupChat = (group: Group) => {
   }, [group, user, toast])
 
   useEffect(() => {
+    if (!socket) return;
     const handleMessage = (message: GroupMessage) => {
       console.log("Received new group message:", message)
-      
       setMessages(prevMessages => {
         if (message.sender.id === user?.id) {
           return prevMessages.map(m => 
@@ -46,24 +47,19 @@ export const useGroupChat = (group: Group) => {
               : m
           )
         }
-        
         const messageExists = prevMessages.some(m => m.id === message.id)
         if (messageExists) {
           return prevMessages
         }
-        
         return [...prevMessages, message]
       })
     }
-
-    socketService.onGroupMessage(handleMessage)
-    socketService.connect()
-
+    socket.onGroupMessage(handleMessage)
+    // No need to call socket.connect/disconnect, context handles it
     return () => {
-      socketService.disconnect()
-      socketService.removeGroupMessageListener(handleMessage)
+      socket.removeGroupMessageListener(handleMessage)
     }
-  }, [user])
+  }, [user, socket])
 
   const handleSendMessage = (content: string, replyData?: GroupMessage) => {
     if (!user || !group) {
@@ -74,9 +70,7 @@ export const useGroupChat = (group: Group) => {
       })
       return
     }
-
     console.log("Sending group message:", content, "to group:", group.name, "reply:", replyData)
-    
     const newMessage: GroupMessage = {
       id: Date.now(),
       sender: user,
@@ -87,11 +81,10 @@ export const useGroupChat = (group: Group) => {
       replyToMessage: replyData,
       reactions: []
     }
-
     setMessages(prevMessages => [...prevMessages, newMessage])
-
-    socketService.sendGroupMessage(newMessage.content, group, newMessage.type, user)
-
+    if (socket) {
+      socket.sendGroupMessage(newMessage.content, group, newMessage.type, user)
+    }
     toast({
       title: "Message sent",
       description: `Message sent to ${group.name}`,
@@ -102,7 +95,6 @@ export const useGroupChat = (group: Group) => {
   const handleReplyMessage = (message: GroupMessage) => {
     console.log("Reply to message requested:", message.id)
     setReplyTo(message)
-
     toast({
       title: "Replying to message",
       description: "Type your reply below",
@@ -116,40 +108,34 @@ export const useGroupChat = (group: Group) => {
 
   const handleReactToMessage = (messageId: number, emoji: string) => {
     console.log("React to message:", messageId, "with emoji:", emoji)
-
     setMessages(prevMessages => {
       let hasExistingReaction = false
-      
       const updatedMessages = prevMessages.map(message => {
         if (message.id === messageId) {
           const reactions = message.reactions || []
           const existingReaction = reactions.find(r => r === emoji)
           hasExistingReaction = !!existingReaction
-
           let updatedReactions: string[]
           if (existingReaction) {
             updatedReactions = reactions.filter(r => r !== emoji)
           } else {
             updatedReactions = [...reactions, emoji]
           }
-
           const updatedMessage = {
             ...message,
             reactions: updatedReactions
           }
-
-          socketService.messageReact(messageId, updatedReactions)
-          
+          if (socket) {
+            socket.messageReact(messageId, updatedReactions)
+          }
           return updatedMessage
         }
         return message
       })
-
       toast({
         title: hasExistingReaction ? "Reaction removed" : "Reaction added",
         description: hasExistingReaction ? `Removed ${emoji}` : `Reacted with ${emoji}`,
       })
-
       return updatedMessages
     })
   }

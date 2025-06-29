@@ -1,6 +1,5 @@
-
 import { Group, User } from '@/types';
-import { AdminMessage, SystemMetric } from '@/pages/admin/types';
+import { AdminMessage, SystemMetric, Alert } from '@/pages/admin/types';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
 import { ApiResponse } from '../types';
@@ -11,6 +10,11 @@ export interface AdminStats {
   totalGroups: number;
   totalMessages: number;
   flaggedContent: number;
+  newUsersThisMonth: number;
+  newGroupsThisWeek: number;
+  messagesToday: number;
+  messagesYesterday: number;
+  percentChange: number;
 }
 
 export class AdminService {
@@ -81,6 +85,14 @@ export class AdminService {
 
   async getAdminStats(): Promise<ApiResponse<AdminStats>> {
     return await apiClient.get<AdminStats>('/admin/stats');
+  }
+
+  async getDashboardStats(): Promise<ApiResponse<AdminStats>> {
+    return await apiClient.get<AdminStats>(API_ENDPOINTS.ADMIN.DASHBOARD_STATS);
+  }
+
+  async getRecentAlerts(): Promise<ApiResponse<Alert[]>> {
+      return await apiClient.get<Alert[]>(API_ENDPOINTS.ADMIN.RECENT_ALERTS);
   }
 }
 

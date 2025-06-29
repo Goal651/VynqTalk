@@ -1,4 +1,3 @@
-
 import { Alert } from '@/components/ui/alert';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
@@ -112,6 +111,39 @@ export class AuthService {
   getStoredUser() {
     const user = localStorage.getItem('lavable-user');
     return user ? JSON.parse(user) : null;
+  }
+
+  async checkToken(): Promise<{ valid: boolean; user?: unknown; message?: string }> {
+    try {
+      const response = await apiClient.post('/api/v1/auth/check-token');
+      if (response && typeof response.data === 'object' && response.data !== null) {
+        const data = response.data as { user?: unknown; message?: string };
+        return { valid: true, user: data.user, message: data.message };
+      }
+      return { valid: false, message: 'Invalid response' };
+    } catch (error: unknown) {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'status' in error &&
+        (error as { status?: number }).status === 401
+      ) {
+        return {
+          valid: false,
+          message:
+            typeof (error as { message?: string }).message === 'string'
+              ? (error as { message?: string }).message
+              : 'Token invalid or expired',
+        };
+      }
+      return {
+        valid: false,
+        message:
+          typeof error === 'object' && error !== null && 'message' in error && typeof (error as { message?: string }).message === 'string'
+            ? (error as { message?: string }).message
+            : 'Unknown error',
+      };
+    }
   }
 }
 

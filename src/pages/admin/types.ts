@@ -16,9 +16,10 @@ export interface SystemMetric {
 
 export interface Alert {
   id: number;
-  type: "warning" | "info" | "error";
+  type: "info" | "warning" | "error";
   message: string;
-  time: string;
+  createdAt: string;
+  ipAddress: string;
 }
 
 export interface ChartData {

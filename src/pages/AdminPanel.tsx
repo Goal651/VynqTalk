@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -13,6 +12,7 @@ import { UserManagement } from "./admin/components/UserManagement";
 import { GroupManagement } from "./admin/components/GroupManagement";
 import { Analytics } from "./admin/components/Analytics";
 import { SystemMetrics } from "./admin/components/SystemMetrics";
+import { SystemControl } from "./admin/components/SystemControl";
 import { toast } from "@/hooks/use-toast";
 
 export const AdminPanel = () => {
@@ -92,7 +92,7 @@ export const AdminPanel = () => {
       <ScrollArea className="flex-1">
         <div className="p-6 space-y-6 max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-6 bg-muted/50 border border-border/30">
+            <TabsList className="grid w-full grid-cols-7 bg-muted/50 border border-border/30">
               <TabsTrigger value="dashboard" className="flex items-center gap-2 cursor-pointer hover:bg-accent transition-colors data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 <BarChart3 className="h-4 w-4" />
                 <span className="hidden sm:inline">Dashboard</span>
@@ -112,6 +112,10 @@ export const AdminPanel = () => {
               <TabsTrigger value="system" className="flex items-center gap-2 cursor-pointer hover:bg-accent transition-colors data-[state=active]:bg-background data-[state=active]:shadow-sm">
                 <Server className="h-4 w-4" />
                 <span className="hidden sm:inline">System</span>
+              </TabsTrigger>
+              <TabsTrigger value="control" className="flex items-center gap-2 cursor-pointer hover:bg-accent transition-colors data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:inline">System Control</span>
               </TabsTrigger>
             </TabsList>
 
@@ -134,6 +138,10 @@ export const AdminPanel = () => {
 
             <TabsContent value="system" className="mt-6">
               <SystemMetrics />
+            </TabsContent>
+
+            <TabsContent value="control" className="mt-6">
+              <SystemControl />
             </TabsContent>
           </Tabs>
         </div>

@@ -1,4 +1,3 @@
-
 import { User, Message } from "../types";
 import { ChatSidebar } from "./ChatSidebar";
 import { MessageList } from "./MessageList";
@@ -57,7 +56,6 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users, onlineUsers }:
 
       <ChatSidebar
         users={users}
-        onUserClick={handleUserClick}
         activeChat={activeChat}
       />
       

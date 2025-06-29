@@ -83,6 +83,9 @@ export const API_ENDPOINTS = {
     MESSAGE_BY_ID: (id: number) => `/admin/messages/${id}`,
     ANALYTICS: '/admin/analytics',
     METRICS: '/admin/metrics',
+    DASHBOARD_STATS: '/admin/dashboard-stats',
+    RECENT_ALERTS: '/admin/alerts/recent',
+    SYSTEM_STATUS: '/admin/system-status',
   },
   SETTINGS: {
     GET: (userId: number) => `/user_settings/${userId}`,

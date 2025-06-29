@@ -2,12 +2,13 @@ import { useState, useEffect } from "react"
 import { User, Message } from "@/types"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
-import { socketService } from "@/api/services/socket"
+import { useSocket } from "@/contexts/SocketContext"
 import { messageService } from "@/api/services/messages"
 
 export const useChat = () => {
   const { user } = useAuth()
   const { toast } = useToast()
+  const socket = useSocket();
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [showUserInfo, setShowUserInfo] = useState(false)
   const [activeChat, setActiveChat] = useState<User | null>(null)
@@ -37,9 +38,9 @@ export const useChat = () => {
   }, [activeChat, user, toast])
 
   useEffect(() => {
+    if (!socket) return;
     const handleMessage = (message: Message) => {
       console.log("Received new message:", message)
-      
       setMessages(prevMessages => {
         if (message.sender.id === user?.id) {
           return prevMessages.map(m => 
@@ -50,12 +51,10 @@ export const useChat = () => {
               : m
           )
         }
-        
         const messageExists = prevMessages.some(m => m.id === message.id)
         if (messageExists) {
           return prevMessages
         }
-        
         return [...prevMessages, message]
       })
     }
@@ -71,16 +70,14 @@ export const useChat = () => {
       )
     }
 
-    socketService.onMessage(handleMessage)
-    socketService.onReaction(handleReaction)
-    socketService.connect()
-
+    socket.onMessage(handleMessage)
+    socket.onReaction(handleReaction)
+    // No need to call socket.connect/disconnect, context handles it
     return () => {
-      socketService.disconnect()
-      socketService.removeMessageListener(handleMessage)
-      socketService.removeReactionListener(handleReaction)
+      socket.removeMessageListener(handleMessage)
+      socket.removeReactionListener(handleReaction)
     }
-  }, [user])
+  }, [user, socket])
 
   const handleSendMessage = (content: string, replyData?: Message) => {
     if (!user || !activeChat) {
@@ -107,10 +104,12 @@ export const useChat = () => {
 
     setMessages(prevMessages => [...prevMessages, newMessage])
 
-    if (replyData) {
-      socketService.messageReply(newMessage.content,activeChat, newMessage.type, user, replyData)
-    } else {
-      socketService.sendMessage(newMessage.content, activeChat, newMessage.type, user)
+    if (socket) {
+      if (replyData) {
+        socket.messageReply(newMessage.content,activeChat, newMessage.type, user, replyData)
+      } else {
+        socket.sendMessage(newMessage.content, activeChat, newMessage.type, user)
+      }
     }
 
     toast({
@@ -181,7 +180,9 @@ export const useChat = () => {
             reactions: updatedReactions
           }
 
-          socketService.messageReact(messageId, updatedReactions)
+          if (socket) {
+            socket.messageReact(messageId, updatedReactions)
+          }
           
           return updatedMessage
         }

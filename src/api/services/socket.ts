@@ -13,6 +13,7 @@ class SocketService {
     private logoutListeners: (() => void)[] = [];
     private connectionAttempts: number = 0;
     private maxConnectionAttempts: number = 3;
+    private systemMetricsListeners: ((metrics: Record<string, unknown>) => void)[] = [];
 
     constructor() {
         this.stompClient = new Client({
@@ -218,6 +219,7 @@ class SocketService {
             this.stompClient.subscribe('/topic/messages', (message) => this.handleMessage(message));
             this.stompClient.subscribe('/topic/reactions', (message) => this.handleReaction(message));
             this.stompClient.subscribe('/topic/groupMessages', (message) => this.handleGroupMessage(message));
+            this.stompClient.subscribe('/topic/systemMetrics', (message) => this.handleSystemMetrics(message));
         } catch (error) {
             console.error('Error subscribing to public topics:', error.message);
         }
@@ -286,6 +288,21 @@ class SocketService {
             });
         } catch (error) {
             console.error('Failed to parse group message:', error.message);
+        }
+    }
+
+    private handleSystemMetrics(message: IMessage) {
+        try {
+            const data = JSON.parse(message.body) as Record<string, unknown>;
+            this.systemMetricsListeners.forEach((callback) => {
+                try {
+                    callback(data);
+                } catch (error) {
+                    console.error('Error in system metrics callback:', error.message);
+                }
+            });
+        } catch (error) {
+            console.error('Failed to parse system metrics:', error.message);
         }
     }
 
@@ -435,6 +452,22 @@ class SocketService {
             this.groupMessageListeners = this.groupMessageListeners.filter(cb => cb !== callback);
         } catch (error) {
             console.error('Error removing group message listener:', error.message);
+        }
+    }
+
+    public onSystemMetrics(callback: (metrics: Record<string, unknown>) => void) {
+        try {
+            this.systemMetricsListeners.push(callback);
+        } catch (error) {
+            console.error('Error adding system metrics listener:', error.message);
+        }
+    }
+
+    public removeSystemMetricsListener(callback: (metrics: Record<string, unknown>) => void) {
+        try {
+            this.systemMetricsListeners = this.systemMetricsListeners.filter(cb => cb !== callback);
+        } catch (error) {
+            console.error('Error removing system metrics listener:', error.message);
         }
     }
 }

@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { apiClient } from "@/api";
-import { adminService } from "@/api/services/admin";
+import { adminService, AdminStats } from "@/api/services/admin";
 import { Group, User } from "@/types";
 import { AdminMessage, SystemMetric, ContentModerationData, Alert, ChartData } from "../types";
+import { useSocket } from "@/contexts/SocketContext";
 
 export const useAdminData = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -125,15 +125,40 @@ export const useAdminData = () => {
 };
 
 export const useAdminMetrics = () => {
-  const [systemMetrics, setSystemMetrics] = useState<SystemMetric[]>([])
+  const [systemMetrics, setSystemMetrics] = useState<SystemMetric[]>([]);
+  const socket = useSocket();
 
   useEffect(() => {
-    const fetchSystemMetrics = async () => {
-      const response = await adminService.getSystemMetrics()
-      setSystemMetrics(response.data)
-    }
-    fetchSystemMetrics()
-  }, [])
+    if (!socket) return;
+    const handleMetrics = (data: Record<string, unknown>) => {
+      // Validate and map data to SystemMetric[]
+      let metrics: SystemMetric[] = [];
+      if (Array.isArray(data)) {
+        metrics = data.filter(
+          (item): item is SystemMetric =>
+            typeof item === 'object' &&
+            item !== null &&
+            'metric' in item &&
+            'value' in item &&
+            'status' in item
+        );
+      } else if (
+        typeof data === 'object' &&
+        data !== null &&
+        'metric' in data &&
+        'value' in data &&
+        'status' in data
+      ) {
+        metrics = [data as unknown as SystemMetric];
+      }
+      setSystemMetrics(metrics);
+    };
+    socket.onSystemMetrics(handleMetrics);
+    return () => {
+      socket.removeSystemMetricsListener(handleMetrics);
+    };
+  }, [socket]);
+
   const userActivityData: ChartData[] = [
     { date: "Jan 1", activeUsers: 120, newUsers: 15, messages: 450 },
     { date: "Jan 2", activeUsers: 135, newUsers: 22, messages: 520 },
@@ -151,18 +176,65 @@ export const useAdminMetrics = () => {
     { name: "Deleted", value: 25, color: "#6b7280" },
   ];
 
-
-
-  const recentAlerts: Alert[] = [
-    { id: 1, type: "warning", message: "High storage usage detected", time: "5 min ago" },
-    { id: 2, type: "info", message: "New user registration spike", time: "15 min ago" },
-    { id: 3, type: "error", message: "Failed login attempts from IP 192.168.1.100", time: "1 hour ago" },
-  ];
-
   return {
     userActivityData,
     contentModerationData,
     systemMetrics,
-    recentAlerts,
   };
+};
+
+export const useDashboardStats = () => {
+  const [stats, setStats] = useState<AdminStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await adminService.getDashboardStats();
+        if (response.success && response.data) {
+          setStats(response.data);
+        } else {
+          setError("Failed to fetch dashboard stats");
+        }
+      } catch (err) {
+        setError("Failed to fetch dashboard stats");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  return { stats, loading, error };
+};
+
+export const useRecentAlerts = () => {
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAlerts = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await adminService.getRecentAlerts();
+        if (response.success && response.data) {
+          setAlerts(response.data);
+        } else {
+          setError("Failed to fetch alerts");
+        }
+      } catch (err) {
+        setError("Failed to fetch alerts");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAlerts();
+  }, []);
+
+  return { alerts, loading, error };
 };
