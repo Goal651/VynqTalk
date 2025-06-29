@@ -1,4 +1,5 @@
-import { Message, User } from "@/types";
+import { Message } from "@/types/message";
+import { User } from "@/types/user";
 
 export interface AdminUser extends User {
   messageCount: number;

@@ -15,7 +15,7 @@ import { useCamera } from "@/hooks/use-camera"
 import { useToast } from "@/hooks/use-toast"
 import { userService } from "@/api/services/users"
 import { settingsService } from "@/api/services/settings"
-import { User, UserSettings } from "@/types"
+import { User, UserSettings } from "@/types/user"
 import { base64ToFile } from "@/lib/utils"
 
 export const Settings = () => {

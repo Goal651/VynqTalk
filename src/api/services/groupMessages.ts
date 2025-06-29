@@ -1,14 +1,8 @@
-import { GroupMessage } from "@/types";
+import { GroupMessage } from "@/types/message";
+import { ApiResponse } from "@/types/api";
 import { apiClient } from "../client";
 import { API_ENDPOINTS } from "../constants";
-import { ApiResponse } from "../types";
-
-export interface SendGroupMessageRequest {
-    content: string;
-    groupId: number;
-    type?: "text" | "image" | "audio" | "file";
-    replyToId?: number;
-}
+import type { SendGroupMessageRequest } from "@/types/message";
 
 export class GroupMessageService {
     // Get messages for a group

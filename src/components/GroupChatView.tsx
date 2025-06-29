@@ -1,4 +1,5 @@
-import { Group, User } from "@/types"
+import { Group } from "@/types/group"
+import { User } from "@/types/user"
 import { GroupChat } from "./GroupChat"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"

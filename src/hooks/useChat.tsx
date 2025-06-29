@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
-import { User, Message } from "@/types"
+import { User } from "@/types/user"
+import { Message } from "@/types/message"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 import { useSocket } from "@/contexts/SocketContext"

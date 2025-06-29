@@ -1,21 +1,9 @@
-import { Group, User } from '@/types';
-import { AdminMessage, SystemMetric, Alert } from '@/pages/admin/types';
+import { Group } from '@/types/group';
+import { User } from '@/types/user';
+import { ApiResponse } from '@/types/api';
+import { AdminMessage, SystemMetric, Alert, AdminStats } from '@/types/admin';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
-import { ApiResponse } from '../types';
-
-export interface AdminStats {
-  totalUsers: number;
-  activeUsers: number;
-  totalGroups: number;
-  totalMessages: number;
-  flaggedContent: number;
-  newUsersThisMonth: number;
-  newGroupsThisWeek: number;
-  messagesToday: number;
-  messagesYesterday: number;
-  percentChange: number;
-}
 
 export class AdminService {
   // User Management

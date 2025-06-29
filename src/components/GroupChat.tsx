@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react"
-import { Group, GroupMessage, User } from "@/types"
+import { Group } from "@/types/group"
+import { GroupMessage } from "@/types/message"
+import { User } from "@/types/user"
 import { useGroupChat } from "@/hooks/useGroupChat"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
@@ -48,9 +50,9 @@ export const GroupChat = ({ group, users }: GroupChatProps) => {
     setMessage("")
   }
 
-  const getSenderName = (senderId: number) => {
-    const sender = users.find(u => u.id === senderId)
-    return sender ? sender.name : "Unknown User"
+  const getSenderName = (senderId: string) => {
+    const sender = users.find((u) => u.id === senderId);
+    return sender ? sender.name : "Unknown User";
   }
 
   const getSenderAvatar = (senderId: number) => {
@@ -59,9 +61,9 @@ export const GroupChat = ({ group, users }: GroupChatProps) => {
   }
 
   const renderMessage = (message: GroupMessage) => {
-    const isCurrentUser = message.sender.id === user?.id
-    const senderName = getSenderName(message.sender.id)
-    const senderAvatar = getSenderAvatar(message.sender.id)
+    const isCurrentUser = message.senderId === user?.id
+    const senderName = getSenderName(message.senderId)
+    const senderAvatar = getSenderAvatar(message.senderId)
 
     return (
       <div
@@ -99,7 +101,7 @@ export const GroupChat = ({ group, users }: GroupChatProps) => {
             >
               {message.replyToMessage && (
                 <div className="text-xs opacity-70 mb-1 border-l-2 pl-2 border-current">
-                  Replying to {getSenderName(message.replyToMessage.sender.id)}:{" "}
+                  Replying to {getSenderName(message.replyToMessage.senderId)}:{" "}
                   {message.replyToMessage.content}
                 </div>
               )}
@@ -180,7 +182,7 @@ export const GroupChat = ({ group, users }: GroupChatProps) => {
       {replyTo && (
         <div className="px-4 py-2 bg-muted/50 flex items-center justify-between border-t">
           <div className="text-sm">
-            Replying to {getSenderName(replyTo.sender.id)}: {replyTo.content}
+            Replying to {getSenderName(replyTo.senderId)}: {replyTo.content}
           </div>
           <Button
             variant="ghost"

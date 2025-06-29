@@ -1,10 +1,8 @@
-
-import { UserSettings } from '@/types';
+import { UserSettings } from '@/types/user';
+import { ApiResponse } from '@/types/api';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
-import { ApiResponse } from '../types';
-
-
+import type { PrivacySettings } from '@/types/user';
 
 export interface PrivacySettings {
   profileVisibility: 'public' | 'friends' | 'private';

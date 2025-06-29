@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Message } from "@/types";
+import { Message } from "@/types/message";
 import { useToast } from "@/hooks/use-toast";
 
 export const useMessageOperations = (

@@ -1,16 +1,8 @@
-
-import { Notification } from '@/types';
+import { Notification } from '@/types/notification';
+import { ApiResponse } from '@/types/api';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
-import { ApiResponse } from '../types';
-
-export interface NotificationSettings {
-  emailNotifications: boolean;
-  pushNotifications: boolean;
-  messageNotifications: boolean;
-  groupNotifications: boolean;
-  mentionNotifications: boolean;
-}
+import type { NotificationSettings } from '@/types/notification';
 
 export class NotificationService {
   async getAllNotifications(userId: number): Promise<ApiResponse<Notification[]>> {

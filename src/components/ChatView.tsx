@@ -1,4 +1,5 @@
-import { User, Message } from "../types";
+import { User } from "@/types/user";
+import { Message } from "@/types/message";
 import { ChatSidebar } from "./ChatSidebar";
 import { MessageList } from "./MessageList";
 import { MessageInput } from "./MessageInput";

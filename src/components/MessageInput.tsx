@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
-import { User, Message } from "../types";
+import { User } from "@/types/user";
+import { Message } from "@/types/message";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageCircle, Smile, Paperclip, Mic, X } from "lucide-react";

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react"
-import { Group, GroupMessage, User } from "@/types"
+import { Group } from "@/types/group"
+import { GroupMessage } from "@/types/message"
+import { User } from "@/types/user"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 import { useSocket } from "@/contexts/SocketContext"
@@ -39,10 +41,10 @@ export const useGroupChat = (group: Group) => {
     const handleMessage = (message: GroupMessage) => {
       console.log("Received new group message:", message)
       setMessages(prevMessages => {
-        if (message.sender.id === user?.id) {
+        if (message.senderId === user?.id) {
           return prevMessages.map(m => 
             m.content === message.content && 
-            m.sender.id === message.sender.id
+            m.senderId === message.senderId
               ? { ...m, id: message.id }
               : m
           )
@@ -73,7 +75,7 @@ export const useGroupChat = (group: Group) => {
     console.log("Sending group message:", content, "to group:", group.name, "reply:", replyData)
     const newMessage: GroupMessage = {
       id: Date.now(),
-      sender: user,
+      senderId: user.id,
       group: group,
       content: content,
       timestamp: new Date().toISOString(),

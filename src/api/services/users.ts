@@ -1,16 +1,8 @@
-
-import { User } from '@/types';
+import { User } from '@/types/user';
+import { ApiResponse } from '@/types/api';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
-import { ApiResponse } from '../types';
-
-export interface UpdateUserRequest {
-  name?: string;
-  email?: string;
-  avatar?: string;
-  isAdmin?: boolean;
-  status?: 'active' | 'blocked' | 'suspended';
-}
+import type { UpdateUserRequest } from '@/types/user';
 
 export class UserService {
   async getAllUsers(): Promise<ApiResponse<User[]>> {

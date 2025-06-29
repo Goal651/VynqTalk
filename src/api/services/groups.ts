@@ -1,15 +1,9 @@
-import { Group, User } from '@/types'
+import { Group } from '@/types/group'
+import { User } from '@/types/user'
+import { ApiResponse } from '@/types/api'
 import { apiClient } from '../client'
 import { API_ENDPOINTS } from '../constants'
-import { ApiResponse } from '../types'
-
-export interface CreateGroupRequest {
-  name: string
-  description?: string
-  avatar?: string
-  isPrivate: boolean
-  members: string[]
-}
+import type { CreateGroupRequest } from '@/types/group'
 
 export interface UpdateGroupRequest {
   name?: string

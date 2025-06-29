@@ -1,6 +1,6 @@
 import SockJS from 'sockjs-client';
 import { Client, IMessage } from '@stomp/stompjs';
-import { Message, User, GroupMessage, Group } from '@/types';
+import { Message, GroupMessage, User, Group } from '@types';
 import { API_CONFIG } from '../constants';
 
 class SocketService {

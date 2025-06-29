@@ -1,4 +1,4 @@
-import { User } from "../types";
+import { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import { Phone, Video, MoreVertical, MessageSquare } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";

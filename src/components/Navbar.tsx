@@ -1,6 +1,6 @@
 import { Home, Users, Settings, Bell, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { User } from "@/types";
+import { User } from "@/types/user";
 import { Link, useLocation } from "react-router-dom";
 
 type NavItem = {

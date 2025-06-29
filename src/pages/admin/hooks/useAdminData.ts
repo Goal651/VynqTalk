@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { apiClient } from "@/api";
-import { adminService, AdminStats } from "@/api/services/admin";
-import { Group, User } from "@/types";
-import { AdminMessage, SystemMetric, ContentModerationData, Alert, ChartData } from "../types";
+import { adminService } from "@/api/services/admin";
+import { AdminStats } from "@/types/admin";
+import { Group } from "@/types/group";
+import { User } from "@/types/user";
+import { AdminMessage, SystemMetric, ContentModerationData, Alert, ChartData } from "@/types/admin";
 import { useSocket } from "@/contexts/SocketContext";
 
 export const useAdminData = () => {

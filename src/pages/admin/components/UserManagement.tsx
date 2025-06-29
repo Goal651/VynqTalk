@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Eye, Trash2, UserX, UserPlus, CheckCircle, Clock, Users } from "lucide-react";
 import { useAdminData } from "../hooks/useAdminData";
-import { User } from "@/types";
+import { User } from "@/types/user";
 
 export const UserManagement = () => {
   const { users, updateUser, deleteUser } = useAdminData();
