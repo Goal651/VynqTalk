@@ -64,6 +64,7 @@ export interface Group {
   description?: string
   avatar: string
   members: User[]
+  admins:User[]
   status: "active" | "suspended"
   createdBy: User
   createdAt: string

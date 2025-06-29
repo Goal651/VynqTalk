@@ -2,7 +2,7 @@
 //DEDPLOY_URL=https://vynqtalk-server-production.up.railway.app
 
 export const API_CONFIG = {
-  BASE_URL: 'https://vynqtalk-server-production.up.railway.app',
+  BASE_URL: 'http://localhost:8080',
   API_VERSION: 'v1',
   TIMEOUT: 10000,
 };
@@ -18,19 +18,15 @@ export const API_ENDPOINTS = {
     RESET_PASSWORD: '/auth/reset-password',
   },
   USER: {
-    PROFILE: '/user/profile',
+    ALL: '/user/all',
+    PROFILE: (fileName: string) => `/profile/${fileName}`,
     UPDATE_PROFILE: (id: number) => `/user/profile/${id}`,
-    UPLOAD_AVATAR: (id: number) =>`/upload/avatar/${id}`,
-    UPDATE_SETTINGS: '/user/settings',
-    GET_SETTINGS: '/user/settings',
+    UPLOAD_AVATAR: (id: number) => `/upload/user/${id}`,
+    BY_ID: (id: number | string) => `/user/${id}`,
+    UPDATE: (id: number | string) => `/user/${id}`,
+    DELETE: (id: number | string) => `/user/${id}`
   },
-  USERS: {
-    ALL: '/users',
-    BY_ID: (id: number | string) => `/users/${id}`,
-    UPDATE: (id: number | string) => `/users/${id}`,
-    DELETE: (id: number | string) => `/users/${id}`,
-    SEARCH: '/users/search',
-  },
+
   CHAT: {
     MESSAGES: '/chat/messages',
     SEND_MESSAGE: '/chat/send',
@@ -45,15 +41,20 @@ export const API_ENDPOINTS = {
     DELETE: (id: number) => `/messages/${id}`,
     SEND: '/messages/send',
   },
-  GROUPS: {
-    LIST: '/groups',
-    CREATE: '/groups',
-    BY_ID: (id: number) => `/groups/${id}`,
-    UPDATE: (id: number) => `/groups/${id}`,
-    DELETE: (id: number) => `/groups/${id}`,
-    JOIN: '/groups/join',
-    LEAVE: '/groups/leave',
-    MEMBERS: (id: number) => `/groups/${id}/members`,
+  GROUP: {
+    LIST: '/group/all',
+    CREATE: '/group',
+    UPLOAD_AVATAR: (id: number) => `/upload/group/${id}`,
+    BY_ID: (id: number) => `/group/${id}`,
+    UPDATE: (id: number) => `/group/${id}`,
+    DELETE: (id: number) => `/group/${id}`,
+    JOIN: '/group/join',
+    LEAVE: '/group/leave',
+  },
+  GROUP_MEMBERS: {
+    GET_MEMBERS: (groupId: number) => `/group_member/${groupId}`,
+    ADD_MEMBER: (groupId: number) => `/group_member/${groupId}`,
+    REMOVE_MEMBER: (groupId: number) => `/group_member/${groupId}`
   },
   GROUP_MESSAGES: {
     ALL: (groupId: number) => `/group_messages/conv/${groupId}`,

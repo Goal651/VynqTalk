@@ -19,7 +19,7 @@ export const UserInfo = ({ user, onClose }: UserInfoProps) => {
     setIsBlocked(!isBlocked);
     toast({
       title: !isBlocked ? "User blocked" : "User unblocked",
-      description: !isBlocked 
+      description: !isBlocked
         ? `You won't receive messages from ${user.name}`
         : `You will now receive messages from ${user.name}`,
     });
@@ -29,7 +29,7 @@ export const UserInfo = ({ user, onClose }: UserInfoProps) => {
     setIsHidden(!isHidden);
     toast({
       title: !isHidden ? "User hidden" : "User unhidden",
-      description: !isHidden 
+      description: !isHidden
         ? `${user.name} will be hidden from your chat list`
         : `${user.name} will be visible in your chat list`,
     });
@@ -55,17 +55,17 @@ export const UserInfo = ({ user, onClose }: UserInfoProps) => {
         </p>
 
         <div className="w-full space-y-3 mt-6">
-          <Button type="button" 
-            variant={isBlocked ? "default" : "outline"} 
+          <Button type="button"
+            variant={isBlocked ? "default" : "outline"}
             className="w-full justify-start"
             onClick={handleBlockUser}
           >
             {isBlocked ? <UserPlus className="mr-2 h-4 w-4" /> : <UserMinus className="mr-2 h-4 w-4" />}
             {isBlocked ? "Unblock User" : "Block User"}
           </Button>
-          
-          <Button type="button" 
-            variant={isHidden ? "default" : "outline"} 
+
+          <Button type="button"
+            variant={isHidden ? "default" : "outline"}
             className="w-full justify-start"
             onClick={handleHideUser}
           >

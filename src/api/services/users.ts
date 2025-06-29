@@ -14,27 +14,24 @@ export interface UpdateUserRequest {
 
 export class UserService {
   async getAllUsers(): Promise<ApiResponse<User[]>> {
-    return await apiClient.get<User[]>(API_ENDPOINTS.USERS.ALL);
+    return await apiClient.get<User[]>(API_ENDPOINTS.USER.ALL);
   }
 
   async getUserById(id: string): Promise<ApiResponse<User>> {
-    return await apiClient.get<User>(API_ENDPOINTS.USERS.BY_ID(id));
+    return await apiClient.get<User>(API_ENDPOINTS.USER.BY_ID(id));
   }
 
   async updateUser(id: string, updates: UpdateUserRequest): Promise<ApiResponse<User>> {
-    return await apiClient.put<User>(API_ENDPOINTS.USERS.UPDATE(id), updates);
+    return await apiClient.put<User>(API_ENDPOINTS.USER.UPDATE(id), updates);
   }
 
   async deleteUser(id: string): Promise<ApiResponse<void>> {
-    return await apiClient.delete<void>(API_ENDPOINTS.USERS.DELETE(id));
+    return await apiClient.delete<void>(API_ENDPOINTS.USER.DELETE(id));
   }
 
-  async searchUsers(query: string): Promise<ApiResponse<User[]>> {
-    return await apiClient.get<User[]>(API_ENDPOINTS.USERS.SEARCH, { q: query });
-  }
 
   async updateProfile(id:number,updates:User): Promise<ApiResponse<User>> {
-    return await apiClient.put<User>(API_ENDPOINTS.USERS.UPDATE(id),updates);
+    return await apiClient.put<User>(API_ENDPOINTS.USER.UPDATE(id),updates);
   }
 
   async uploadAvatar(id:number,file: File): Promise<ApiResponse<string>> {
