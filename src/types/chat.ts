@@ -1,15 +1,9 @@
 /**
  * Chat and message types.
  */
+import { Reaction } from '@/types';
 import type { UserProfile } from './user';
 
-export interface SendMessageRequest {
-  content: string;
-  type: 'text' | 'image' | 'audio' | 'file';
-  chatWithUserId?: number;
-  groupId?: number;
-  replyToId?: number;
-}
 
 export interface MessageResponse {
   id: number;
@@ -20,12 +14,7 @@ export interface MessageResponse {
   senderAvatar?: string;
   timestamp: string;
   isEdited: boolean;
-  reactions: Array<{
-    id: string;
-    emoji: string;
-    userId: string;
-    userName: string;
-  }>;
+  reactions: Reaction;
   replyTo?: {
     messageId: number;
     userId: number;
@@ -51,4 +40,9 @@ export interface ChatMessage {
   to: string;
   content: string;
   timestamp?: string;
-} 
+}
+
+export interface ChatReaction {
+  messageId: number,
+  reaction: Reaction[]
+}

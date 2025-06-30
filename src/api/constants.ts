@@ -85,7 +85,9 @@ export const API_ENDPOINTS = {
     METRICS: '/admin/metrics',
     DASHBOARD_STATS: '/admin/dashboard-stats',
     RECENT_ALERTS: '/admin/alerts/recent',
-    SYSTEM_STATUS: '/admin/system-status',
+  },
+  SYSTEM:{
+    STATUS:'/system/status',
   },
   SETTINGS: {
     GET: (userId: number) => `/user_settings/${userId}`,

@@ -1,6 +1,4 @@
-import { ApiResponse } from '@/types/api';
-import { User } from '@/types/user';
-import { LoginRequest, SignupRequest, AuthResponse, RefreshTokenRequest, ForgotPasswordRequest, ResetPasswordRequest } from '@/types/auth';
+import { ApiResponse, User, LoginRequest, SignupRequest, AuthResponse, RefreshTokenRequest, ForgotPasswordRequest, ResetPasswordRequest } from '@/types';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
 

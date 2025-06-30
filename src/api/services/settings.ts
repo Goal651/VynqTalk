@@ -1,16 +1,9 @@
-import { UserSettings } from '@/types/user';
-import { ApiResponse } from '@/types/api';
+import { UserSettings, PrivacySettings, ApiResponse } from '@/types';
 import { apiClient } from '../client';
-import { API_ENDPOINTS } from '../constants';
-import type { PrivacySettings } from '@/types/user';
+import { API_ENDPOINTS } from '../constants'  ;
 
-export interface PrivacySettings {
-  profileVisibility: 'public' | 'friends' | 'private';
-  showOnlineStatus: boolean;
-  allowMessageRequests: boolean;
-  readReceipts: boolean;
-  blockedUsers: string[];
-}
+
+
 
 export class SettingsService {
   async getSettings(userId: number): Promise<ApiResponse<UserSettings>> {

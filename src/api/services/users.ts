@@ -1,8 +1,6 @@
-import { User } from '@/types/user';
-import { ApiResponse } from '@/types/api';
+import { User, ApiResponse, UpdateUserRequest } from '@/types';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
-import type { UpdateUserRequest } from '@/types/user';
 
 export class UserService {
   async getAllUsers(): Promise<ApiResponse<User[]>> {

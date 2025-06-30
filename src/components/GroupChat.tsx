@@ -1,7 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { Group } from "@/types/group"
-import { GroupMessage } from "@/types/message"
-import { User } from "@/types/user"
+import { Group, GroupMessage, User } from '@/types'
 import { useGroupChat } from "@/hooks/useGroupChat"
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
@@ -50,20 +48,11 @@ export const GroupChat = ({ group, users }: GroupChatProps) => {
     setMessage("")
   }
 
-  const getSenderName = (senderId: string) => {
-    const sender = users.find((u) => u.id === senderId);
-    return sender ? sender.name : "Unknown User";
-  }
-
-  const getSenderAvatar = (senderId: number) => {
-    const sender = users.find(u => u.id === senderId)
-    return sender?.avatar || ""
-  }
 
   const renderMessage = (message: GroupMessage) => {
-    const isCurrentUser = message.senderId === user?.id
-    const senderName = getSenderName(message.senderId)
-    const senderAvatar = getSenderAvatar(message.senderId)
+    const isCurrentUser = message.sender.id === user?.id
+    const senderName = message.sender.name
+    const senderAvatar = message.sender.avatar
 
     return (
       <div
@@ -99,10 +88,9 @@ export const GroupChat = ({ group, users }: GroupChatProps) => {
                   : "bg-muted"
               )}
             >
-              {message.replyToMessage && (
+              {message.replyTo && (
                 <div className="text-xs opacity-70 mb-1 border-l-2 pl-2 border-current">
-                  Replying to {getSenderName(message.replyToMessage.senderId)}:{" "}
-                  {message.replyToMessage.content}
+                  Replying to {message.replyTo.sender.name}: {message.replyTo.content}
                 </div>
               )}
               <p className="whitespace-pre-wrap break-words">{message.content}</p>
@@ -110,11 +98,11 @@ export const GroupChat = ({ group, users }: GroupChatProps) => {
                 <div className="flex flex-wrap gap-1 mt-1">
                   {message.reactions.map((reaction, index) => (
                     <span
-                      key={index}
+                      key={reaction.id}
                       className="text-xs cursor-pointer hover:bg-muted/50 rounded px-1 transition-colors"
-                      onClick={() => handleReactToMessage(message.id, reaction)}
+                      onClick={() => handleReactToMessage(message.id, reaction.emoji)}
                     >
-                      {reaction}
+                      {reaction.emoji}
                     </span>
                   ))}
                 </div>
@@ -182,7 +170,7 @@ export const GroupChat = ({ group, users }: GroupChatProps) => {
       {replyTo && (
         <div className="px-4 py-2 bg-muted/50 flex items-center justify-between border-t">
           <div className="text-sm">
-            Replying to {getSenderName(replyTo.senderId)}: {replyTo.content}
+            Replying to {replyTo.sender.name}: {replyTo.content}
           </div>
           <Button
             variant="ghost"

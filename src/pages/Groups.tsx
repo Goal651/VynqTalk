@@ -11,9 +11,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Users, Settings, MessageCircle, Search, Crown } from "lucide-react";
-import { Group } from "@/types/group";
-import { User } from "@/types/user";
-import { GroupMessage } from "@/types/message";
+import { Group, User, GroupMessage } from '@/types';
 import { GroupChatView } from "@/components/GroupChatView";
 import { GroupSettings } from "@/components/GroupSettings";
 import { useToast } from "@/hooks/use-toast";
@@ -26,6 +24,10 @@ const createGroupSchema = z.object({
   description: z.string().optional(),
 });
 
+/**
+ * Groups page for managing and joining group chats.
+ * Handles group creation, search, chat, and settings views.
+ */
 export const Groups = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -49,6 +51,9 @@ export const Groups = () => {
     fetchGroups();
   }, []);
 
+  /**
+   * Fetch groups from the backend and update state.
+   */
   const fetchGroups = async () => {
     try {
       setIsLoading(true);
@@ -65,13 +70,16 @@ export const Groups = () => {
     }
   };
 
+  /**
+   * Handle group creation form submission.
+   * @param values - The form values for creating a group.
+   */
   const onSubmit = async (values: z.infer<typeof createGroupSchema>) => {
     try {
       const newGroup = await groupService.createGroup({
         name: values.name,
         description: values.description,
-        isPrivate: false,
-        members: []
+        isPrivate: false
       });
 
       setGroups([...groups, newGroup.data]);
@@ -91,34 +99,59 @@ export const Groups = () => {
     }
   };
 
+  /**
+   * Set the selected group and switch to chat view.
+   * @param group - The group to open chat for.
+   */
   const handleGroupChat = (group: Group) => {
     setSelectedGroup(group);
     setCurrentView("chat");
   };
 
+  /**
+   * Set the selected group and switch to settings view.
+   * @param group - The group to open settings for.
+   */
   const handleGroupSettings = (group: Group) => {
     setSelectedGroup(group);
     setCurrentView("settings");
   };
 
+  /**
+   * Return to the group list view.
+   */
   const handleBackToList = () => {
     setCurrentView("list");
     setSelectedGroup(null);
   };
 
+  /**
+   * Update the search query for filtering groups.
+   * @param e - The input change event.
+   */
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
+  /**
+   * Open the create group dialog.
+   */
   const handleCreateGroupClick = () => {
     setIsCreateOpen(true);
   };
 
+  /**
+   * Cancel group creation and reset the form.
+   */
   const handleCancelCreate = () => {
     setIsCreateOpen(false);
     form.reset();
   };
 
+  /**
+   * Update a group and show a toast on success or error.
+   * @param updatedGroup - The updated group object.
+   */
   const handleUpdateGroup = async (updatedGroup: Group) => {
     try {
       const result = await groupService.updateGroup(updatedGroup.id, updatedGroup);

@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
-import { User } from "@/types/user"
-import { Message } from "@/types/message"
+import { User, Message } from '@/types'
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 import { useSocket } from "@/contexts/SocketContext"
@@ -99,7 +98,7 @@ export const useChat = () => {
       timestamp: new Date().toISOString(),
       receiver: activeChat,
       type: "text",
-      replyToMessage: replyData,
+      replyTo,
       reactions: []
     }
 

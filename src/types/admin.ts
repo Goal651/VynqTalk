@@ -2,7 +2,6 @@
  * Admin panel types.
  */
 import type { User } from './user';
-import type { Message } from './message';
 
 export interface AdminUser extends User {
   messageCount: number;

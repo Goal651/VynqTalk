@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 import { User } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { authService, LoginRequest, SignupRequest, ApiError } from "@/api";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface AuthContextType {
   user: User | null;
@@ -25,6 +26,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Check if the user is already logged in
   useEffect(() => {
@@ -35,8 +38,15 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(storedUser);
         setIsAuthenticated(true);
       }
+    } else {
+      setUser(null);
+      setIsAuthenticated(false);
+      // Only redirect if not already on /login or /signup
+      if (location.pathname !== "/login" && location.pathname !== "/signup") {
+        navigate("/login", { replace: true });
+      }
     }
-  }, []);
+  }, [navigate, location]);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {

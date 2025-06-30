@@ -58,6 +58,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users, onlineUsers }:
       <ChatSidebar
         users={users}
         activeChat={activeChat}
+        onUserClick={handleUserClick}
       />
       
       <div className="flex-1 flex flex-col h-full border-l border-r border-border/30 bg-background/90 backdrop-blur-sm relative z-0">

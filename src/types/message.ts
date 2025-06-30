@@ -1,41 +1,45 @@
+// Import dependencies
+import type { User } from "./user";
+import type { Group } from "./group";
+
+
 /**
  * Represents a direct message between users.
  */
 export interface Message {
   id: number;
   sender: User;
-  receiver?: User;
+  receiver: User;
   content: string;
   timestamp: string;
   edited?: boolean;
   type: "text" | "image" | "audio" | "file";
   reactions?: string[];
-  replyToMessage?: Message;
+  replyTo?: Message;
 }
 
 /**
  * Represents a message in a group chat.
  */
 export interface GroupMessage {
+  /** Unique identifier for the message */
   id: number;
-  groupId: number;
-  senderId: number;
+  /** ID of the group this message belongs to */
+  group: Group;
+  /** ID of the sender */
+  sender: User;
+  /** Content of the message */
   content: string;
-  type: 'text' | 'image' | 'audio' | 'file';
-  timestamp: string;
+  /** Whether the message has been edited */
   isEdited: boolean;
-  reactions: Array<{
-    id: number;
-    emoji: string;
-    userId: number;
-    userName: string;
-  }>;
-  replyTo?: {
-    messageId: number;
-    userId: number;
-    userName: string;
-    content: string;
-  };
+  /** Array of reactions to the message */
+  reactions: Reaction[];
+  /** The message this is replying to, if any */
+  replyTo?: GroupMessage;
+  /** Type of the message */
+  type: 'text' | 'image' | 'audio' | 'file';
+  /** Timestamp of the message */
+  timestamp: string;
 }
 
 /**
@@ -44,14 +48,13 @@ export interface GroupMessage {
 export interface Reaction {
   id: number;
   emoji: string;
-  userId: number;
-  userName: string;
+  user: User;
 }
 
-// Import dependencies
-import type { User } from "./user";
-import type { Group } from "./group";
 
+/**
+ * Request payload for sending a direct message.
+ */
 export interface SendMessageRequest {
   content: string;
   receiverId: number;
@@ -60,6 +63,9 @@ export interface SendMessageRequest {
   replyToId?: number;
 }
 
+/**
+ * Request payload for sending a group message.
+ */
 export interface SendGroupMessageRequest {
   content: string;
   groupId: number;

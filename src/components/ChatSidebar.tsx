@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User } from "../types";
+import { User } from '@/types';
 import { Search, Plus, Phone, Video } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";

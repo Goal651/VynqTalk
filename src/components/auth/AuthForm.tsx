@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +24,7 @@ const signupSchema = z.object({
 
 interface AuthFormProps {
   type: 'login' | 'signup';
-  onSubmit: (values: any) => Promise<void>;
+  onSubmit: (values:unknown) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -58,7 +57,7 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
                     <Input 
                       placeholder="John Doe" 
                       {...field} 
-                      className="pl-10 bg-background border-border focus:border-primary transition-colors"
+                      className="pl-10 bg-background border-border focus:border-primary transition-colors login-ocean-input"
                     />
                   </div>
                 </FormControl>
@@ -80,7 +79,7 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
                   <Input 
                     placeholder="your.email@example.com" 
                     {...field} 
-                    className="pl-10 bg-background border-border focus:border-primary transition-colors"
+                    className="pl-10 bg-background border-border focus:border-primary transition-colors login-ocean-input"
                   />
                 </div>
               </FormControl>
@@ -102,13 +101,13 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
                     type={showPassword ? "text" : "password"} 
                     placeholder="••••••••" 
                     {...field} 
-                    className="pl-10 pr-10 bg-background border-border focus:border-primary transition-colors"
+                    className="pl-10 pr-10 bg-background border-border focus:border-primary transition-colors login-ocean-input"
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-muted/50"
+                    className="absolute right-0 top-0 w-10 h-full flex items-center justify-center hover:bg-muted/50"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
@@ -138,13 +137,13 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
                       type={showConfirmPassword ? "text" : "password"} 
                       placeholder="••••••••" 
                       {...field} 
-                      className="pl-10 pr-10 bg-background border-border focus:border-primary transition-colors"
+                      className="pl-10 pr-10 bg-background border-border focus:border-primary transition-colors login-ocean-input"
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-muted/50"
+                      className="absolute right-0 top-0 w-10 h-full flex items-center justify-center hover:bg-muted/50"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                       {showConfirmPassword ? (
@@ -163,7 +162,7 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
         
         <Button 
           type="submit" 
-          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl" 
+          className="w-full font-medium py-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl ocean-btn" 
           disabled={isLoading}
         >
           {isLoading ? (

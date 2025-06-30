@@ -15,7 +15,7 @@ import { useCamera } from "@/hooks/use-camera"
 import { useToast } from "@/hooks/use-toast"
 import { userService } from "@/api/services/users"
 import { settingsService } from "@/api/services/settings"
-import { User, UserSettings } from "@/types/user"
+import { User, UserSettings } from '@/types'
 import { base64ToFile } from "@/lib/utils"
 
 export const Settings = () => {
@@ -332,7 +332,6 @@ export const Settings = () => {
                       id="name"
                       value={profileData.name}
                       onChange={(e) => {
-                        console.log("Name input changed:", e.target.value)
                         setProfileData(prev => ({ ...prev, name: e.target.value }))
                       }}
                       className="cursor-text"
@@ -344,7 +343,6 @@ export const Settings = () => {
                       id="email"
                       value={profileData.email}
                       onChange={(e) => {
-                        console.log("Email input changed:", e.target.value)
                         setProfileData(prev => ({ ...prev, email: e.target.value }))
                       }}
                       type="email"

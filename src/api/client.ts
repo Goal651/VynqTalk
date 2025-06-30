@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { API_CONFIG, HTTP_STATUS } from './constants';
-import { ApiResponse, ApiError } from './types';
+import { ApiResponse, ApiError } from '@/types';
 
 class ApiClient {
   private axiosInstance: AxiosInstance;
@@ -21,7 +21,7 @@ class ApiClient {
     this.axiosInstance.interceptors.request.use(
       (config) => {
         try {
-          if (config.url?.includes('/auth')) {
+          if (config.url?.includes('/auth')||config.url?.includes('/system')) {
             return config;
           }
           const token = this.getAuthToken();

@@ -1,7 +1,4 @@
-import { Group } from '@/types/group';
-import { User } from '@/types/user';
-import { ApiResponse } from '@/types/api';
-import { AdminMessage, SystemMetric, Alert, AdminStats } from '@/types/admin';
+import { Group, User, ApiResponse, AdminMessage, SystemMetric, Alert, AdminStats } from '@/types';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
 

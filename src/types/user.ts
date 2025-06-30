@@ -1,27 +1,36 @@
 /**
  * Represents a user in the system.
+ * @property {string} avatar - The user's avatar URL.
+ * @property {string} createdAt - The date the user was created.
+ * @property {string} email - The user's email address (optional).
+ * @property {number} id - The user's unique identifier.
+ * @property {boolean} isAdmin - Whether the user is an admin.
+ * @property {boolean} isOnline - Whether the user is currently online (optional).
+ * @property {string} lastActive - The last time the user was active.
+ * @property {string} name - The user's display name.
+ * @property {string} role - The user's role (optional).
+ * @property {"active"|"blocked"|"suspended"} status - The user's status.
  */
 export interface User {
-  id: number;
-  name: string;
-  status: "active" | "blocked" | "suspended";
-  createdAt: string;
-  lastActive: string;
-  email?: string;
   avatar: string;
-  isOnline?: boolean;
+  createdAt: string;
+  email?: string;
+  id: number;
   isAdmin: boolean;
-  role?: "user" | "admin" | "moderator";
+  isOnline?: boolean;
+  lastActive: string;
+  name: string;
+  role?: "user" | "admin";
+  status: "active" | "blocked" | "suspended";
 }
 
 /**
  * User settings/preferences.
  */
 export interface UserSettings {
-  id: number;
-  user: User;
   autoStatus?: boolean;
   emailNotifications?: boolean;
+  id: number;
   language?: string;
   notificationEnabled?: boolean;
   profileVisibility?: "public" | "friends" | "private";
@@ -31,44 +40,45 @@ export interface UserSettings {
   soundEnabled?: boolean;
   theme?: "blue" | "dark" | "cyberpunk" | "neon" | "ocean" | "sunset";
   timezone?: string;
+  user: User;
 }
 
 /**
  * Request to update user profile.
  */
 export interface UpdateProfileRequest {
-  name?: string;
-  email?: string;
   avatar?: string;
+  email?: string;
+  name?: string;
 }
 
 /**
  * User profile details.
  */
 export interface UserProfile {
-  id: number;
-  name: string;
-  email: string;
   avatar?: string;
-  isOnline: boolean;
-  lastSeen?: string;
   bio?: string;
   createdAt: string;
+  email: string;
+  id: number;
+  isOnline: boolean;
+  lastSeen?: string;
+  name: string;
   updatedAt: string;
 }
 
 export interface UpdateUserRequest {
-  name?: string;
-  email?: string;
   avatar?: string;
+  email?: string;
   isAdmin?: boolean;
+  name?: string;
   status?: 'active' | 'blocked' | 'suspended';
 }
 
 export interface PrivacySettings {
-  profileVisibility: 'public' | 'friends' | 'private';
-  showOnlineStatus: boolean;
   allowMessageRequests: boolean;
-  readReceipts: boolean;
   blockedUsers: string[];
+  profileVisibility: 'public' | 'friends' | 'private';
+  readReceipts: boolean;
+  showOnlineStatus: boolean;
 } 

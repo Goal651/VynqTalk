@@ -1,8 +1,6 @@
-import { Message } from "@/types/message";
-import { ApiResponse } from "@/types/api";
+import { Message, ApiResponse, SendMessageRequest } from '@/types';
 import { apiClient } from "../client";
 import { API_ENDPOINTS } from "../constants";
-import type { SendMessageRequest } from "@/types/message";
 
 export class MessageService {
   // Get messages between two users

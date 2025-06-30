@@ -8,7 +8,7 @@ export interface SystemStatus {
 
 export const systemStatusService = {
   async getStatus(): Promise<SystemStatus> {
-    const res = await apiClient.get<SystemStatus>(API_ENDPOINTS.ADMIN.SYSTEM_STATUS);
+    const res = await apiClient.get<SystemStatus>(API_ENDPOINTS.SYSTEM.STATUS);
     return res.data;
   },
   async setStatus(inMaintenance: boolean, message: string) {
@@ -17,7 +17,7 @@ export const systemStatusService = {
       inMaintenance: String(inMaintenance),
       message
     }).toString();
-    const endpoint = `${API_ENDPOINTS.ADMIN.SYSTEM_STATUS}?${params}`;
+    const endpoint = `${API_ENDPOINTS.SYSTEM.STATUS}?${params}`;
     return apiClient.put(endpoint, null);
   }
 }; 

@@ -7,7 +7,7 @@ import type { UserProfile } from './user';
 export interface Group {
   id: number;
   name: string;
-  description?: string;
+  description: string;
   avatar: string;
   members: User[];
   admins: User[];
@@ -23,9 +23,7 @@ export interface Group {
 export interface CreateGroupRequest {
   name: string;
   description?: string;
-  avatar?: string;
   isPrivate: boolean;
-  members: string[];
 }
 
 export interface GroupResponse {

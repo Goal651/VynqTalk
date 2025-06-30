@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { User } from "../types";
+import { User } from '@/types';
 import { X, UserPlus, UserMinus, Eye, EyeOff } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";

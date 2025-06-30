@@ -8,7 +8,7 @@ export interface Notification {
   title: string;
   user: User;
   message: string;
-  timestamp: Date;
+  timestamp: string;
   isRead: boolean;
   type: "info" | "warning" | "error" | "success";
 }

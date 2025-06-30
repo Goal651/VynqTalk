@@ -1,5 +1,5 @@
 import { formatDistanceToNow } from "date-fns";
-import { Message, User, Reaction } from "../types";
+import { Message, User, Reaction } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   ContextMenu,
@@ -91,14 +91,14 @@ export const MessageBubble = ({
 
   const messageBubble = (
     <div className="relative">
-      {message.replyToMessage && (
+      {message.replyTo && (
         <div className="flex items-center mb-2">
           <div className="border-l-4 border-primary bg-muted/60 px-3 py-1 rounded-md w-full">
             <span className="block text-xs font-semibold text-primary mb-0.5">
-              Replying to {message.replyToMessage.sender.name}
+              Replying to {message.replyTo.sender.name}
             </span>
             <span className="block text-xs text-muted-foreground truncate max-w-[200px]">
-              {message.replyToMessage.content}
+              {message.replyTo.content}
             </span>
           </div>
         </div>

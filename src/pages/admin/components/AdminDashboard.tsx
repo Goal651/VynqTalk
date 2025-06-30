@@ -86,12 +86,12 @@ export const AdminDashboard = () => {
                 onClick={() => console.log("Alert clicked:", alert.id)}
               >
                 <AlertTriangle className={`h-4 w-4 ${
-                  alert.type === "error" ? "text-red-500" : 
-                  alert.type === "warning" ? "text-yellow-500" : "text-blue-500"
+                  alert.level === "critical" ? "text-red-500" : 
+                  alert.level === "warning" ? "text-yellow-500" : "text-blue-500"
                 }`} />
                 <div className="flex-1">
                   <p className="text-sm font-medium">{alert.message}</p>
-                  <p className="text-xs text-muted-foreground">{new Date(alert.createdAt).toLocaleString()}</p>
+                  <p className="text-xs text-muted-foreground">{new Date(alert.timestamp).toLocaleString()}</p>
                 </div>
               </div>
             ))}
