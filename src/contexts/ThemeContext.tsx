@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 import { settingsService } from "@/api/services/settings";
 import { useAuth } from "./AuthContext";
 
-type Theme = "blue" | "dark" | "cyberpunk" | "neon" | "ocean" | "sunset";
+type Theme = "BLUE" | "DARK" | "CYBERPUNK" | "NEON" | "OCEAN" | "SUNSET"
 
 interface ThemeContextType {
   theme: Theme;
@@ -12,7 +12,11 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+<<<<<<< HEAD
   const [theme, setTheme] = useState<Theme>("dark");
+=======
+  const [theme, setTheme] = useState<Theme>("BLUE");
+>>>>>>> 27b528f22c0481684e653aff088b47f85c7acf06
   const { user } = useAuth();
   
   // Apply theme to document
