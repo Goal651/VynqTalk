@@ -229,7 +229,7 @@ export const Settings = () => {
     }
   }
 
-  const handleThemeChange = async (newTheme: "blue" | "dark" | "cyberpunk" | "neon" | "ocean" | "sunset") => {
+  const handleThemeChange = async (newTheme:  "BLUE" | "DARK" | "CYBERPUNK" | "NEON" | "OCEAN" | "SUNSET") => {
     if (!user?.id) return
     try {
       const updatedSettings = {
@@ -372,18 +372,18 @@ export const Settings = () => {
                 <Label>Theme</Label>
                 <Select
                   value={theme}
-                  onValueChange={(value: "blue" | "dark" | "cyberpunk" | "neon" | "ocean" | "sunset") => handleThemeChange(value)}
+                  onValueChange={(value:  "BLUE" | "DARK" | "CYBERPUNK" | "NEON" | "OCEAN" | "SUNSET") => handleThemeChange(value)}
                 >
                   <SelectTrigger className="cursor-pointer">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="blue">Classic</SelectItem>
-                    <SelectItem value="dark">Dark</SelectItem>
-                    <SelectItem value="cyberpunk">Cyberpunk</SelectItem>
-                    <SelectItem value="neon">Neon</SelectItem>
-                    <SelectItem value="ocean">Ocean</SelectItem>
-                    <SelectItem value="sunset">Sunset</SelectItem>
+                    <SelectItem value="BLUE">Classic</SelectItem>
+                    <SelectItem value="DARK">Dark</SelectItem>
+                    <SelectItem value="CYBERPUNK">Cyberpunk</SelectItem>
+                    <SelectItem value="NEON">Neon</SelectItem>
+                    <SelectItem value="OCEAN">Ocean</SelectItem>
+                    <SelectItem value="SUNSET">Sunset</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

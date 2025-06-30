@@ -12,11 +12,7 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-<<<<<<< HEAD
-  const [theme, setTheme] = useState<Theme>("dark");
-=======
   const [theme, setTheme] = useState<Theme>("BLUE");
->>>>>>> 27b528f22c0481684e653aff088b47f85c7acf06
   const { user } = useAuth();
   
   // Apply theme to document
@@ -43,7 +39,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       
       // Fallback to localStorage if backend fails or user is not logged in
       const savedTheme = localStorage.getItem("vynq-theme") as Theme | null;
-      if (savedTheme && ["blue", "dark", "cyberpunk", "neon", "ocean", "sunset"].includes(savedTheme)) {
+      if (savedTheme && [ "BLUE" , "DARK" , "CYBERPUNK" , "NEON" , "OCEAN" , "SUNSET"].includes(savedTheme)) {
         setTheme(savedTheme);
       }
     };

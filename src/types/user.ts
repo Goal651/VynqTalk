@@ -38,7 +38,7 @@ export interface UserSettings {
   readReceipts?: boolean;
   showOnlineStatus?: boolean;
   soundEnabled?: boolean;
-  theme?: "blue" | "dark" | "cyberpunk" | "neon" | "ocean" | "sunset";
+  theme?: "BLUE" | "DARK" | "CYBERPUNK" | "NEON" | "OCEAN" | "SUNSET";
   timezone?: string;
   user: User;
 }

@@ -24,11 +24,7 @@ const signupSchema = z.object({
 
 interface AuthFormProps {
   type: 'login' | 'signup';
-<<<<<<< HEAD
-  onSubmit: (values:unknown) => Promise<void>;
-=======
   onSubmit: (values: unknown) => Promise<void>;
->>>>>>> 27b528f22c0481684e653aff088b47f85c7acf06
   isLoading: boolean;
 }
 

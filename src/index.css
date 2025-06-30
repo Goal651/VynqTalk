@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 @layer base {
-  [data-theme="dark"] {
+  [data-theme="DARK"] {
     --background: 240 10% 3.9%;
     --foreground: 0 0% 98%;
     --card: 240 10% 3.9%;
@@ -26,7 +26,7 @@
     --ring: 240 4.9% 83.9%;
   }
   
-  [data-theme="blue"] {
+  [data-theme="BLUE"] {
     --background: 217 76% 98%;
     --foreground: 222 47% 11%;
     --card: 0 0% 100%;
@@ -48,7 +48,7 @@
     --ring: 221 83% 53%;
   }
   
-  [data-theme="cyberpunk"] {
+  [data-theme="CYBERPUNK"] {
     --background: 254 63% 8%;
     --foreground: 320 70% 75%;
     --card: 254 63% 12%;
@@ -70,7 +70,7 @@
     --ring: 317 100% 54%;
   }
   
-  [data-theme="neon"] {
+  [data-theme="NEON"] {
     --background: 300 20% 7%;
     --foreground: 310 100% 90%;
     --card: 300 20% 10%;
@@ -92,7 +92,7 @@
     --ring: 315 100% 60%;
   }
   
-  [data-theme="ocean"] {
+  [data-theme="OCEAN"] {
     --background: 200 40% 8%;
     --foreground: 180 100% 90%;
     --card: 200 40% 12%;
@@ -114,7 +114,7 @@
     --ring: 190 100% 50%;
   }
   
-  [data-theme="sunset"] {
+  [data-theme="SUNSET"] {
     --background: 25 30% 8%;
     --foreground: 50 100% 90%;
     --card: 25 30% 12%;
