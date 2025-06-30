@@ -25,7 +25,7 @@ export const Navbar = ({ onLogout, user }: NavbarProps) => {
   ];
 
   const adminNavItem: NavItem = { id: "admin", label: "Admin", icon: Shield, path: "/admin" };
-  const navItems = user?.isAdmin ? [...baseNavItems, adminNavItem] : baseNavItems;
+  const navItems = user?.userRole=='ADMIN' ? [...baseNavItems, adminNavItem] : baseNavItems;
 
   const handleLogout = () => {
     if (onLogout) {

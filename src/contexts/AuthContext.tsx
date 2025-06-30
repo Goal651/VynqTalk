@@ -64,7 +64,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
           email: apiUser.email,
           avatar: apiUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${apiUser.name}`,
           isOnline: apiUser.isOnline,
-          isAdmin: apiUser.isAdmin || false
+          userRole: apiUser.userRole || "USER"
         };
 
         setUser(user);
@@ -114,7 +114,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
           email: apiUser.email,
           avatar: apiUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${apiUser.name}`,
           isOnline: apiUser.isOnline,
-          isAdmin: apiUser.isAdmin || false
+          userRole: apiUser.userRole || "USER"
         };
 
         setUser(user);

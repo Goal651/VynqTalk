@@ -23,7 +23,7 @@ export const AdminPanel = () => {
 
   // Check if user is admin
   useEffect(() => {
-    if (user && !user.isAdmin) {
+    if (user && user.userRole !== 'ADMIN') {
       toast({
         title: "Unauthorized",
         description: "You are not authorized to access this page.",
@@ -33,7 +33,7 @@ export const AdminPanel = () => {
   }, [user]);
 
   // Redirect if user is not admin
-  if (!user || !user.isAdmin) {
+  if (!user || user.userRole !== 'ADMIN') {
     return <Navigate to="/login" replace />;
   }
 

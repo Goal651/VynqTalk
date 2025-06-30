@@ -43,8 +43,8 @@ const AppWithMaintenance = () => {
 
   if (error) return <div className="flex items-center justify-center h-screen text-destructive">{error}</div>;
   if (!maintenance) return <div>Loading...</div>;
-  // Allow admin to bypass maintenance mode
-  if (maintenance.inMaintenance && !(user && user.isAdmin)) {
+      // Allow admin to bypass maintenance mode
+    if (maintenance.inMaintenance && !(user && user.userRole === 'ADMIN')) {
     return <MaintenancePage message={maintenance.message} />;
   }
   return <AppRoutes />;

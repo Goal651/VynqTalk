@@ -4,11 +4,10 @@
  * @property {string} createdAt - The date the user was created.
  * @property {string} email - The user's email address (optional).
  * @property {number} id - The user's unique identifier.
- * @property {boolean} isAdmin - Whether the user is an admin.
  * @property {boolean} isOnline - Whether the user is currently online (optional).
  * @property {string} lastActive - The last time the user was active.
  * @property {string} name - The user's display name.
- * @property {string} role - The user's role (optional).
+ * @property {string} userRole - The user's role ("USER" | "ADMIN").
  * @property {"active"|"blocked"|"suspended"} status - The user's status.
  */
 export interface User {
@@ -16,11 +15,10 @@ export interface User {
   createdAt: string;
   email?: string;
   id: number;
-  isAdmin: boolean;
   isOnline?: boolean;
   lastActive: string;
   name: string;
-  role?: "user" | "admin";
+  userRole: "USER" | "ADMIN";
   status: "active" | "blocked" | "suspended";
 }
 
@@ -70,7 +68,7 @@ export interface UserProfile {
 export interface UpdateUserRequest {
   avatar?: string;
   email?: string;
-  isAdmin?: boolean;
+  userRole?: "USER" | "ADMIN";
   name?: string;
   status?: 'active' | 'blocked' | 'suspended';
 }
