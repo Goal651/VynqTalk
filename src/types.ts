@@ -14,7 +14,7 @@ export interface User {
 export interface UserSettings {
   id: number;
   user: User;
-  theme?: "blue" | "dark" | "cyberpunk" | "neon" | "ocean" | "sunset"
+  theme?: "BLUE" | "DARK" | "CYBERPUNK" | "NEON" | "OCEAN" | "SUNSET"
   language?: string;
   timezone?: string;
   notificationEnabled?: boolean;
