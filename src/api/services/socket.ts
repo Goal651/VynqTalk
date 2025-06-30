@@ -4,7 +4,7 @@ import { Message, GroupMessage, User, Group } from '@/types';
 import { API_CONFIG } from '../constants';
 
 class SocketService {
-    private stompClient: Client;
+    public stompClient: Client;
     private onlineUsers: Map<string, string> = new Map();
     private onlineUserListeners: ((users: Map<string, string>) => void)[] = [];
     private messageListeners: ((message: Message) => void)[] = [];
@@ -25,9 +25,12 @@ class SocketService {
                         this.logout();
                         throw new Error('Missing access token');
                     }
-                    return new SockJS(`${API_CONFIG.BASE_URL}/ws?token=${encodeURIComponent(token)}`, null, {
+                    const wsUrl = `${API_CONFIG.BASE_URL}/ws?token=${encodeURIComponent(token)}`;
+                    console.log('🔗 Creating WebSocket connection to:', wsUrl);
+                    return new SockJS(wsUrl, null, {
                         transports: ['websocket', 'xhr-polling', 'eventsource'],
-                        timeout: 10000
+                        timeout: 10000,
+                        heartbeat: { outgoing: 10000, incoming: 10000 }
                     });
                 } catch (error) {
                     console.error('Failed to initialize WebSocket factory:', error.message);
@@ -38,7 +41,7 @@ class SocketService {
             reconnectDelay: 5000,
             onConnect: () => {
                 try {
-                    console.log('WebSocket connected');
+                    console.log('✅ WebSocket connected successfully');
                     this.connectionAttempts = 0; // Reset attempts
                     this.subscribeToPublic();
                 } catch (error) {
@@ -190,6 +193,8 @@ class SocketService {
                 this.logout();
                 return;
             }
+            console.log('Attempting to connect to WebSocket...');
+            console.log('WebSocket URL:', `${API_CONFIG.BASE_URL}/ws?token=${encodeURIComponent(token)}`);
             this.stompClient.activate();
         } catch (error) {
             console.error('Error connecting to WebSocket:', error.message);
@@ -213,15 +218,21 @@ class SocketService {
         }
     }
 
+    public isConnected(): boolean {
+        return this.stompClient?.connected || false;
+    }
+
     private subscribeToPublic() {
         try {
+            console.log('📡 Subscribing to WebSocket topics...');
             this.stompClient.subscribe('/topic/onlineUsers', (message) => this.handleOnlineUsers(message));
             this.stompClient.subscribe('/topic/messages', (message) => this.handleMessage(message));
             this.stompClient.subscribe('/topic/reactions', (message) => this.handleReaction(message));
             this.stompClient.subscribe('/topic/groupMessages', (message) => this.handleGroupMessage(message));
             this.stompClient.subscribe('/topic/systemMetrics', (message) => this.handleSystemMetrics(message));
+            console.log('✅ Successfully subscribed to all WebSocket topics');
         } catch (error) {
-            console.error('Error subscribing to public topics:', error.message);
+            console.error('❌ Error subscribing to public topics:', error.message);
         }
     }
 

@@ -2,6 +2,7 @@ import { Home, Users, Settings, Bell, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { User } from "@/types/user";
 import { Link, useLocation } from "react-router-dom";
+import { WebSocketStatus } from "./WebSocketStatus";
 
 type NavItem = {
   id: "chat" | "group" | "settings" | "notifications" | "admin";
@@ -68,6 +69,7 @@ export const Navbar = ({ onLogout, user }: NavbarProps) => {
           </nav>
         </div>
         <div className="flex items-center gap-3">
+          <WebSocketStatus />
           {user && (
             <div className="hidden sm:flex items-center text-sm text-muted-foreground mr-2 bg-secondary/50 rounded-lg px-3 py-1.5">
               <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>

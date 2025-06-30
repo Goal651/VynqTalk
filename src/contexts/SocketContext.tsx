@@ -7,8 +7,10 @@ export const useSocket = () => useContext(SocketContext);
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     useEffect(() => {
+        console.log('🔌 SocketProvider: Initializing WebSocket connection...');
         socketService.connect();
         return () => {
+            console.log('🔌 SocketProvider: Cleaning up WebSocket connection...');
             socketService.disconnect();
         };
     }, []);
