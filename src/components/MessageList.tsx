@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Message } from "@/types/message";
+import { Message, Reaction } from "@/types/message";
 import { User } from "@/types/user";
 import { MessageBubble } from "./MessageBubble";
 
@@ -10,7 +10,7 @@ interface MessageListProps {
   onDeleteMessage?: (messageId: number) => void;
   onEditMessage?: (message: Message) => void;
   onReplyMessage?: (message: Message) => void;
-  onReactToMessage?: (messageId: number, emoji: string) => void;
+  onReactToMessage?: (messageId: number, reaction:Reaction) => void;
   currentUserId?: number;
 }
 

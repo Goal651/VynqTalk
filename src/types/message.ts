@@ -13,8 +13,8 @@ export interface Message {
   content: string;
   timestamp: string;
   edited?: boolean;
-  type: "text" | "image" | "audio" | "file";
-  reactions?: string[];
+  type: "TEXT" | "IMAGE" | "AUDIO" | "FILE";
+  reactions?: Reaction[];
   replyTo?: Message;
 }
 
@@ -37,7 +37,7 @@ export interface GroupMessage {
   /** The message this is replying to, if any */
   replyTo?: GroupMessage;
   /** Type of the message */
-  type: 'text' | 'image' | 'audio' | 'file';
+  type: "TEXT" | "IMAGE" | "AUDIO" | "FILE";
   /** Timestamp of the message */
   timestamp: string;
 }
@@ -46,9 +46,8 @@ export interface GroupMessage {
  * Represents a reaction to a message.
  */
 export interface Reaction {
-  id: number;
+  userId: number;
   emoji: string;
-  user: User;
 }
 
 
@@ -59,7 +58,7 @@ export interface SendMessageRequest {
   content: string;
   receiverId: number;
   senderId: number;
-  type?: "text" | "image" | "audio" | "file";
+  type?: "TEXT" | "IMAGE" | "AUDIO" | "FILE";
   replyToId?: number;
 }
 
@@ -69,6 +68,6 @@ export interface SendMessageRequest {
 export interface SendGroupMessageRequest {
   content: string;
   groupId: number;
-  type?: "text" | "image" | "audio" | "file";
+  type?: "TEXT" | "IMAGE" | "AUDIO" | "FILE";
   replyToId?: number;
 } 

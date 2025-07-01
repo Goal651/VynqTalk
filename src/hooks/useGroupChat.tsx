@@ -5,6 +5,23 @@ import { useToast } from "@/hooks/use-toast"
 import { useSocket } from "@/contexts/SocketContext"
 import { groupMessageService } from "@/api/services/groupMessages"
 
+// Utility to deduplicate reactions: only one per userId+emoji, ignore invalid userIds
+function deduplicateReactions(reactions: { userId: number|string|null, emoji: string }[]): { userId: number, emoji: string }[] {
+  const seen = new Set();
+  return reactions
+    .map(r => ({
+      userId: typeof r.userId === "string" ? Number(r.userId) : r.userId,
+      emoji: r.emoji
+    }))
+    .filter(r => {
+      if (!r.userId || typeof r.userId !== "number" || isNaN(r.userId)) return false;
+      const key = `${r.userId}-${r.emoji}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
+
 export const useGroupChat = (group: Group) => {
   const { user } = useAuth()
   const { toast } = useToast()
@@ -35,20 +52,24 @@ export const useGroupChat = (group: Group) => {
   useEffect(() => {
     if (!socket) return;
     const handleMessage = (message: GroupMessage) => {
+      // Deduplicate reactions before updating state
+      const cleanedReactions = deduplicateReactions(message.reactions || []);
       setMessages(prevMessages => {
         if (message.sender.id === user?.id) {
           return prevMessages.map(m =>
             m.content === message.content &&
             m.sender.id === message.sender.id
-              ? { ...m, id: message.id }
+              ? { ...m, id: message.id, reactions: cleanedReactions }
               : m
           );
         }
         const messageExists = prevMessages.some(m => m.id === message.id);
         if (messageExists) {
-          return prevMessages;
+          return prevMessages.map(m =>
+            m.id === message.id ? { ...m, reactions: cleanedReactions } : m
+          );
         }
-        return [...prevMessages, message];
+        return [...prevMessages, { ...message, reactions: cleanedReactions }];
       });
     };
     socket.onGroupMessage(handleMessage);
@@ -72,7 +93,7 @@ export const useGroupChat = (group: Group) => {
       group: group,
       content: content,
       timestamp: new Date().toISOString(),
-      type: "text",
+      type: "TEXT",
       replyTo: replyData,
       reactions: [],
       isEdited: false,
@@ -106,21 +127,17 @@ export const useGroupChat = (group: Group) => {
       return prevMessages.map(message => {
         if (message.id !== messageId) return message;
         const existingReaction = message.reactions.find(
-          r => r.emoji === emoji && r.user.id === user.id
+          r => r.emoji === emoji && r.userId === user.id
         );
         let updatedReactions;
         if (existingReaction) {
           updatedReactions = message.reactions.filter(
-            r => !(r.emoji === emoji && r.user.id === user.id)
+            r => !(r.emoji === emoji && r.userId === user.id)
           );
         } else {
           updatedReactions = [
             ...message.reactions,
-            {
-              id: Date.now(),
-              emoji,
-              user: user,
-            },
+            { userId: user.id, emoji }
           ];
         }
         if (socket) {

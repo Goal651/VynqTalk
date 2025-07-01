@@ -152,6 +152,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setUser(null);
       setIsAuthenticated(false);
+      navigate('/login')
       toast({
         title: "Logged out",
         description: "You have been logged out successfully",

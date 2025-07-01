@@ -1,9 +1,26 @@
 import { useState, useEffect } from "react"
-import { User, Message } from '@/types'
+import { User, Message, Reaction } from '@/types'
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 import { useSocket } from "@/contexts/SocketContext"
 import { messageService } from "@/api/services/messages"
+
+// Utility to deduplicate reactions: only one per userId+emoji, ignore invalid userIds
+function deduplicateReactions(reactions: { userId: number|string|null, emoji: string }[]): { userId: number, emoji: string }[] {
+  const seen = new Set();
+  return reactions
+    .map(r => ({
+      userId: typeof r.userId === "string" ? Number(r.userId) : r.userId,
+      emoji: r.emoji
+    }))
+    .filter(r => {
+      if (!r.userId || typeof r.userId !== "number" || isNaN(r.userId)) return false;
+      const key = `${r.userId}-${r.emoji}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+}
 
 export const useChat = () => {
   const { user } = useAuth()
@@ -61,10 +78,12 @@ export const useChat = () => {
 
     const handleReaction = (message: Message) => {
       console.log("Received reaction:", message)
+      // Deduplicate reactions before updating state
+      const cleanedReactions = deduplicateReactions(message.reactions || []);
       setMessages(prevMessages => 
         prevMessages.map(m => 
           m.id === message.id 
-            ? { ...m, reactions: message.reactions }
+            ? { ...m, reactions: cleanedReactions }
             : m
         )
       )
@@ -97,7 +116,7 @@ export const useChat = () => {
       content: content,
       timestamp: new Date().toISOString(),
       receiver: activeChat,
-      type: "text",
+      type: "TEXT",
       replyTo,
       reactions: []
     }
@@ -156,44 +175,47 @@ export const useChat = () => {
     setReplyTo(null)
   }
 
-  const handleReactToMessage = (messageId: number, emoji: string) => {
-    console.log("React to message:", messageId, "with emoji:", emoji)
+  const handleReactToMessage = (messageId: number, reaction: Reaction) => {
+    console.log("React to message:", messageId, "with emoji:", reaction.emoji)
 
     setMessages(prevMessages => {
       let hasExistingReaction = false
-      
       const updatedMessages = prevMessages.map(message => {
         if (message.id === messageId) {
           const reactions = message.reactions || []
-          const existingReaction = reactions.find(r => r === emoji)
-          hasExistingReaction = !!existingReaction
-
-          let updatedReactions: string[]
+          const existingReaction = reactions.find(
+            r => r.emoji === reaction.emoji && r.userId === reaction.userId
+          );
+          let updatedReactions: Reaction[]
           if (existingReaction) {
-            updatedReactions = reactions.filter(r => r !== emoji)
+            // Remove only this user's reaction for this emoji
+            updatedReactions = reactions.filter(
+              r => !(r.emoji === reaction.emoji && r.userId === reaction.userId)
+            );
+            hasExistingReaction = true
           } else {
-            updatedReactions = [...reactions, emoji]
+            // Add this user's reaction for this emoji
+            updatedReactions = [
+              ...reactions,
+              { userId: reaction.userId, emoji: reaction.emoji }
+            ];
+            hasExistingReaction = false
           }
-
           const updatedMessage = {
             ...message,
             reactions: updatedReactions
           }
-
           if (socket) {
             socket.messageReact(messageId, updatedReactions)
           }
-          
           return updatedMessage
         }
         return message
       })
-
       toast({
         title: hasExistingReaction ? "Reaction removed" : "Reaction added",
-        description: hasExistingReaction ? `Removed ${emoji}` : `Reacted with ${emoji}`,
+        description: hasExistingReaction ? `Removed ${reaction.emoji}` : `Reacted with ${reaction.emoji}`,
       })
-
       return updatedMessages
     })
   }
