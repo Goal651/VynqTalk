@@ -136,10 +136,10 @@ export const Notifications = () => {
 
   return (
     <div className="h-full flex flex-col bg-gradient-to-br from-background to-secondary/5">
-      <div className="flex-shrink-0 p-6 border-b space-y-6 bg-background/50 backdrop-blur-sm">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2">
+      <div className="flex-shrink-0 text-center p-6 border-b space-y-6 bg-background/50 backdrop-blur-sm">
+        <div className="flex justify-between items-center  w-full">
+          <div className="flex flex-col gap-y-6 w-full "> 
+            <h1 className="text-2xl font-bold flex justify-center items-center gap-2">
               <Bell className="h-6 w-6" />
               Notifications
               {unreadCount > 0 && (
@@ -148,7 +148,6 @@ export const Notifications = () => {
                 </Badge>
               )}
             </h1>
-            <p className="text-muted-foreground">Stay updated with your latest activity</p>
           </div>
           {unreadCount > 0 && (
             <Button 

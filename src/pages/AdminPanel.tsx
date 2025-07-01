@@ -54,6 +54,7 @@ export const AdminPanel = () => {
 
   return (
     <div className="h-full flex flex-col bg-gradient-to-br from-background via-background to-secondary/20">
+      <ScrollArea className="flex-1">
       <div className="flex-shrink-0 p-6 border-b border-border/50 space-y-6 bg-gradient-to-r from-background via-card/50 to-background backdrop-blur-sm">
         <div className="flex items-center justify-between">
           <div>
@@ -89,7 +90,7 @@ export const AdminPanel = () => {
         </div>
       </div>
 
-      <ScrollArea className="flex-1">
+      
         <div className="p-6 space-y-6 max-w-7xl mx-auto">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList className="grid w-full grid-cols-7 bg-muted/50 border border-border/30">

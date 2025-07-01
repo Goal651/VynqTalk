@@ -293,7 +293,7 @@ export const Settings = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex-shrink-0 p-6 border-b">
+      <div className=" text-center p-6 border-b ">
         <h1 className="text-2xl font-bold">Settings</h1>
         <p className="text-muted-foreground">Manage your account and application preferences</p>
       </div>

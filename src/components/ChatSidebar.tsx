@@ -28,7 +28,7 @@ export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps
     console.log("Call initiated:", type, "with", user.name);
     setCallingUser(user);
     setCallType(type);
-    
+
     toast({
       title: `${type === "audio" ? "Voice" : "Video"} call`,
       description: `Calling ${user.name}...`,
@@ -55,19 +55,7 @@ export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps
 
   return (
     <div className="w-80 border-r border-border flex flex-col h-full bg-card relative z-10">
-      <div className="p-4 border-b border-border bg-background/80 flex-shrink-0">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Chats</h2>
-          <Button  
-            size="icon" 
-            variant="ghost" 
-            onClick={handleNewChat}
-            className="cursor-pointer hover:bg-accent transition-colors"
-            type="button"
-          >
-            <Plus className="h-5 w-5" />
-          </Button>
-        </div>
+      <div className="p-2 border-b border-border bg-background/80 flex-shrink-0">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
           <Input
@@ -84,9 +72,8 @@ export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps
           {filteredUsers.map((user) => (
             <div
               key={user.id}
-              className={`flex items-center p-3 hover:bg-muted/50 cursor-pointer border-b border-border group transition-all duration-200 ${
-                activeChat?.id === user.id ? "bg-muted/50 border-l-4 border-l-primary" : "hover:bg-accent/30"
-              }`}
+              className={`flex items-center p-3 hover:bg-muted/50 cursor-pointer border-b border-border group transition-all duration-200 ${activeChat?.id === user.id ? "bg-muted/50 border-l-4 border-l-primary" : "hover:bg-accent/30"
+                }`}
               onClick={() => handleUserClick(user)}
             >
               <div className="relative">
@@ -106,37 +93,9 @@ export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps
                   {activeChat?.id === user.id ? "Active chat" : user.isOnline ? "Online" : "Offline"}
                 </div>
               </div>
-              <div className="flex space-x-1">
-                <Button  
-                  size="icon" 
-                  variant="ghost" 
-                  className="h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-green-100 hover:text-green-600"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleCall(user, "audio");
-                  }}
-                  type="button"
-                  title={`Call ${user.name}`}
-                >
-                  <Phone className="h-4 w-4" />
-                </Button>
-                <Button  
-                  size="icon" 
-                  variant="ghost" 
-                  className="h-7 w-7 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-blue-100 hover:text-blue-600"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleCall(user, "video");
-                  }}
-                  type="button"
-                  title={`Video call ${user.name}`}
-                >
-                  <Video className="h-4 w-4" />
-                </Button>
-              </div>
             </div>
           ))}
-          
+
           {filteredUsers.length === 0 && searchTerm && (
             <div className="p-4 text-center text-muted-foreground">
               No users found matching "{searchTerm}"
@@ -144,32 +103,6 @@ export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps
           )}
         </div>
       </ScrollArea>
-
-      {callType && callingUser && (
-        <CallPreview 
-          user={callingUser} 
-          type={callType} 
-          isOutgoing={true}
-          onAccept={() => {
-            console.log("Call accepted with", callingUser.name);
-            toast({
-              title: "Call connected",
-              description: `Connected with ${callingUser.name}`,
-            });
-            setCallType(null);
-            setCallingUser(null);
-          }}
-          onDecline={() => {
-            console.log("Call declined with", callingUser.name);
-            toast({
-              title: "Call ended",
-              description: "Call was declined",
-            });
-            setCallType(null);
-            setCallingUser(null);
-          }}
-        />
-      )}
     </div>
   );
 };

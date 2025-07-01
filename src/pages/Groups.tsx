@@ -208,8 +208,8 @@ export const Groups = () => {
   }
 
   return (
-    <div className="p-6 space-y-6 z-20">
-      <div className="flex justify-between items-center">
+    <div className="p-6 space-y-6 z-20 px-40">
+      <div className="flex justify-between items-center px-72">
         <div>
           <h1 className="text-2xl font-bold">Groups</h1>
           <p className="text-muted-foreground">Manage your group conversations</p>

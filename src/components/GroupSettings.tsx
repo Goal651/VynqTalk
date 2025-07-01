@@ -201,7 +201,7 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full px-40">
       <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full">
           <div className="p-6 space-y-6">

@@ -98,7 +98,7 @@ export const GroupChat = ({ group, users }: GroupChatProps) => {
                 <div className="flex flex-wrap gap-1 mt-1">
                   {message.reactions.map((reaction, index) => (
                     <span
-                      key={reaction.id}
+                      key={index}
                       className="text-xs cursor-pointer hover:bg-muted/50 rounded px-1 transition-colors"
                       onClick={() => handleReactToMessage(message.id, reaction.emoji)}
                     >

@@ -2,6 +2,7 @@ import { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import { Phone, Video, MoreVertical, MessageSquare } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 
 interface ChatHeaderProps {
   onlineUsers: Map<string, string>;
@@ -36,19 +37,19 @@ export const ChatHeader = ({ onlineUsers, activeChat, onVoiceCall, onVideoCall, 
 
         {activeChat && (
           <div className="flex items-center space-x-3 ">
-            <div className="flex items-center space-x-3 cursor-pointer"   onClick={ handleUserClick}>
-              <div className="relative"
-              
-              >
-                <img
-                  src={activeChat.avatar||''}
-                  alt={activeChat.name}
-                  className="w-9 h-9 rounded-full border-2 border-primary/20 shadow-md ring-2 ring-background overflow-hidden"
-                />
+            <div className="flex items-center space-x-3 cursor-pointer" onClick={handleUserClick}>
+              <div className="relative ">
+                <Avatar className={` cursor-pointer transition-transform hover:scale-105 ${isOnline ? "ring-2 ring-green-500" : ""}`}>
+                  <AvatarImage src={activeChat.avatar} alt={activeChat.name} className="w-10 h-10 rounded-full" />
+                  <AvatarFallback className="rounded-full p-3 bg-primary/10 text-primary font-bold">
+                    {activeChat.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
                 {isOnline && (
-                  <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-background rounded-full shadow-sm"></span>
+                  <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-background animate-pulse"></span>
                 )}
               </div>
+
               <div>
                 <div className="font-semibold text-sm text-foreground">{activeChat.name}</div>
                 <div className="text-xs text-muted-foreground flex items-center">

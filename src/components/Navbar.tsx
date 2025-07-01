@@ -39,9 +39,9 @@ export const Navbar = ({ onLogout, user }: NavbarProps) => {
 
   return (
     <header className="border-b border-border bg-card/50 backdrop-blur-lg p-2 relative z-50 shadow-lg">
-      <div className="container mx-auto flex items-center justify-between">
-        <div className="flex items-center">
-          <div className="flex items-center mr-6">
+      <div className="container  mx-auto flex items-center justify-between">
+        <div className="flex  items-center">
+          <div className="flex items-center mr-16">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center mr-3">
               <span className="text-primary-foreground font-bold text-lg">V</span>
             </div>
@@ -56,7 +56,7 @@ export const Navbar = ({ onLogout, user }: NavbarProps) => {
                   type="button"
                   variant={activeTab === item.id ? "default" : "ghost"}
                   size="sm"
-                  className="flex items-center gap-2 cursor-pointer hover:bg-accent/50 transition-all duration-200 relative group"
+                  className="flex items-center gap-4 cursor-pointer hover:bg-accent/50 transition-all duration-200 relative group"
                 >
                   <item.icon className="h-4 w-4" />
                   <span>{item.label}</span>
@@ -98,13 +98,13 @@ export const Navbar = ({ onLogout, user }: NavbarProps) => {
               type="button"
               variant="ghost"
               size="sm"
-              className={`flex flex-col items-center py-2 cursor-pointer transition-all duration-200 relative ${
+              className={`flex flex-col py-6 items-center cursor-pointer transition-all duration-200 relative ${
                 activeTab === item.id
                   ? "text-primary bg-accent/50 shadow-sm"
                   : "text-muted-foreground hover:text-foreground hover:bg-accent/30"
               }`}
             >
-              <item.icon className="h-5 w-5 mb-1" />
+              <item.icon className="h-4 w-4 " />
               <span className="text-xs font-medium">{item.label}</span>
               {activeTab === item.id && (
                 <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full" />
