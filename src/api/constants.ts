@@ -2,7 +2,7 @@
 //DEDPLOY_URL=https://vynqtalk-server-production.up.railway.app
 
 export const API_CONFIG = {
-  BASE_URL: 'https://vynqtalk-server-production.up.railway.app',
+  BASE_URL: import.meta.env.MODE === 'development' ? 'http://localhost:8080' : 'https://vynqtalk-server-production.up.railway.app',
   API_VERSION: 'v1',
   TIMEOUT: 10000,
 };

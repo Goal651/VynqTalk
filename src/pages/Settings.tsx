@@ -26,7 +26,7 @@ export const Settings = () => {
 
   const [profileData, setProfileData] = useState({
     name: user?.name || "",
-    email: user?.email || "",
+    bio: user?.bio || "",
   })
 
   const [settings, setSettings] = useState<UserSettings>({
@@ -80,7 +80,7 @@ export const Settings = () => {
     if (!user?.id) return
     try {
       setSettings((prev) => {
-        return { ...prev, user: { ...user, name: profileData.name, email: profileData.email } }
+        return { ...prev, user: { ...user, name: profileData.name, email: profileData.bio } }
       })
       const response = await userService.updateProfile(user.id, settings.user)
 
@@ -338,10 +338,10 @@ export const Settings = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">Bio</Label>
                     <Input
                       id="email"
-                      value={profileData.email}
+                      value={profileData.bio}
                       onChange={(e) => {
                         setProfileData(prev => ({ ...prev, email: e.target.value }))
                       }}

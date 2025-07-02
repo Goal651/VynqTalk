@@ -25,7 +25,7 @@ class SocketService {
                         this.logout();
                         throw new Error('Missing access token');
                     }
-                    const wsUrl = `${API_CONFIG.BASE_URL}/ws?token=${encodeURIComponent(token)}`;
+                    const wsUrl = `${API_CONFIG.BASE_URL}/api/${API_CONFIG.API_VERSION}/ws?token=${encodeURIComponent(token)}`;
                     console.log('🔗 Creating WebSocket connection to:', wsUrl);
                     return new SockJS(wsUrl, null, {
                         transports: ['websocket', 'xhr-polling', 'eventsource'],
@@ -93,7 +93,7 @@ class SocketService {
             if (!refreshToken) {
                 throw new Error('No refresh token available');
             }
-            const response = await fetch(`${API_CONFIG.BASE_URL}/api/v1/auth/refresh`, {
+            const response = await fetch(`${API_CONFIG.BASE_URL}/api/${API_CONFIG.API_VERSION}/auth/refresh`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ refreshToken })
@@ -194,7 +194,7 @@ class SocketService {
                 return;
             }
             console.log('Attempting to connect to WebSocket...');
-            console.log('WebSocket URL:', `${API_CONFIG.BASE_URL}/ws?token=${encodeURIComponent(token)}`);
+            console.log('WebSocket URL:', `${API_CONFIG.BASE_URL}/api/${API_CONFIG.API_VERSION}/ws?token=${encodeURIComponent(token)}`);
             this.stompClient.activate();
         } catch (error) {
             console.error('Error connecting to WebSocket:', error.message);

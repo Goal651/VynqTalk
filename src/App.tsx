@@ -45,6 +45,7 @@ const AppWithMaintenance = () => {
   }, [])
 
   useEffect(() => {
+   
     if (
       maintenance &&
       maintenance.inMaintenance &&
@@ -57,7 +58,14 @@ const AppWithMaintenance = () => {
   }, [maintenance, user, location, navigate]);
 
   if (error) return <div className="flex items-center justify-center h-screen text-destructive">{error}</div>
-  if (!maintenance) return <div>Loading...</div>
+  if (!maintenance) return (
+    <div className="flex items-center justify-center h-screen bg-background">
+      <div className="flex flex-col items-center gap-4">
+        <span className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        <span className="text-lg text-muted-foreground font-medium">Checking system status...</span>
+      </div>
+    </div>
+  )
 
   if (
     maintenance.inMaintenance &&
@@ -108,7 +116,6 @@ const App = () => (
     <TooltipProvider>
       <Sonner />
       <BrowserRouter>
-
         <AuthProvider>
           <ThemeProvider>
             <SocketProvider>

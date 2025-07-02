@@ -20,6 +20,7 @@ export interface User {
   name: string;
   userRole: "USER" | "ADMIN";
   status: "active" | "blocked" | "suspended";
+  bio:string
 }
 
 /**
