@@ -2,6 +2,7 @@
 import type { User } from "./user";
 import type { Group } from "./group";
 
+export type MessageType = "TEXT" | "IMAGE" | "AUDIO" | "FILE" | "VIDEO";
 
 /**
  * Represents a direct message between users.
@@ -13,33 +14,26 @@ export interface Message {
   content: string;
   timestamp: string;
   edited?: boolean;
-  type: "TEXT" | "IMAGE" | "AUDIO" | "FILE";
+  type: MessageType;
   reactions?: Reaction[];
   replyTo?: Message;
+  fileName?: string;
 }
 
 /**
  * Represents a message in a group chat.
  */
 export interface GroupMessage {
-  /** Unique identifier for the message */
   id: number;
-  /** ID of the group this message belongs to */
   group: Group;
-  /** ID of the sender */
   sender: User;
-  /** Content of the message */
   content: string;
-  /** Whether the message has been edited */
   isEdited: boolean;
-  /** Array of reactions to the message */
   reactions: Reaction[];
-  /** The message this is replying to, if any */
   replyTo?: GroupMessage;
-  /** Type of the message */
-  type: "TEXT" | "IMAGE" | "AUDIO" | "FILE";
-  /** Timestamp of the message */
+  type: MessageType
   timestamp: string;
+  fileName?: string;
 }
 
 /**
@@ -51,23 +45,3 @@ export interface Reaction {
 }
 
 
-/**
- * Request payload for sending a direct message.
- */
-export interface SendMessageRequest {
-  content: string;
-  receiverId: number;
-  senderId: number;
-  type?: "TEXT" | "IMAGE" | "AUDIO" | "FILE";
-  replyToId?: number;
-}
-
-/**
- * Request payload for sending a group message.
- */
-export interface SendGroupMessageRequest {
-  content: string;
-  groupId: number;
-  type?: "TEXT" | "IMAGE" | "AUDIO" | "FILE";
-  replyToId?: number;
-} 

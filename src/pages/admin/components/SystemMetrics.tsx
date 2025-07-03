@@ -17,17 +17,17 @@ export const SystemMetrics = () => {
             <Card 
               key={index} 
               className="cursor-pointer hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-background to-background/50 border-border/30"
-              onClick={() => console.log("System metric clicked:", metric.metric)}
+              onClick={() => console.log("System metric clicked:", metric.name)}
             >
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">{metric.metric}</p>
-                    <p className="text-2xl font-bold">{metric.value}</p>
+                    <p className="text-sm font-medium text-muted-foreground">{metric.name}</p>
+                    <p className="text-2xl font-bold">{metric.value}%</p>
                   </div>
                   <div className={`h-3 w-3 rounded-full ${
-                    metric.status === "good" ? "bg-green-500" :
-                    metric.status === "warning" ? "bg-yellow-500" : "bg-red-500"
+                    metric.value<50 ? "bg-green-500" :
+                    metric.value<80 ? "bg-yellow-500" : "bg-red-500"
                   }`} />
                 </div>
               </CardContent>

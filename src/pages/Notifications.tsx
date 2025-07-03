@@ -262,7 +262,7 @@ export const Notifications = () => {
                                 </span>
                               </div>
                               <p className="text-sm text-muted-foreground">
-                                {notification.message}
+                                {notification.details}
                               </p>
                               
                               <div className="flex items-center space-x-2 pt-2">

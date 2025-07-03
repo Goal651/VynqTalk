@@ -1,3 +1,5 @@
+import { Theme } from "./system";
+
 /**
  * Represents a user in the system.
  * @property {string} avatar - The user's avatar URL.
@@ -11,45 +13,28 @@
  * @property {"active"|"blocked"|"suspended"} status - The user's status.
  */
 export interface User {
+  id: number;
+  email: string;
+  name: string;
+  bio: string
   avatar: string;
   createdAt: string;
-  email?: string;
-  id: number;
-  isOnline?: boolean;
   lastActive: string;
-  name: string;
   userRole: "USER" | "ADMIN";
   status: "active" | "blocked" | "suspended";
-  bio:string
 }
 
 /**
  * User settings/preferences.
  */
 export interface UserSettings {
-  autoStatus?: boolean;
-  emailNotifications?: boolean;
   id: number;
-  language?: string;
-  notificationEnabled?: boolean;
-  profileVisibility?: "public" | "friends" | "private";
-  pushNotifications?: boolean;
-  readReceipts?: boolean;
-  showOnlineStatus?: boolean;
-  soundEnabled?: boolean;
-  theme?: "BLUE" | "DARK" | "CYBERPUNK" | "NEON" | "OCEAN" | "SUNSET";
-  timezone?: string;
   user: User;
+  showOnlineStatus: boolean;
+  notificationEnabled?: boolean;
+  theme: Theme
 }
 
-/**
- * Request to update user profile.
- */
-export interface UpdateProfileRequest {
-  avatar?: string;
-  email?: string;
-  name?: string;
-}
 
 /**
  * User profile details.
@@ -66,13 +51,7 @@ export interface UserProfile {
   updatedAt: string;
 }
 
-export interface UpdateUserRequest {
-  avatar?: string;
-  email?: string;
-  userRole?: "USER" | "ADMIN";
-  name?: string;
-  status?: 'active' | 'blocked' | 'suspended';
-}
+
 
 export interface PrivacySettings {
   allowMessageRequests: boolean;

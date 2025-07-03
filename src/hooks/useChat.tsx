@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react"
-import { User, Message, Reaction } from '@/types'
+import { User, Message, Reaction, MessageType } from '@/types'
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks/use-toast"
 import { useSocket } from "@/contexts/SocketContext"
 import { messageService } from "@/api/services/messages"
 
 // Utility to deduplicate reactions: only one per userId+emoji, ignore invalid userIds
-function deduplicateReactions(reactions: { userId: number|string|null, emoji: string }[]): { userId: number, emoji: string }[] {
+function deduplicateReactions(reactions: { userId: number | string | null, emoji: string }[]): { userId: number, emoji: string }[] {
   const seen = new Set();
   return reactions
     .map(r => ({
@@ -60,10 +60,10 @@ export const useChat = () => {
       console.log("Received new message:", message)
       setMessages(prevMessages => {
         if (message.sender.id === user?.id) {
-          return prevMessages.map(m => 
-            m.content === message.content && 
-            m.sender.id === message.sender.id && 
-            m.receiver.id === message.receiver.id
+          return prevMessages.map(m =>
+            m.content === message.content &&
+              m.sender.id === message.sender.id &&
+              m.receiver.id === message.receiver.id
               ? { ...m, id: message.id }
               : m
           )
@@ -80,9 +80,9 @@ export const useChat = () => {
       console.log("Received reaction:", message)
       // Deduplicate reactions before updating state
       const cleanedReactions = deduplicateReactions(message.reactions || []);
-      setMessages(prevMessages => 
-        prevMessages.map(m => 
-          m.id === message.id 
+      setMessages(prevMessages =>
+        prevMessages.map(m =>
+          m.id === message.id
             ? { ...m, reactions: cleanedReactions }
             : m
         )
@@ -98,7 +98,7 @@ export const useChat = () => {
     }
   }, [user, socket])
 
-  const handleSendMessage = (content: string, replyData?: Message) => {
+  const handleSendMessage = (content: string, type: MessageType, replyData?: Message, fileName?: string) => {
     if (!user || !activeChat) {
       toast({
         title: "Error",
@@ -109,23 +109,24 @@ export const useChat = () => {
     }
 
     console.log("Sending message:", content, "to user:", activeChat.name, "reply:", replyData)
-    
+
     const newMessage: Message = {
       id: Date.now(),
       sender: user,
       content: content,
       timestamp: new Date().toISOString(),
       receiver: activeChat,
-      type: "TEXT",
+      type,
       replyTo,
-      reactions: []
+      reactions: [],
+      fileName: fileName
     }
 
     setMessages(prevMessages => [...prevMessages, newMessage])
 
     if (socket) {
       if (replyData) {
-        socket.messageReply(newMessage.content,activeChat, newMessage.type, user, replyData)
+        socket.messageReply(newMessage.content, activeChat, newMessage.type, user, replyData)
       } else {
         socket.sendMessage(newMessage.content, activeChat, newMessage.type, user)
       }

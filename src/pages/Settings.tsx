@@ -33,15 +33,7 @@ export const Settings = () => {
     id: user?.id || 0,
     user: user as User,
     theme: theme,
-    language: 'en',
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    emailNotifications: false,
-    pushNotifications: true,
-    soundEnabled: true,
-    autoStatus: true,
     showOnlineStatus: true,
-    readReceipts: true,
-    profileVisibility: 'public'
   })
 
   useEffect(() => {
@@ -103,7 +95,7 @@ export const Settings = () => {
       if (!user?.id || !capturedImage) return
       try {
         const file = base64ToFile(capturedImage, 'profile.png')
-        const response = await userService.uploadAvatar(user.id,file)
+        const response = await userService.uploadAvatar(user.id, file)
         if (response.success && response.data) {
           toast({
             title: "Avatar Updated",
@@ -117,7 +109,7 @@ export const Settings = () => {
             avatar: response.data
           }
         }))
-      await  handleProfileSave()
+        await handleProfileSave()
       } catch (error) {
         toast({
           title: "Error",
@@ -129,7 +121,7 @@ export const Settings = () => {
     handleAvatarUpload()
   }, [capturedImage, toast, user?.id])
 
-  const handleNotificationChange = async (key : string, value: boolean) => {
+  const handleNotificationChange = async (key: string, value: boolean) => {
     if (!user?.id) return
     try {
       const updatedSettings = {
@@ -229,7 +221,7 @@ export const Settings = () => {
     }
   }
 
-  const handleThemeChange = async (newTheme:  "BLUE" | "DARK" | "CYBERPUNK" | "NEON" | "OCEAN" | "SUNSET") => {
+  const handleThemeChange = async (newTheme: "BLUE" | "DARK" | "CYBERPUNK" | "NEON" | "OCEAN" | "SUNSET") => {
     if (!user?.id) return
     try {
       const updatedSettings = {
@@ -372,7 +364,7 @@ export const Settings = () => {
                 <Label>Theme</Label>
                 <Select
                   value={theme}
-                  onValueChange={(value:  "BLUE" | "DARK" | "CYBERPUNK" | "NEON" | "OCEAN" | "SUNSET") => handleThemeChange(value)}
+                  onValueChange={(value: "BLUE" | "DARK" | "CYBERPUNK" | "NEON" | "OCEAN" | "SUNSET") => handleThemeChange(value)}
                 >
                   <SelectTrigger className="cursor-pointer">
                     <SelectValue />
@@ -387,51 +379,7 @@ export const Settings = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label>Font Size</Label>
-                <Select
-                  value={settings.language}
-                  onValueChange={(value) => handleAppearanceChange("language", value)}
-                >
-                  <SelectTrigger className="cursor-pointer">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Spanish</SelectItem>
-                    <SelectItem value="fr">French</SelectItem>
-                    <SelectItem value="de">German</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label>Language</Label>
-                <Select
-                  value={settings.language}
-                  onValueChange={(value) => handleAppearanceChange("language", value)}
-                >
-                  <SelectTrigger className="cursor-pointer">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="es">Spanish</SelectItem>
-                    <SelectItem value="fr">French</SelectItem>
-                    <SelectItem value="de">German</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Auto Status</Label>
-                  <p className="text-sm text-muted-foreground">Automatically update your status</p>
-                </div>
-                <Switch
-                  checked={settings.autoStatus}
-                  onCheckedChange={(checked) => handleAppearanceChange("autoStatus", checked)}
-                />
-              </div>
+
             </CardContent>
           </Card>
 
@@ -445,38 +393,17 @@ export const Settings = () => {
               <CardDescription>Control how you receive notifications</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label>Push Notifications</Label>
                   <p className="text-sm text-muted-foreground">Receive notifications on this device</p>
                 </div>
                 <Switch
-                  checked={settings.pushNotifications}
+                  checked={settings.notificationEnabled}
                   onCheckedChange={(checked) => handleNotificationChange('pushNotifications', checked)}
                 />
               </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Sound</Label>
-                  <p className="text-sm text-muted-foreground">Play sounds for new messages</p>
-                </div>
-                <Switch
-                  checked={settings.soundEnabled}
-                  onCheckedChange={(checked) => handleNotificationChange('soundEnabled', checked)}
-                />
-              </div>
-              <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Email Notifications</Label>
-                  <p className="text-sm text-muted-foreground">Receive email summaries</p>
-                </div>
-                <Switch
-                  checked={settings.emailNotifications}
-                  onCheckedChange={(checked) => handleNotificationChange('emailNotifications', checked)}
-                />
-              </div>
+
             </CardContent>
           </Card>
 
@@ -500,34 +427,9 @@ export const Settings = () => {
                   onCheckedChange={(checked) => handlePrivacyChange('showOnlineStatus', checked)}
                 />
               </div>
+
               <Separator />
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Read Receipts</Label>
-                  <p className="text-sm text-muted-foreground">Let others see when you've read their messages</p>
-                </div>
-                <Switch
-                  checked={settings.readReceipts}
-                  onCheckedChange={(checked) => handlePrivacyChange('readReceipts', checked)}
-                />
-              </div>
-              <Separator />
-              <div className="space-y-2">
-                <Label>Profile Visibility</Label>
-                <Select
-                  value={settings.profileVisibility}
-                  onValueChange={(value: 'public' | 'friends' | 'private') => handlePrivacyChange('profileVisibility', value)}
-                >
-                  <SelectTrigger className="cursor-pointer">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="public">Public</SelectItem>
-                    <SelectItem value="friends">Friends Only</SelectItem>
-                    <SelectItem value="private">Private</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+
             </CardContent>
           </Card>
 

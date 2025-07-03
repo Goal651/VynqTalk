@@ -1,4 +1,4 @@
-import { User, ApiResponse, UpdateUserRequest } from '@/types';
+import { User, ApiResponse } from '@/types';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
 
@@ -11,9 +11,6 @@ export class UserService {
     return await apiClient.get<User>(API_ENDPOINTS.USER.BY_ID(id));
   }
 
-  async updateUser(id: string, updates: UpdateUserRequest): Promise<ApiResponse<User>> {
-    return await apiClient.put<User>(API_ENDPOINTS.USER.UPDATE(id), updates);
-  }
 
   async deleteUser(id: string): Promise<ApiResponse<void>> {
     return await apiClient.delete<void>(API_ENDPOINTS.USER.DELETE(id));

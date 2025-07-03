@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useUsers } from "@/contexts/UsersContext";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface MessageBubbleProps {
   message: Message;
@@ -39,6 +40,7 @@ export const MessageBubble = ({
   const isCurrentUser = user.id === currentUserId;
   const formattedTime = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const { getUserName, users } = useUsers();
+  const [mediaModal, setMediaModal] = useState<{ type: "IMAGE" | "VIDEO", url: string } | null>(null);
 
   const handleAvatarClick = () => {
     console.log("Avatar clicked:", user.name);
@@ -133,7 +135,50 @@ export const MessageBubble = ({
           <p className="text-xs text-muted-foreground mb-1">User {message.sender.name}</p>
         )}
 
-        <div className="break-words whitespace-pre-wrap ">{message.content}</div>
+        {/* Message content rendering based on type */}
+        {message.type === "TEXT" && (
+          <div className="break-words whitespace-pre-wrap ">{message.content}</div>
+        )}
+        {message.type === "IMAGE" && message.content && (
+          <img
+            src={message.content}
+            alt={message.fileName || "Image"}
+            className="max-w-full rounded-md cursor-pointer"
+            style={{ maxHeight: 300 }}
+            onClick={() => setMediaModal({ type: "IMAGE", url: message.content })}
+          />
+        )}
+        {message.type === "AUDIO" && message.content && (
+          <audio controls src={message.content} className="w-full mt-1" />
+        )}
+        {message.type === "FILE" && message.content && (
+          <div className="flex items-center gap-2 mt-1">
+            <Avatar className="h-8 w-8">
+              <AvatarFallback>{user?.name?.[0] || "U"}</AvatarFallback>
+              <AvatarImage src={user?.avatar} alt={user?.name} />
+            </Avatar>
+            <a
+              href={message.content}
+              download={message.fileName || undefined}
+              className="flex items-center gap-1 text-primary underline break-all"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {/* File icon from Lucide */}
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" /></svg>
+              <span>{message.fileName || "Download file"}</span>
+            </a>
+          </div>
+        )}
+        {message.type === "VIDEO" && message.content && (
+          <video
+            controls
+            src={message.content}
+            className="max-w-full rounded-md cursor-pointer"
+            style={{ maxHeight: 300 }}
+            onClick={() => setMediaModal({ type: "VIDEO", url: message.content })}
+          />
+        )}
         <p className="text-xs opacity-70 mt-1">
           {formattedTime}
         </p>
@@ -263,6 +308,24 @@ export const MessageBubble = ({
           )}
         </ContextMenuContent>
       </ContextMenu>
+
+      {/* Media Modal for enlarged image/video */}
+      <Dialog open={!!mediaModal} onOpenChange={() => setMediaModal(null)}>
+        <DialogContent className="flex items-center justify-center bg-black">
+          {mediaModal?.type === "IMAGE" && (
+            <img src={mediaModal.url} alt="Enlarged" className="max-h-[80vh] max-w-[90vw] rounded-lg" />
+          )}
+          {mediaModal?.type === "VIDEO" && (
+            <video
+              src={mediaModal.url}
+              controls
+              autoPlay
+              className="max-h-[80vh] max-w-[90vw] rounded-lg"
+              style={{ background: "#000" }}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

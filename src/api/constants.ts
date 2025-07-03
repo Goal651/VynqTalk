@@ -40,6 +40,7 @@ export const API_ENDPOINTS = {
     UPDATE: (id: number) => `/messages/${id}`,
     DELETE: (id: number) => `/messages/${id}`,
     SEND: '/messages/send',
+    UPLOAD:'/upload/message',
   },
   GROUP: {
     LIST: '/group/all',

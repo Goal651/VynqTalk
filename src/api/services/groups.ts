@@ -1,4 +1,4 @@
-import { Group, User, ApiResponse, CreateGroupRequest } from '@/types'
+import { Group, User, ApiResponse} from '@/types'
 import { apiClient } from '../client'
 import { API_ENDPOINTS } from '../constants'
 
@@ -17,11 +17,6 @@ export class GroupService {
 
   async getGroup(id: number): Promise<ApiResponse<Group>> {
     return await apiClient.get<Group>(API_ENDPOINTS.GROUP.BY_ID(id))
-
-  }
-
-  async createGroup(data: CreateGroupRequest): Promise<ApiResponse<Group>> {
-    return await apiClient.post<Group>(API_ENDPOINTS.GROUP.CREATE, data)
 
   }
 

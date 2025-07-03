@@ -1,6 +1,6 @@
 import SockJS from 'sockjs-client';
 import { Client, IMessage } from '@stomp/stompjs';
-import { Message, GroupMessage, User, Group, Reaction } from '@/types';
+import { Message, GroupMessage, User, Group, Reaction, MessageType } from '@/types';
 import { API_CONFIG } from '../constants';
 
 class SocketService {
@@ -317,7 +317,7 @@ class SocketService {
         }
     }
 
-    public sendMessage(content: string, receiver: User, type: "TEXT" | "IMAGE" | "AUDIO" | "FILE", sender: User) {
+    public sendMessage(content: string, receiver: User, type: MessageType, sender: User) {
         try {
             if (!this.stompClient.connected) {
                 console.warn('Cannot send message: WebSocket not connected');
@@ -336,7 +336,7 @@ class SocketService {
         }
     }
 
-    public messageReply(content: string, receiver: User, type: "TEXT" | "IMAGE" | "AUDIO" | "FILE", sender: User, replyTo: Message) {
+    public messageReply(content: string, receiver: User, type: MessageType, sender: User, replyTo: Message) {
         try {
             if (!this.stompClient.connected) {
                 console.warn('Cannot send message: WebSocket not connected');
@@ -431,7 +431,7 @@ class SocketService {
         }
     }
 
-    public sendGroupMessage(content: string, group: Group, type: 'TEXT' | 'IMAGE' | 'AUDIO' | 'FILE', sender: User) {
+    public sendGroupMessage(content: string, group: Group, type: MessageType, sender: User) {
         try {
             if (!this.stompClient.connected) {
                 console.warn('Cannot send group message: WebSocket not connected');

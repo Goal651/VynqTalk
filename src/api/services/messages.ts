@@ -1,4 +1,4 @@
-import { Message, ApiResponse, SendMessageRequest } from '@/types';
+import { Message, ApiResponse} from '@/types';
 import { apiClient } from "../client";
 import { API_ENDPOINTS } from "../constants";
 
@@ -8,10 +8,7 @@ export class MessageService {
     return await apiClient.get<Message[]>(API_ENDPOINTS.MESSAGES.CONVERSATION(senderId, receiverId));
   }
 
-  // Send a new message
-  async sendMessage(messageData: SendMessageRequest): Promise<ApiResponse<Message>> {
-    return await apiClient.post<Message>(API_ENDPOINTS.MESSAGES.SEND, messageData);
-  }
+
 
   // Update a message by ID
   async updateMessage(messageId: number, newMessage: Message): Promise<ApiResponse<Message>> {
@@ -36,6 +33,11 @@ export class MessageService {
   // Remove reaction from a message
   async removeReaction(messageId: number, reactionId: string): Promise<ApiResponse<void>> {
     return await apiClient.delete<void>(`${API_ENDPOINTS.MESSAGES.BY_ID(messageId)}/reactions/${reactionId}`);
+  }
+
+  // Upload a file for a message
+  async uploadMessage( file: File): Promise<ApiResponse<string>> {
+    return await apiClient.uploadFile<string>(API_ENDPOINTS.MESSAGES.UPLOAD, file);
   }
 }
 

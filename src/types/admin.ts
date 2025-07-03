@@ -45,11 +45,3 @@ export interface AdminStats {
   messagesYesterday: number;
   percentChange: number;
 }
-
-export interface AdminMessage {
-  id: number;
-  content: string;
-  senderId: number;
-  timestamp: string;
-  status: 'approved' | 'flagged' | 'pending';
-} 

@@ -17,22 +17,3 @@ export interface Group {
   isPrivate?: boolean;
 }
 
-/**
- * Group types.
- */
-export interface CreateGroupRequest {
-  name: string;
-  description?: string;
-  isPrivate: boolean;
-}
-
-export interface GroupResponse {
-  id: number;
-  name: string;
-  description?: string;
-  avatar: string;
-  members: UserProfile[];
-  createdBy: string;
-  createdAt: string;
-  isPrivate: boolean;
-} 

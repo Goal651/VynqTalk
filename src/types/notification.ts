@@ -7,10 +7,10 @@ export interface Notification {
   id: number;
   title: string;
   user: User;
-  message: string;
+  details: string;
   timestamp: string;
   isRead: boolean;
-  type: "info" | "warning" | "error" | "success";
+  type: "INFO" | "WARNING" | "ERROR" | "SUCCESS";
 }
 
 export interface NotificationSettings {

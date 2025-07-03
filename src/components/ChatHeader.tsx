@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Phone, Video, MoreVertical, MessageSquare } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
+import { CallControls } from "./CallControls";
 
 interface ChatHeaderProps {
   onlineUsers: Map<string, string>;
@@ -19,10 +20,6 @@ export const ChatHeader = ({ onlineUsers, activeChat, onVoiceCall, onVideoCall, 
     if (onVoiceCall) onVoiceCall();
   };
 
-  const handleVideoCall = () => {
-    console.log("Video call initiated");
-    if (onVideoCall) onVideoCall();
-  };
 
   const isOnline = onlineUsers.has(activeChat?.email)
 
@@ -52,10 +49,6 @@ export const ChatHeader = ({ onlineUsers, activeChat, onVoiceCall, onVideoCall, 
 
               <div>
                 <div className="font-semibold text-sm text-foreground">{activeChat.name}</div>
-                <div className="text-xs text-muted-foreground flex items-center">
-                  <div className={`w-1.5 h-1.5 rounded-full mr-1.5 ${activeChat.isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
-                  {isOnline ? "Active now" : "Offline"}
-                </div>
               </div>
             </div>
           </div>
@@ -65,22 +58,9 @@ export const ChatHeader = ({ onlineUsers, activeChat, onVoiceCall, onVideoCall, 
       <div className="flex items-center space-x-3">
         {activeChat && (
           <div className="flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleVoiceCall}
-              className="h-9 w-9 p-0 hover:bg-primary/10 hover:text-primary transition-all duration-200 rounded-full border border-primary/20 bg-primary/5"
-            >
-              <Phone className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleVideoCall}
-              className="h-9 w-9 p-0 hover:bg-primary/10 hover:text-primary transition-all duration-200 rounded-full border border-primary/20 bg-primary/5"
-            >
-              <Video className="h-4 w-4" />
-            </Button>
+            <CallControls
+            activeChat={activeChat}
+            />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-9 w-9 p-0 hover:bg-accent transition-all duration-200 rounded-full">
