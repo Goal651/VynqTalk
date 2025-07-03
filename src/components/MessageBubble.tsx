@@ -15,6 +15,10 @@ import { useUsers } from "@/contexts/UsersContext";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
+import Waveform from "@wavesurfer/react";
+import { useRef } from "react";
+import { CustomVideoPlayer } from "./CustomVideoPlayer";
+import { CustomAudioPlayer } from "./CustomAudioPlayer";
 
 interface MessageBubbleProps {
   message: Message;
@@ -89,8 +93,8 @@ export const MessageBubble = ({
   const handleEmojiSelect = (emoji: string) => {
     console.log("Emoji selected:", emoji, "for message:", message.id);
     if (onReactToMessage) {
-      const newReaction:Reaction={
-        userId:currentUserId,
+      const newReaction: Reaction = {
+        userId: currentUserId,
         emoji,
       }
       onReactToMessage(message.id, newReaction);
@@ -189,7 +193,9 @@ export const MessageBubble = ({
           />
         )}
         {message.type === "AUDIO" && message.content && (
-          <audio controls src={message.content} className="w-full mt-1" />
+          <div className="w-full mt-2">
+            <CustomAudioPlayer src={message.content} />
+          </div>
         )}
         {message.type === "FILE" && message.content && (
           <div className="flex items-center gap-2 mt-1">
@@ -211,13 +217,12 @@ export const MessageBubble = ({
           </div>
         )}
         {message.type === "VIDEO" && message.content && (
-          <video
-            controls
-            src={message.content}
-            className="max-w-full rounded-md cursor-pointer"
-            style={{ maxHeight: 300 }}
-            onClick={() => onMediaClick?.(message.id)}
-          />
+          <div className="w-full mt-2 rounded-md overflow-hidden">
+            <CustomVideoPlayer
+              src={message.content}
+              style={{ borderRadius: 12, background: "#000", maxHeight: 240 }}
+            />
+          </div>
         )}
         {/* Timestamp bottom right */}
         <span className="absolute bottom-1 right-3 text-xs opacity-60 select-none">
@@ -234,11 +239,10 @@ export const MessageBubble = ({
                 <Button
                   variant={userReactedEmojis.has(emoji) ? "default" : "secondary"}
                   size="sm"
-                  className={`h-6 px-2 text-xs rounded-full shadow ${
-                    userReactedEmojis.has(emoji)
+                  className={`h-6 px-2 text-xs rounded-full shadow ${userReactedEmojis.has(emoji)
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted/80 hover:bg-muted"
-                  }`}
+                    }`}
                   onClick={() => handleEmojiSelect(emoji)}
                 >
                   {emoji} {userIds.length}

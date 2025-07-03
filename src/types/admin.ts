@@ -8,7 +8,7 @@ export interface AdminUser extends User {
 }
 
 export interface SystemMetric {
-  name: string;
+  metric: string;
   value: number;
   timestamp: string;
 }

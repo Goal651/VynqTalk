@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { adminService } from "@/api/services/admin";
-import { AdminStats, Group, User, AdminMessage, SystemMetric, ContentModerationData, Alert, ChartData } from '@/types';
+import { AdminStats, Group, User, SystemMetric, ContentModerationData, Alert, ChartData } from '@/types';
 import { useSocket } from "@/contexts/SocketContext";
 
 export const useAdminData = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
-  const [messages, setMessages] = useState<AdminMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -45,18 +44,7 @@ export const useAdminData = () => {
     }
   }
 
-  const fetchMessages = async () => {
-    try {
-      const response = await adminService.getAllMessages();
-      if (response.success && response.data) {
-        setMessages(response.data);
-      }
-    }
-    catch (error) {
-      console.error('Failed to fetch messages:', error);
-      setMessages([]);
-    }
-  }
+
 
   const updateUser = async (userId: number, updates: User) => {
     try {
@@ -113,7 +101,6 @@ export const useAdminData = () => {
   return {
     users,
     groups,
-    messages,
     loading,
     fetchUsers,
     updateUser,

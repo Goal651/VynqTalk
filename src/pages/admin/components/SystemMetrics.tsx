@@ -17,12 +17,12 @@ export const SystemMetrics = () => {
             <Card 
               key={index} 
               className="cursor-pointer hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-background to-background/50 border-border/30"
-              onClick={() => console.log("System metric clicked:", metric.name)}
+              onClick={() => console.log("System metric clicked:", metric.metric)}
             >
               <CardContent className="pt-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-muted-foreground">{metric.name}</p>
+                    <p className="text-sm font-medium text-muted-foreground">{metric.metric}</p>
                     <p className="text-2xl font-bold">{metric.value}%</p>
                   </div>
                   <div className={`h-3 w-3 rounded-full ${
