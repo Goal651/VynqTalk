@@ -14,6 +14,7 @@ import { useState } from "react";
 import { useUsers } from "@/contexts/UsersContext";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface MessageBubbleProps {
   message: Message;
@@ -24,6 +25,7 @@ interface MessageBubbleProps {
   onReplyMessage?: (message: Message) => void;
   onReactToMessage?: (messageId: number, reaction: Reaction) => void;
   currentUserId?: number;
+  onMediaClick?: (messageId: number) => void;
 }
 
 export const MessageBubble = ({
@@ -34,13 +36,13 @@ export const MessageBubble = ({
   onEditMessage,
   onReplyMessage,
   onReactToMessage,
-  currentUserId 
+  currentUserId,
+  onMediaClick
 }: MessageBubbleProps) => {
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const isCurrentUser = user.id === currentUserId;
   const formattedTime = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const { getUserName, users } = useUsers();
-  const [mediaModal, setMediaModal] = useState<{ type: "IMAGE" | "VIDEO", url: string } | null>(null);
 
   const handleAvatarClick = () => {
     console.log("Avatar clicked:", user.name);
@@ -113,22 +115,60 @@ export const MessageBubble = ({
   const messageBubble = (
     <div className="relative">
       {message.replyTo && (
-        <div className="flex items-center mb-2">
-          <div className="border-l-4 border-primary bg-muted/60 px-3 py-1 rounded-md w-full">
-            <span className="block text-xs font-semibold text-primary mb-0.5">
+        <div className="flex flex-col mb-2">
+          <div className="flex items-center gap-2 bg-muted/70 border-l-4 border-primary rounded-md px-3 py-2 shadow-sm">
+            <span className="block text-xs font-semibold text-primary">
               Replying to {message.replyTo.sender.name}
             </span>
-            <span className="block text-xs text-muted-foreground truncate max-w-[200px]">
-              {message.replyTo.content}
-            </span>
+            {(() => {
+              const r = message.replyTo;
+              switch (r.type) {
+                case "IMAGE":
+                  return (
+                    <img
+                      src={r.content}
+                      alt={r.fileName || "Image"}
+                      className="h-8 w-8 object-cover rounded-md border ml-2"
+                    />
+                  );
+                case "VIDEO":
+                  return (
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground ml-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h12a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" /></svg>
+                      {r.fileName || "Video"}
+                    </span>
+                  );
+                case "AUDIO":
+                  return (
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground ml-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l-2 2H5a2 2 0 00-2 2v4a2 2 0 002 2h2l2 2zm7-2a2 2 0 100-4 2 2 0 000 4z" /></svg>
+                      {r.fileName || "Audio"}
+                    </span>
+                  );
+                case "FILE":
+                  return (
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground ml-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" /></svg>
+                      {r.fileName || "File"}
+                    </span>
+                  );
+                default:
+                  return (
+                    <span className="block text-xs text-muted-foreground truncate max-w-[200px] ml-2">
+                      {r.content}
+                    </span>
+                  );
+              }
+            })()}
           </div>
+          <div className="w-full h-px bg-border/60 my-1" />
         </div>
       )}
 
       <div
-        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${isCurrentUser
-          ? "bg-primary text-primary-foreground"
-          : "bg-muted text-foreground"
+        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg shadow-sm relative ${isCurrentUser
+          ? "bg-primary text-primary-foreground ml-auto"
+          : "bg-muted text-foreground mr-auto"
           }`}
       >
         {!isCurrentUser && (
@@ -145,7 +185,7 @@ export const MessageBubble = ({
             alt={message.fileName || "Image"}
             className="max-w-full rounded-md cursor-pointer"
             style={{ maxHeight: 300 }}
-            onClick={() => setMediaModal({ type: "IMAGE", url: message.content })}
+            onClick={() => onMediaClick?.(message.id)}
           />
         )}
         {message.type === "AUDIO" && message.content && (
@@ -176,23 +216,25 @@ export const MessageBubble = ({
             src={message.content}
             className="max-w-full rounded-md cursor-pointer"
             style={{ maxHeight: 300 }}
-            onClick={() => setMediaModal({ type: "VIDEO", url: message.content })}
+            onClick={() => onMediaClick?.(message.id)}
           />
         )}
-        <p className="text-xs opacity-70 mt-1">
+        {/* Timestamp bottom right */}
+        <span className="absolute bottom-1 right-3 text-xs opacity-60 select-none">
           {formattedTime}
-        </p>
+        </span>
       </div>
 
+      {/* Reactions below the bubble */}
       {message.reactions && message.reactions.length > 0 && (
-        <div className={`flex flex-wrap gap-1 mt-1 ${isCurrentUser ? "justify-end mr-4" : "ml-4"}`}>
+        <div className={`flex flex-wrap gap-1 mt-1 ${isCurrentUser ? "justify-end" : "justify-start"}`}>
           {Object.entries(reactionsByEmoji).map(([emoji, userIds]) => (
             <Tooltip key={emoji}>
               <TooltipTrigger asChild>
                 <Button
                   variant={userReactedEmojis.has(emoji) ? "default" : "secondary"}
                   size="sm"
-                  className={`h-6 px-2 text-xs rounded-full ${
+                  className={`h-6 px-2 text-xs rounded-full shadow ${
                     userReactedEmojis.has(emoji)
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted/80 hover:bg-muted"
@@ -224,6 +266,7 @@ export const MessageBubble = ({
         </div>
       )}
 
+      {/* Reaction picker stays above bubble */}
       {showReactionPicker && (
         <div className={`absolute top-full mt-1 z-50 bg-popover border border-border rounded-md shadow-lg p-2 ${isCurrentUser ? "right-0" : "left-0"
           }`}>
@@ -246,86 +289,72 @@ export const MessageBubble = ({
   );
 
   return (
-    <div
-      className={`flex items-start gap-2 animate-fade-in ${isCurrentUser ? "flex-row-reverse" : "flex-row"
-        }`}
-    >
+    <AnimatePresence>
+      <motion.div
+        className={`flex items-start gap-2 ${isCurrentUser ? "flex-row-reverse" : "flex-row"}`}
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 30 }}
+        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+        layout
+      >
+        <ContextMenu>
+          <ContextMenuTrigger className="focus:outline-none">
+            {messageBubble}
+          </ContextMenuTrigger>
+          <ContextMenuContent className="bg-background border border-border shadow-lg z-50">
+            {onReplyMessage && (
+              <ContextMenuItem
+                onClick={handleReplyClick}
+                className="cursor-pointer hover:bg-accent transition-colors"
+              >
+                <Reply className="mr-2 h-4 w-4" />
+                Reply
+              </ContextMenuItem>
+            )}
 
-
-      <ContextMenu>
-        <ContextMenuTrigger className="focus:outline-none">
-          {messageBubble}
-        </ContextMenuTrigger>
-        <ContextMenuContent className="bg-background border border-border shadow-lg z-50">
-          {onReplyMessage && (
             <ContextMenuItem
-              onClick={handleReplyClick}
+              onClick={handleReactClick}
               className="cursor-pointer hover:bg-accent transition-colors"
             >
-              <Reply className="mr-2 h-4 w-4" />
-              Reply
+              <span className="mr-2">😀</span>
+              React
             </ContextMenuItem>
-          )}
 
-          <ContextMenuItem
-            onClick={handleReactClick}
-            className="cursor-pointer hover:bg-accent transition-colors"
-          >
-            <span className="mr-2">😀</span>
-            React
-          </ContextMenuItem>
+            <ContextMenuItem
+              onClick={handleCopyClick}
+              className="cursor-pointer hover:bg-accent transition-colors"
+            >
+              <Copy className="mr-2 h-4 w-4" />
+              Copy
+            </ContextMenuItem>
 
-          <ContextMenuItem
-            onClick={handleCopyClick}
-            className="cursor-pointer hover:bg-accent transition-colors"
-          >
-            <Copy className="mr-2 h-4 w-4" />
-            Copy
-          </ContextMenuItem>
-
-          {isCurrentUser && (
-            <>
-              <ContextMenuSeparator />
-              {onEditMessage && (
-                <ContextMenuItem
-                  onClick={handleEditClick}
-                  className="cursor-pointer hover:bg-accent transition-colors"
-                >
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit message
-                </ContextMenuItem>
-              )}
-              {onDeleteMessage && (
-                <ContextMenuItem
-                  onClick={handleDeleteClick}
-                  className="cursor-pointer text-destructive focus:text-destructive hover:bg-destructive/10 transition-colors"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete message
-                </ContextMenuItem>
-              )}
-            </>
-          )}
-        </ContextMenuContent>
-      </ContextMenu>
-
-      {/* Media Modal for enlarged image/video */}
-      <Dialog open={!!mediaModal} onOpenChange={() => setMediaModal(null)}>
-        <DialogContent className="flex items-center justify-center bg-black">
-          {mediaModal?.type === "IMAGE" && (
-            <img src={mediaModal.url} alt="Enlarged" className="max-h-[80vh] max-w-[90vw] rounded-lg" />
-          )}
-          {mediaModal?.type === "VIDEO" && (
-            <video
-              src={mediaModal.url}
-              controls
-              autoPlay
-              className="max-h-[80vh] max-w-[90vw] rounded-lg"
-              style={{ background: "#000" }}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
-    </div>
+            {isCurrentUser && (
+              <>
+                <ContextMenuSeparator />
+                {onEditMessage && (
+                  <ContextMenuItem
+                    onClick={handleEditClick}
+                    className="cursor-pointer hover:bg-accent transition-colors"
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit message
+                  </ContextMenuItem>
+                )}
+                {onDeleteMessage && (
+                  <ContextMenuItem
+                    onClick={handleDeleteClick}
+                    className="cursor-pointer text-destructive focus:text-destructive hover:bg-destructive/10 transition-colors"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete message
+                  </ContextMenuItem>
+                )}
+              </>
+            )}
+          </ContextMenuContent>
+        </ContextMenu>
+      </motion.div>
+    </AnimatePresence>
   );
 };

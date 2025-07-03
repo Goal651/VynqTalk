@@ -1,6 +1,7 @@
 import { Message, ApiResponse} from '@/types';
 import { apiClient } from "../client";
 import { API_ENDPOINTS } from "../constants";
+import type { AxiosProgressEvent, CancelToken } from 'axios';
 
 export class MessageService {
   // Get messages between two users
@@ -36,8 +37,13 @@ export class MessageService {
   }
 
   // Upload a file for a message
-  async uploadMessage( file: File): Promise<ApiResponse<string>> {
-    return await apiClient.uploadFile<string>(API_ENDPOINTS.MESSAGES.UPLOAD, file);
+  async uploadMessage(
+    file: File,
+    onUploadProgress?: (event: AxiosProgressEvent) => void,
+    cancelToken?: CancelToken,
+    timeout: number = 60000 // 60 seconds default
+  ): Promise<ApiResponse<string>> {
+    return await apiClient.uploadFile<string>(API_ENDPOINTS.MESSAGES.UPLOAD, file, onUploadProgress, cancelToken, timeout);
   }
 }
 

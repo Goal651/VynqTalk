@@ -2,11 +2,13 @@ import { useState, useRef } from "react";
 import { User, Message, MessageType } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageCircle, Smile, Paperclip, Mic, X } from "lucide-react";
+import { MessageCircle, Smile, Paperclip, Mic, X, Loader2 } from "lucide-react";
 import { EmojiPicker } from "./EmojiPicker";
 import { AudioRecorder } from "./AudioRecorder";
 import { FilePreview } from "./FilePreview";
 import { messageService } from "@/api/services/messages";
+import axios from "axios";
+import { toast } from "sonner";
 
 interface MessageInputProps {
   onSendMessage: (content: string, type: MessageType, replyTo?: Message) => void;
@@ -34,29 +36,52 @@ export const MessageInput = ({
   const [showAudioRecorder, setShowAudioRecorder] = useState(false);
   const [files, setFiles] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadingFiles, setUploadingFiles] = useState<{
+    file: File;
+    progress: number;
+    cancel: () => void;
+  }[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Message submitted:", message);
 
+    setIsUploading(true);
     // Send text message if present
     if (message.trim()) {
       onSendMessage(message.trim(), 'TEXT', replyTo);
     }
 
-    // Upload and send each file
+    // Upload and send each file with progress and cancel support
     for (const file of files) {
+      const source = axios.CancelToken.source();
+      setUploadingFiles(prev => [...prev, { file, progress: 0, cancel: source.cancel }]);
       try {
-        const response = await messageService.uploadMessage(file);
+        const response = await messageService.uploadMessage(file, (event: import('axios').AxiosProgressEvent) => {
+          const percent = event.total ? Math.round((event.loaded * 100) / event.total) : 0;
+          setUploadingFiles(prev => prev.map(f => f.file === file ? { ...f, progress: percent } : f));
+        }, source.token, 60000);
         if (response.success && response.data) {
           const msgType = getMessageTypeForFile(file);
           onSendMessage(response.data, msgType, replyTo);
         }
       } catch (error) {
-        console.error("File upload failed:", error);
+        if (axios.isCancel(error)) {
+          console.log("Upload cancelled for", file.name);
+        } else {
+          console.error("File upload failed:", error);
+          toast.error(
+            error?.message?.includes("timeout")
+              ? `Upload timed out for ${file.name}. Try a smaller file or check your connection.`
+              : `Failed to upload ${file.name}`
+          );
+        }
+      } finally {
+        setUploadingFiles(prev => prev.filter(f => f.file !== file));
       }
     }
-
+    setIsUploading(false);
     setMessage("");
     setFiles([]);
     setShowEmojiPicker(false);
@@ -139,24 +164,61 @@ export const MessageInput = ({
 
   return (
     <form onSubmit={handleSubmit} className="p-4 border-t border-border bg-secondary/50 relative z-10">
+      {isUploading && (
+        <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-50 rounded-lg">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-3 text-primary font-medium">Uploading...</span>
+        </div>
+      )}
+
       {replyTo && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-          <div className="border-l-4 border-primary bg-muted/60 px-3 py-1 rounded-md flex-1">
-            <span className="block text-xs font-semibold text-primary mb-0.5">
+        <div className="flex flex-col mb-2">
+          <div className="flex items-center gap-2 bg-muted/70 border-l-4 border-primary rounded-md px-3 py-2 shadow-sm">
+            <span className="block text-xs font-semibold text-primary">
               Replying to {replyTo.sender.id === currentUser.id ? "yourself" : replyTo.sender.name}
             </span>
-            <span className="block text-xs text-muted-foreground truncate max-w-[200px]">
-              {replyTo.content}
-            </span>
+            {(() => {
+              const r = replyTo;
+              switch (r.type) {
+                case "IMAGE":
+                  return (
+                    <img
+                      src={r.content}
+                      alt={r.fileName || "Image"}
+                      className="h-8 w-8 object-cover rounded-md border ml-2"
+                    />
+                  );
+                case "VIDEO":
+                  return (
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground ml-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h12a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" /></svg>
+                      {r.fileName || "Video"}
+                    </span>
+                  );
+                case "AUDIO":
+                  return (
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground ml-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l-2 2H5a2 2 0 00-2 2v4a2 2 0 002 2h2l2 2zm7-2a2 2 0 100-4 2 2 0 000 4z" /></svg>
+                      {r.fileName || "Audio"}
+                    </span>
+                  );
+                case "FILE":
+                  return (
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground ml-2">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" /></svg>
+                      {r.fileName || "File"}
+                    </span>
+                  );
+                default:
+                  return (
+                    <span className="block text-xs text-muted-foreground truncate max-w-[200px] ml-2">
+                      {r.content}
+                    </span>
+                  );
+              }
+            })()}
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-6 w-6 p-0 hover:bg-accent"
-            onClick={onCancelReply}
-          >
-            <X className="h-4 w-4" />
-          </Button>
+          <div className="w-full h-px bg-border/60 my-1" />
         </div>
       )}
 
@@ -173,13 +235,15 @@ export const MessageInput = ({
       {showAudioRecorder && (
         <AudioRecorder
           onComplete={async (audioBlob) => {
+            setIsUploading(true);
             console.log("Audio recorded:", audioBlob);
             // Convert Blob to File
             const audioFile = new File([audioBlob], `audio-${Date.now()}.webm`, { type: 'audio/webm' });
-            const response = await messageService.uploadMessage(audioFile);
+            const response = await messageService.uploadMessage(audioFile, undefined, undefined, 60000);
             if (response.success && response.data) {
               onSendMessage(response.data, 'AUDIO', replyTo);
             }
+            setIsUploading(false);
             setShowAudioRecorder(false);
           }}
           onCancel={() => {
@@ -187,6 +251,33 @@ export const MessageInput = ({
             setShowAudioRecorder(false);
           }}
         />
+      )}
+
+      {uploadingFiles.length > 0 && (
+        <div className="mb-2 space-y-2">
+          {uploadingFiles.map(({ file, progress, cancel }) => (
+            <div key={file.name + file.size} className="flex items-center gap-2 bg-muted rounded p-2">
+              <span className="truncate max-w-[120px] text-xs">{file.name}</span>
+              <div className="flex-1 h-2 bg-secondary rounded">
+                <div
+                  className="h-2 bg-primary rounded"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <span className="text-xs w-10 text-right">{progress}%</span>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="h-6 w-6 p-0"
+                onClick={cancel}
+                title="Cancel upload"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
       )}
 
       <div className="flex items-end space-x-2">
@@ -210,11 +301,11 @@ export const MessageInput = ({
             <Button
               type="submit"
               size="icon"
-              className={`h-8 w-8 rounded-full cursor-pointer transition-all ${isDisabled
+              className={`h-8 w-8 rounded-full cursor-pointer transition-all ${isDisabled || isUploading || uploadingFiles.length > 0
                 ? "opacity-50 cursor-not-allowed"
                 : "hover:scale-105 hover:bg-primary/90"
                 }`}
-              disabled={isDisabled}
+              disabled={isDisabled || isUploading || uploadingFiles.length > 0}
             >
               <MessageCircle className="h-4 w-4" />
             </Button>

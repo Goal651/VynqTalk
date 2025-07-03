@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosProgressEvent, CancelToken } from 'axios';
 import { API_CONFIG, HTTP_STATUS } from './constants';
 import { ApiResponse, ApiError } from '@/types';
 
@@ -229,7 +229,13 @@ class ApiClient {
     }
   }
 
-  async uploadFile<T>(endpoint: string, file: File): Promise<ApiResponse<T>> {
+  async uploadFile<T>(
+    endpoint: string,
+    file: File,
+    onUploadProgress?: (event: AxiosProgressEvent) => void,
+    cancelToken?: CancelToken,
+    timeout?: number
+  ): Promise<ApiResponse<T>> {
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -237,13 +243,16 @@ class ApiClient {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+        onUploadProgress,
+        cancelToken,
+        timeout: timeout ?? API_CONFIG.TIMEOUT,
       });
       return response.data;
     } catch (error) {
       console.error(`UPLOAD ${endpoint} failed:`, error.message);
       if (error.status === HTTP_STATUS.UNAUTHORIZED) {
         await this.handleUnauthorized();
-        return this.uploadFile<T>(endpoint, file); // Retry
+        return this.uploadFile<T>(endpoint, file, onUploadProgress, cancelToken, timeout); // Retry
       }
       throw error;
     }

@@ -10,6 +10,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChat } from "@/hooks/useChat";
 import { useMessageOperations } from "@/hooks/useMessageOperations";
+import { MediaGalleryModal } from "./MediaGalleryModal";
+import { useState, useMemo } from "react";
 
 
 interface ChatViewProps {
@@ -52,6 +54,23 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users, onlineUsers }:
     confirmEditMessage
   } = useMessageOperations(messages, setMessages, onMessageDelete, onMessageEdit);
 
+  // Gallery modal state
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState(0);
+  // Collect all media messages (images/videos) in the current chat
+  const mediaMessages = useMemo(
+    () => filteredMessages.filter(m => m.type === "IMAGE" || m.type === "VIDEO"),
+    [filteredMessages]
+  );
+  // Handler to open gallery modal
+  const handleMediaClick = (messageId: number) => {
+    const idx = mediaMessages.findIndex(m => m.id === messageId);
+    if (idx !== -1) {
+      setGalleryIndex(idx);
+      setGalleryOpen(true);
+    }
+  };
+
   return (
     <div className="flex h-full relative bg-gradient-to-br from-background to-secondary/10">
 
@@ -82,6 +101,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users, onlineUsers }:
                 onEditMessage={handleEditMessage}
                 onReplyMessage={handleReplyMessage}
                 onReactToMessage={handleReactToMessage}
+                onMediaClick={handleMediaClick}
               />
             </ScrollArea>
             <div className="flex-shrink-0 border-t border-border/30 bg-background/50 backdrop-blur-sm">
@@ -119,6 +139,13 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users, onlineUsers }:
         setMessageToEdit={setMessageToEdit}
         confirmDeleteMessage={confirmDeleteMessage}
         confirmEditMessage={confirmEditMessage}
+      />
+      <MediaGalleryModal
+        open={galleryOpen}
+        mediaMessages={mediaMessages}
+        currentIndex={galleryIndex}
+        onClose={() => setGalleryOpen(false)}
+        onNavigate={setGalleryIndex}
       />
     </div>
   );
