@@ -3,9 +3,7 @@ import { User } from '@/types';
 import { Search, Plus, Phone, Video } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CallPreview } from "./CallPreview";
 import { useToast } from "@/hooks/use-toast";
 
 interface ChatSidebarProps {
@@ -77,21 +75,15 @@ export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps
               onClick={() => handleUserClick(user)}
             >
               <div className="relative">
-                <Avatar className={`cursor-pointer transition-transform hover:scale-105 ${user.isOnline ? "ring-2 ring-green-500" : ""}`}>
+                <Avatar className={`cursor-pointer transition-transform hover:scale-105`}>
                   <AvatarImage src={user.avatar} alt={user.name} />
                   <AvatarFallback className="bg-primary/10 text-primary font-medium">
                     {user.name.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                {user.isOnline && (
-                  <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-background animate-pulse"></span>
-                )}
               </div>
               <div className="ml-3 flex-1 overflow-hidden">
                 <div className="font-medium text-foreground">{user.name}</div>
-                <div className="text-xs text-muted-foreground truncate">
-                  {activeChat?.id === user.id ? "Active chat" : user.isOnline ? "Online" : "Offline"}
-                </div>
               </div>
             </div>
           ))}
