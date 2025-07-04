@@ -57,7 +57,7 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
                     <Input 
                       placeholder="John Doe" 
                       {...field} 
-                      className="pl-10 bg-background border-border focus:border-primary transition-colors login-ocean-input"
+                      className="pl-10 bg-background/40 border-border/60 rounded-lg focus:border-primary transition-colors login-ocean-input"
                     />
                   </div>
                 </FormControl>
@@ -79,7 +79,7 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
                   <Input 
                     placeholder="your.email@example.com" 
                     {...field} 
-                    className="pl-10 bg-background border-border focus:border-primary transition-colors login-ocean-input"
+                    className="pl-10 bg-background/40 border-border/60 focus:border-primary transition-colors login-ocean-input rounded-lg"
                   />
                 </div>
               </FormControl>
@@ -101,7 +101,7 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
                     type={showPassword ? "text" : "password"} 
                     placeholder="••••••••" 
                     {...field} 
-                    className="pl-10 pr-10 bg-background border-border focus:border-primary transition-colors login-ocean-input"
+                    className="pl-10 pr-10 bg-background/40 border-border/60 rounded-lg focus:border-primary transition-colors login-ocean-input"
                   />
                   <Button
                     type="button"
@@ -137,7 +137,7 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
                       type={showConfirmPassword ? "text" : "password"} 
                       placeholder="••••••••" 
                       {...field} 
-                      className="pl-10 pr-10 bg-background border-border focus:border-primary transition-colors login-ocean-input"
+                      className="pl-10 pr-10 bg-background/40 border-border/60 rounded-lg focus:border-primary transition-colors login-ocean-input"
                     />
                     <Button
                       type="button"

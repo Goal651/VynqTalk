@@ -1,6 +1,6 @@
 import { User } from "@/types/user";
 import { Button } from "@/components/ui/button";
-import { Phone, Video, MoreVertical, MessageSquare } from "lucide-react";
+import { MoreVertical } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { CallControls } from "./CallControls";
@@ -59,7 +59,7 @@ export const ChatHeader = ({ onlineUsers, activeChat, onVoiceCall, onVideoCall, 
         {activeChat && (
           <div className="flex items-center space-x-2">
             <CallControls
-            activeChat={activeChat}
+              activeChat={activeChat}
             />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

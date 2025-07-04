@@ -15,7 +15,6 @@ import { useUsers } from "@/contexts/UsersContext";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
-import Waveform from "@wavesurfer/react";
 import { useRef } from "react";
 import { CustomVideoPlayer } from "./CustomVideoPlayer";
 import { CustomAudioPlayer } from "./CustomAudioPlayer";
@@ -220,7 +219,6 @@ export const MessageBubble = ({
           <div className="w-full mt-2 rounded-md overflow-hidden">
             <CustomVideoPlayer
               src={message.content}
-              style={{ borderRadius: 12, background: "#000", maxHeight: 240 }}
             />
           </div>
         )}

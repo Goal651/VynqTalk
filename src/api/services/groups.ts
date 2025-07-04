@@ -1,6 +1,7 @@
-import { Group, User, ApiResponse} from '@/types'
+import { Group, User, ApiResponse } from '@/types'
 import { apiClient } from '../client'
 import { API_ENDPOINTS } from '../constants'
+import { CreateGroupRequest } from '@/types/request'
 
 export interface UpdateGroupRequest {
   name?: string
@@ -31,7 +32,7 @@ export class GroupService {
   async uploadAvatar(id: number, file: File): Promise<ApiResponse<string>> {
     return await apiClient.uploadFile<string>(API_ENDPOINTS.GROUP.UPLOAD_AVATAR(id), file);
   }
-  
+
   async addMember(groupId: number, user: User): Promise<ApiResponse<Group>> {
     return await apiClient.post<Group>(API_ENDPOINTS.GROUP_MEMBERS.ADD_MEMBER(groupId), user)
 
@@ -56,6 +57,9 @@ export class GroupService {
     return await apiClient.get<Group['members']>(API_ENDPOINTS.GROUP_MEMBERS.GET_MEMBERS(id))
   }
 
+  async createGroup(newGroup: CreateGroupRequest): Promise<ApiResponse<Group>> {
+    return await apiClient.post(API_ENDPOINTS.GROUP.CREATE, newGroup)
+  }
 }
 
 export const groupService = new GroupService()

@@ -5,14 +5,12 @@ interface CustomVideoPlayerProps {
     src: string;
     poster?: string;
     className?: string;
-    style?: React.CSSProperties;
 }
 
 export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
     src,
     poster,
     className = "",
-    style = {},
 }) => {
     const videoRef = useRef<HTMLVideoElement>(null);
     const [playing, setPlaying] = useState(false);
@@ -133,8 +131,7 @@ export const CustomVideoPlayer: React.FC<CustomVideoPlayerProps> = ({
 
     return (
         <div
-            className={`relative bg-black rounded-lg overflow-hidden group ${className}`}
-            style={style}
+            className={`w-full max-h-52 flex relative bg-black rounded-lg overflow-hidden group ${className} justify-center items-center`}
             tabIndex={0}
             onKeyDown={handleKeyDown}
             onFocus={() => setIsFocused(true)}
