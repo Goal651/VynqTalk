@@ -98,7 +98,7 @@ export const useChat = () => {
     }
   }, [user, socket])
 
-  const handleSendMessage = (content: string, type: MessageType, replyData?: Message, fileName?: string) => {
+  const handleSendMessage = (content: string, type: MessageType,fileName: string|null, replyData?: Message) => {
     if (!user || !activeChat) {
       toast({
         title: "Error",
@@ -126,9 +126,9 @@ export const useChat = () => {
 
     if (socket) {
       if (replyData) {
-        socket.messageReply(newMessage.content, activeChat, newMessage.type, user, replyData)
+        socket.messageReply(newMessage.content, activeChat, newMessage.type, user, replyData,newMessage.fileName)
       } else {
-        socket.sendMessage(newMessage.content, activeChat, newMessage.type, user)
+        socket.sendMessage(newMessage.content, activeChat, newMessage.type, user,newMessage.fileName)
       }
     }
 

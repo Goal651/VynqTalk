@@ -136,25 +136,23 @@ export const Notifications = () => {
 
   return (
     <div className="h-full flex flex-col bg-gradient-to-br from-background to-secondary/5">
-      <div className="flex-shrink-0 text-center p-6 border-b space-y-6 bg-background/50 backdrop-blur-sm">
-        <div className="flex justify-between items-center  w-full">
-          <div className="flex flex-col gap-y-6 w-full "> 
-            <h1 className="text-2xl font-bold flex justify-center items-center gap-2">
-              <Bell className="h-6 w-6" />
-              Notifications
-              {unreadCount > 0 && (
-                <Badge variant="destructive" className="animate-pulse">
-                  {unreadCount}
-                </Badge>
-              )}
-            </h1>
-          </div>
+      <div className="flex-shrink-0 text-center p-3 sm:p-6 border-b space-y-4 sm:space-y-6 bg-background/50 backdrop-blur-sm">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 w-full">
+          <h1 className="text-xl sm:text-2xl font-bold flex justify-center items-center gap-2">
+            <Bell className="h-5 w-5 sm:h-6 sm:w-6" />
+            Notifications
+            {unreadCount > 0 && (
+              <Badge variant="destructive" className="animate-pulse">
+                {unreadCount}
+              </Badge>
+            )}
+          </h1>
           {unreadCount > 0 && (
             <Button 
               type="button" 
               onClick={markAllAsRead} 
               variant="outline"
-              className="hover:bg-primary hover:text-primary-foreground transition-colors"
+              className="hover:bg-primary hover:text-primary-foreground transition-colors w-full sm:w-auto mt-2 sm:mt-0"
             >
               <Check className="h-4 w-4 mr-2" />
               Mark all as read
@@ -163,8 +161,8 @@ export const Notifications = () => {
         </div>
 
         <Tabs defaultValue="all" className="w-full" onValueChange={setActiveFilter}>
-          <TabsList className="bg-background/50 backdrop-blur-sm">
-            <TabsTrigger value="all" className="relative">
+          <TabsList className="bg-background/50 backdrop-blur-sm flex flex-wrap">
+            <TabsTrigger value="all" className="relative text-xs sm:text-base">
               All
               {notifications.length > 0 && (
                 <Badge variant="secondary" className="ml-1">
@@ -172,7 +170,7 @@ export const Notifications = () => {
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="unread" className="relative">
+            <TabsTrigger value="unread" className="relative text-xs sm:text-base">
               Unread
               {unreadCount > 0 && (
                 <Badge variant="destructive" className="ml-1">
@@ -180,15 +178,15 @@ export const Notifications = () => {
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="message">Messages</TabsTrigger>
-            <TabsTrigger value="group_invite">Groups</TabsTrigger>
-            <TabsTrigger value="system">System</TabsTrigger>
+            <TabsTrigger value="message" className="text-xs sm:text-base">Messages</TabsTrigger>
+            <TabsTrigger value="group_invite" className="text-xs sm:text-base">Groups</TabsTrigger>
+            <TabsTrigger value="system" className="text-xs sm:text-base">System</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-6 max-w-4xl mx-auto">
+        <div className="p-2 sm:p-6 max-w-4xl mx-auto">
           {isLoading ? (
             <div className="flex items-center justify-center h-64">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -201,7 +199,7 @@ export const Notifications = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.2 }}
-                className="space-y-4"
+                className="space-y-3 sm:space-y-4"
               >
                 {filterNotifications(activeFilter).length === 0 ? (
                   <Card className="bg-background/50 backdrop-blur-sm">
@@ -229,8 +227,8 @@ export const Notifications = () => {
                           !notification.isRead && "ring-2 ring-primary/20 bg-primary/5"
                         )}
                       >
-                        <CardContent className="p-4">
-                          <div className="flex items-start space-x-4">
+                        <CardContent className="p-3 sm:p-4">
+                          <div className="flex items-start space-x-3 sm:space-x-4">
                             <div className="relative">
                               {notification.user.avatar ? (
                                 <Avatar className="ring-2 ring-primary/10">
@@ -252,7 +250,7 @@ export const Notifications = () => {
                             <div className="flex-1 space-y-1">
                               <div className="flex items-center justify-between">
                                 <h3 className={cn(
-                                  "font-medium",
+                                  "font-medium text-sm sm:text-base truncate",
                                   !notification.isRead && "font-semibold"
                                 )}>
                                   {notification.title}
@@ -261,11 +259,11 @@ export const Notifications = () => {
                                   {formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true })}
                                 </span>
                               </div>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-xs sm:text-sm text-muted-foreground truncate">
                                 {notification.details}
                               </p>
                               
-                              <div className="flex items-center space-x-2 pt-2">
+                              <div className="flex items-center space-x-1 sm:space-x-2 pt-2">
                                 {!notification.isRead && (
                                   <Button
                                     type="button"

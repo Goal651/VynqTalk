@@ -1,6 +1,5 @@
 import './App.css'
 import { useEffect, useState } from "react"
-import { Toaster as Sonner } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { BrowserRouter, useNavigate } from "react-router-dom"
@@ -26,26 +25,30 @@ import { messageService } from "@/api/services/messages"
 import { useSocket } from "@/contexts/SocketContext"
 import { ChatView } from "./components/ChatView"
 import { UsersProvider, useUsers } from "@/contexts/UsersContext"
+import { Toaster } from './components/ui/toaster'
+import { authService } from './api'
 
 const queryClient = new QueryClient()
 
 const AppWithMaintenance = () => {
   const [maintenance, setMaintenance] = useState<SystemStatus | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const { user } = useAuth()
+  const { user, refreshUser } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
 
   useEffect(() => {
+
     systemStatusService.getStatus()
       .then(status => setMaintenance(status))
       .catch(err => {
         setError("Unable to fetch system status. Please try again later.")
       })
+    refreshUser()
   }, [])
 
   useEffect(() => {
-   
+
     if (
       maintenance &&
       maintenance.inMaintenance &&
@@ -114,18 +117,19 @@ const AppRoutes = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Sonner />
+      <Toaster />
       <BrowserRouter>
         <AuthProvider>
           <ThemeProvider>
             <SocketProvider>
               <UsersProvider>
-                <AppWithMaintenance />
+                <div className='overflow-hidden h-screen'>
+                  <AppWithMaintenance />
+                </div>
               </UsersProvider>
             </SocketProvider>
           </ThemeProvider>
         </AuthProvider>
-
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

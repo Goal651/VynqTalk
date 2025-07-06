@@ -13,7 +13,7 @@ export const API_ENDPOINTS = {
     SIGNUP: '/auth/signup',
     LOGOUT: '/auth/logout',
     REFRESH: '/auth/refresh',
-    VERIFY_EMAIL: '/auth/verify-email',
+    VERIFY_USER: '/auth/check-user',
     FORGOT_PASSWORD: '/auth/forgot-password',
     RESET_PASSWORD: '/auth/reset-password',
   },
@@ -21,10 +21,11 @@ export const API_ENDPOINTS = {
     ALL: '/user/all',
     PROFILE: (fileName: string) => `/profile/${fileName}`,
     UPDATE_PROFILE: (id: number) => `/user/profile/${id}`,
-    UPLOAD_AVATAR: (id: number) => `/upload/user/${id}`,
+    UPLOAD_AVATAR: '/upload/user',
     BY_ID: (id: number | string) => `/user/${id}`,
-    UPDATE: (id: number | string) => `/user/${id}`,
-    DELETE: (id: number | string) => `/user/${id}`
+    UPDATE: '/user',
+    EXPORT: '/user/export',
+    DELETE: '/user'
   },
 
   CHAT: {
@@ -35,12 +36,11 @@ export const API_ENDPOINTS = {
     DELETE_MESSAGE: (id: string) => `/chat/messages/${id}`,
   },
   MESSAGES: {
-    CONVERSATION: (senderId: string, receiverId: string) => `/messages/conv/${senderId}/${receiverId}`,
+    CONVERSATION: (senderId: string, receiverId: string) => `/messages/all/${senderId}/${receiverId}`,
     BY_ID: (id: number) => `/messages/${id}`,
     UPDATE: (id: number) => `/messages/${id}`,
     DELETE: (id: number) => `/messages/${id}`,
-    SEND: '/messages/send',
-    UPLOAD:'/upload/message',
+    UPLOAD: '/upload/message',
   },
   GROUP: {
     LIST: '/group/all',
@@ -87,17 +87,12 @@ export const API_ENDPOINTS = {
     DASHBOARD_STATS: '/admin/dashboard-stats',
     RECENT_ALERTS: '/admin/alerts/recent',
   },
-  SYSTEM:{
-    STATUS:'/system/status',
+  SYSTEM: {
+    STATUS: '/system/status',
   },
   SETTINGS: {
-    GET: (userId: number) => `/user_settings/${userId}`,
-    UPDATE: (userId: number) => `/user_settings/${userId}`,
-    PRIVACY: (userId: number) => `/user_settings/${userId}/privacy`,
-    NOTIFICATIONS: (userId: number) => `/user_settings/${userId}/notifications`,
-    THEME: (userId: number) => `/user_settings/${userId}/theme`,
-    BLOCK_USER: (userId: number) => `/user_settings/${userId}/block-user`,
-    UNBLOCK_USER: (userId: number) => `/user_settings/${userId}/unblock-user`,
+    GET: '/user/settings',
+    UPDATE: '/user/settings',
   },
 
 };

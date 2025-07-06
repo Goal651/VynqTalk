@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, AxiosProgressEvent, CancelToken } from 'axios';
-import { API_CONFIG, HTTP_STATUS } from './constants';
+import { API_CONFIG, API_ENDPOINTS, HTTP_STATUS } from './constants';
 import { ApiResponse, ApiError } from '@/types';
 
 class ApiClient {
@@ -21,16 +21,11 @@ class ApiClient {
     this.axiosInstance.interceptors.request.use(
       (config) => {
         try {
-          if (config.url?.includes('/auth')||config.url?.includes('/system')) {
-            return config;
-          }
           const token = this.getAuthToken();
-          if (!token) {
-            console.warn('No access token found, triggering logout');
-            this.logout();
-            throw new Error('Missing access token');
+          console.log('Token in interceptor:', token, 'For URL:', config.url);
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
           }
-          config.headers.Authorization = `Bearer ${token}`;
           return config;
         } catch (error) {
           console.error('Error in request interceptor:', error.message);
@@ -54,7 +49,7 @@ class ApiClient {
               message: error?.message || 'An error occurred',
               errors: error.errors,
             };
-            if (apiError.status === HTTP_STATUS.UNAUTHORIZED||apiError.status === HTTP_STATUS.FORBIDDEN) {
+            if (apiError.status === HTTP_STATUS.UNAUTHORIZED || apiError.status === HTTP_STATUS.FORBIDDEN) {
               console.warn('401 Unauthorized detected, attempting token refresh');
               await this.handleUnauthorized();
               // Retry the original request after refresh
@@ -67,7 +62,7 @@ class ApiClient {
           }
           throw new Error('Network error');
         } catch (err) {
-          console.error('Error in response interceptor:', err.message,"this is another error\n",error.status===HTTP_STATUS.UNAUTHORIZED);
+          console.error('Error in response interceptor:', err.message, "this is another error\n", error.status === HTTP_STATUS.UNAUTHORIZED);
           return Promise.reject(err);
         }
       }
@@ -175,7 +170,7 @@ class ApiClient {
   async post<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.post<ApiResponse<T>>(endpoint, data);
-      console.log("This is the response",response,"endpoint",endpoint)
+      console.log("This is the response", response, "endpoint", endpoint)
       return response.data;
     } catch (error) {
       console.error(`POST ${endpoint} failed:`, error.request);

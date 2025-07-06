@@ -208,15 +208,19 @@ export const Groups = () => {
   }
 
   return (
-    <div className="p-6 space-y-6 z-20 px-40">
-      <div className="flex justify-between items-center px-72">
+    <div className="p-2 sm:p-6 space-y-4 sm:space-y-6 z-20 lg:px-20 px-2 sm:px-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:px-4">
         <div>
-          <h1 className="text-2xl font-bold">Groups</h1>
-          <p className="text-muted-foreground">Manage your group conversations</p>
+          <h1 className="text-xl sm:text-2xl font-bold">Groups</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">Manage your group conversations</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button onClick={handleCreateGroupClick}>
+            <Button
+              onClick={handleCreateGroupClick}
+              className="w-full sm:w-auto"
+              size="sm"
+            >
               <Plus className="h-4 w-4 mr-2" />
               Create Group
             </Button>
@@ -269,33 +273,32 @@ export const Groups = () => {
           placeholder="Search groups..."
           value={searchQuery}
           onChange={handleSearchChange}
-          className="pl-9"
+          className="pl-9 text-sm py-2"
         />
       </div>
 
-      <ScrollArea
-        className="grid gap-4 h-[calc(100vh-200px)]">
+      <ScrollArea className="grid gap-3 sm:gap-4 h-[calc(100vh-180px)]">
         {filteredGroups.map((group) => (
           <Card key={group.id} className="hover:bg-accent/50 transition-colors">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <Avatar>
+                <div className="flex items-center space-x-3 sm:space-x-4">
+                  <Avatar className="h-10 w-10 sm:h-12 sm:w-12">
                     <AvatarImage src={group.avatar} />
                     <AvatarFallback>{group.name[0]}</AvatarFallback>
                   </Avatar>
-                  <div>
-                    <CardTitle className="text-lg">{group.name}</CardTitle>
-                    <CardDescription className="text-sm">
+                  <div className="min-w-0">
+                    <CardTitle className="text-base sm:text-lg truncate">{group.name}</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm truncate">
                       {group.description || "No description"}
                     </CardDescription>
                     <div className="flex items-center space-x-2 mt-1">
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary" className="text-[10px] sm:text-xs">
                         <Users className="h-3 w-3 mr-1" />
                         {group.members.length} members
                       </Badge>
                       {group.createdBy.id === user?.id && (
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" className="text-[10px] sm:text-xs">
                           <Crown className="h-3 w-3 mr-1" />
                           Admin
                         </Badge>
@@ -303,11 +306,12 @@ export const Groups = () => {
                     </div>
                   </div>
                 </div>
-                <div className="flex space-x-2">
+                <div className="flex space-x-1 sm:space-x-2">
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => handleGroupChat(group)}
+                    className="h-8 w-8 sm:h-10 sm:w-10"
                   >
                     <MessageCircle className="h-4 w-4" />
                   </Button>
@@ -315,6 +319,7 @@ export const Groups = () => {
                     variant="ghost"
                     size="icon"
                     onClick={() => handleGroupSettings(group)}
+                    className="h-8 w-8 sm:h-10 sm:w-10"
                   >
                     <Settings className="h-4 w-4" />
                   </Button>
@@ -323,7 +328,6 @@ export const Groups = () => {
             </CardContent>
           </Card>
         ))}
-
       </ScrollArea>
     </div>
   );

@@ -17,7 +17,7 @@ const Index = () => {
           onLogout={handleLogout}
           user={user}
         />
-        <main className="flex-1 overflow-hidden relative">
+        <main className="flex-1 overflow-hidden relative pb-20 md:pb-0">
           <Outlet />
         </main>
       </div>

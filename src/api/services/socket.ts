@@ -317,13 +317,13 @@ class SocketService {
         }
     }
 
-    public sendMessage(content: string, receiver: User, type: MessageType, sender: User) {
+    public sendMessage(content: string, receiver: User, type: MessageType, sender: User,fileName:string|null) {
         try {
             if (!this.stompClient.connected) {
                 console.warn('Cannot send message: WebSocket not connected');
                 return;
             }
-            const payload = { content, receiver, type, sender }; // Match backend
+            const payload = { content, receiver, type, sender,fileName }; // Match backend
             this.stompClient.publish({
                 destination: '/app/chat.sendMessage',
                 body: JSON.stringify(payload),
@@ -336,13 +336,13 @@ class SocketService {
         }
     }
 
-    public messageReply(content: string, receiver: User, type: MessageType, sender: User, replyTo: Message) {
+    public messageReply(content: string, receiver: User, type: MessageType, sender: User, replyTo: Message,fileName:string|null) {
         try {
             if (!this.stompClient.connected) {
                 console.warn('Cannot send message: WebSocket not connected');
                 return;
             }
-            const payload = { content, receiver, type, sender, replyTo }; // Match backend
+            const payload = { content, receiver, type, sender, replyTo ,fileName}; // Match backend
             this.stompClient.publish({
                 destination: '/app/chat.sendMessageReply',
                 body: JSON.stringify(payload),

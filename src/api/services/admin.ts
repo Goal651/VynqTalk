@@ -1,4 +1,4 @@
-import { Group, User, ApiResponse, AdminMessage, SystemMetric, Alert, AdminStats } from '@/types';
+import { Group, User, ApiResponse, SystemMetric, Alert, AdminStats, UpdateUserStatusRequest } from '@/types';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
 
@@ -12,8 +12,8 @@ export class AdminService {
     return await apiClient.get<User>(API_ENDPOINTS.ADMIN.USER_BY_ID(id));
   }
 
-  async updateUser(id: number, updates: User): Promise<ApiResponse<User>> {
-    return await apiClient.put<User>(API_ENDPOINTS.ADMIN.UPDATE_USER(id), updates);
+  async updateUser(id: number, updates: UpdateUserStatusRequest): Promise<ApiResponse> {
+    return await apiClient.put(API_ENDPOINTS.ADMIN.UPDATE_USER(id), updates);
   }
 
   async deleteUser(id: number): Promise<ApiResponse<void>> {
@@ -38,14 +38,6 @@ export class AdminService {
     return await apiClient.put<void>(`${API_ENDPOINTS.ADMIN.GROUP_BY_ID(id)}/activate`);
   }
 
-  // Content Moderation
-  async getAllMessages(): Promise<ApiResponse<AdminMessage[]>> {
-    return await apiClient.get<AdminMessage[]>(API_ENDPOINTS.ADMIN.MESSAGES);
-  }
-
-  async getMessageById(id: number): Promise<ApiResponse<AdminMessage>> {
-    return await apiClient.get<AdminMessage>(API_ENDPOINTS.ADMIN.MESSAGE_BY_ID(id));
-  }
 
   async approveMessage(id: number): Promise<ApiResponse<void>> {
     return await apiClient.put<void>(`${API_ENDPOINTS.ADMIN.MESSAGE_BY_ID(id)}/approve`);

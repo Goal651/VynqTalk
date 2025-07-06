@@ -8,7 +8,7 @@ import {
   ContextMenuTrigger,
   ContextMenuSeparator
 } from "@/components/ui/context-menu";
-import { Edit, Trash2, Reply, Copy } from "lucide-react";
+import { Edit, Trash2, Reply, Copy, File } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useUsers } from "@/contexts/UsersContext";
@@ -169,49 +169,49 @@ export const MessageBubble = ({
       )}
 
       <div
-        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg shadow-sm relative ${isCurrentUser
+        className={`max-w-xs min-w-24 lg:max-w-md px-4 py-2 rounded-lg shadow-sm relative ${isCurrentUser
           ? "bg-primary text-primary-foreground ml-auto"
           : "bg-muted text-foreground mr-auto"
           }`}
       >
         {!isCurrentUser && (
-          <p className="text-xs text-muted-foreground mb-1">User {message.sender.name}</p>
+          <p className="text-xs text-muted-foreground mb-1">{message.sender.name}</p>
         )}
 
         {/* Message content rendering based on type */}
         {message.type === "TEXT" && (
-          <div className="break-words whitespace-pre-wrap ">{message.content}</div>
+          <div className="break-words whitespace-pre-wrap mb-2">{message.content}</div>
         )}
         {message.type === "IMAGE" && message.content && (
           <img
             src={message.content}
             alt={message.fileName || "Image"}
-            className="max-w-full rounded-md cursor-pointer"
+            className="max-w-full rounded-md cursor-pointer mb-2"
             style={{ maxHeight: 300 }}
             onClick={() => onMediaClick?.(message.id)}
           />
         )}
         {message.type === "AUDIO" && message.content && (
-          <div className="w-full mt-2">
+          <div className="w-full my-2">
             <CustomAudioPlayer src={message.content} />
           </div>
         )}
         {message.type === "FILE" && message.content && (
-          <div className="flex items-center gap-2 mt-1">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback>{user?.name?.[0] || "U"}</AvatarFallback>
-              <AvatarImage src={user?.avatar} alt={user?.name} />
-            </Avatar>
+          <div className="flex items-center gap-2 my-2">
             <a
               href={message.content}
               download={message.fileName || undefined}
-              className="flex items-center gap-1 text-primary underline break-all"
+              className="relative flex flex-col items-center gap-1  break-all "
               target="_blank"
               rel="noopener noreferrer"
             >
-              {/* File icon from Lucide */}
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" /></svg>
-              <span>{message.fileName || "Download file"}</span>
+              <span className="">{message.fileName || "Download file"}</span>
+              
+                <File
+                  className="w-full h-full rounded-md cursor-pointer mb-2"
+                  style={{ maxHeight: 300 }}
+                />
+              
             </a>
           </div>
         )}
@@ -223,7 +223,7 @@ export const MessageBubble = ({
           </div>
         )}
         {/* Timestamp bottom right */}
-        <span className="absolute bottom-1 right-3 text-xs opacity-60 select-none">
+        <span className="absolute bottom-1 right-3 text-xs opacity-80">
           {formattedTime}
         </span>
       </div>
@@ -238,8 +238,8 @@ export const MessageBubble = ({
                   variant={userReactedEmojis.has(emoji) ? "default" : "secondary"}
                   size="sm"
                   className={`h-6 px-2 text-xs rounded-full shadow ${userReactedEmojis.has(emoji)
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted/80 hover:bg-muted"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted/80 hover:bg-muted"
                     }`}
                   onClick={() => handleEmojiSelect(emoji)}
                 >

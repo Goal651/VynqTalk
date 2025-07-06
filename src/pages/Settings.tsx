@@ -15,7 +15,7 @@ import { useCamera } from "@/hooks/use-camera"
 import { useToast } from "@/hooks/use-toast"
 import { userService } from "@/api/services/users"
 import { settingsService } from "@/api/services/settings"
-import { User, UserSettings } from '@/types'
+import { UserSettings } from '@/types'
 import { base64ToFile } from "@/lib/utils"
 
 export const Settings = () => {
@@ -31,7 +31,7 @@ export const Settings = () => {
 
   const [settings, setSettings] = useState<UserSettings>({
     id: user?.id || 0,
-    user: user as User,
+    user: user,
     theme: theme,
     showOnlineStatus: true,
   })
@@ -41,7 +41,7 @@ export const Settings = () => {
       const fetchSettings = async () => {
         if (!user?.id) return
         try {
-          const response = await settingsService.getSettings(user.id)
+          const response = await settingsService.getSettings()
           if (response.success && response.data) {
             setSettings(response.data)
             if (response.data.theme && response.data.theme !== theme) {
@@ -71,18 +71,20 @@ export const Settings = () => {
   const handleProfileSave = async () => {
     if (!user?.id) return
     try {
-      setSettings((prev) => {
-        return { ...prev, user: { ...user, name: profileData.name, email: profileData.bio } }
-      })
-      const response = await userService.updateProfile(user.id, settings.user)
 
-      if (response.success && response.data) {
+      setSettings((prev) => {
+        return { ...prev, user: { ...user, name: profileData.name, bio: profileData.bio } }
+      })
+      const response = await userService.updateProfile(profileData)
+
+      if (response.success) {
         toast({
           title: "Profile Updated",
           description: "Your profile has been successfully updated.",
         })
       }
     } catch (error) {
+      console.error(error)
       toast({
         title: "Error",
         description: "Failed to update profile",
@@ -95,7 +97,7 @@ export const Settings = () => {
       if (!user?.id || !capturedImage) return
       try {
         const file = base64ToFile(capturedImage, 'profile.png')
-        const response = await userService.uploadAvatar(user.id, file)
+        const response = await userService.uploadAvatar(file)
         if (response.success && response.data) {
           toast({
             title: "Avatar Updated",
@@ -109,7 +111,6 @@ export const Settings = () => {
             avatar: response.data
           }
         }))
-        await handleProfileSave()
       } catch (error) {
         toast({
           title: "Error",
@@ -128,7 +129,7 @@ export const Settings = () => {
         ...settings,
         [key]: value
       }
-      const response = await settingsService.updateSettings(user.id, updatedSettings)
+      const response = await settingsService.updateSettings(updatedSettings)
 
       if (response.success) {
         setSettings(updatedSettings)
@@ -153,7 +154,7 @@ export const Settings = () => {
         ...settings,
         [key]: value
       }
-      const response = await settingsService.updateSettings(user.id, updatedSettings)
+      const response = await settingsService.updateSettings(updatedSettings)
 
       if (response.success) {
         setSettings(updatedSettings)
@@ -178,7 +179,7 @@ export const Settings = () => {
         ...settings,
         [key]: value
       }
-      const response = await settingsService.updateSettings(user.id, updatedSettings)
+      const response = await settingsService.updateSettings(updatedSettings)
 
       if (response.success) {
         setSettings(updatedSettings)
@@ -203,7 +204,7 @@ export const Settings = () => {
         ...settings,
         [key]: value
       }
-      const response = await settingsService.updateSettings(user.id, updatedSettings)
+      const response = await settingsService.updateSettings(updatedSettings)
 
       if (response.success) {
         setSettings(updatedSettings)
@@ -228,7 +229,7 @@ export const Settings = () => {
         ...settings,
         theme: newTheme
       }
-      const response = await settingsService.updateSettings(user.id, updatedSettings)
+      const response = await settingsService.updateSettings(updatedSettings)
       if (response.success) {
         setTheme(newTheme)
         setSettings(updatedSettings)
@@ -252,7 +253,8 @@ export const Settings = () => {
 
   const handleDataExport = async () => {
     try {
-      // Implement data export functionality
+      const response = await userService.getUserData()
+      console.log("Data exported is ", response.data)
       toast({
         title: "Data Export Started",
         description: "Your data export will be ready shortly.",
@@ -268,7 +270,8 @@ export const Settings = () => {
 
   const handleAccountDelete = async () => {
     try {
-      // Implement account deletion functionality
+
+      await userService.deleteUser()
       toast({
         title: "Account Deletion",
         description: "Please contact support to delete your account.",
@@ -285,13 +288,13 @@ export const Settings = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <div className=" text-center p-6 border-b ">
-        <h1 className="text-2xl font-bold">Settings</h1>
-        <p className="text-muted-foreground">Manage your account and application preferences</p>
+      <div className="text-center p-3 sm:p-6 border-b ">
+        <h1 className="text-xl sm:text-2xl font-bold">Settings</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground">Manage your account and application preferences</p>
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-6 space-y-6 max-w-4xl mx-auto">
+        <div className="p-2 sm:p-6 space-y-4 sm:space-y-6 max-w-4xl mx-auto">
           {/* Profile Section */}
           <Card>
             <CardHeader>
@@ -302,9 +305,9 @@ export const Settings = () => {
               <CardDescription>Update your personal information</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <Avatar className="h-20 w-20">
+              <div className="flex flex-col sm:flex-row items-center sm:space-x-4 space-y-3 sm:space-y-0">
+                <div className="relative flex-shrink-0">
+                  <Avatar className="h-16 w-16 sm:h-20 sm:w-20">
                     <AvatarImage src={capturedImage || user?.avatar} alt={user?.name} />
                     <AvatarFallback>{user?.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
                   </Avatar>
@@ -317,7 +320,7 @@ export const Settings = () => {
                     <Camera className="h-4 w-4" />
                   </Button>
                 </div>
-                <div className="space-y-2 flex-1">
+                <div className="space-y-2 flex-1 w-full">
                   <div>
                     <Label htmlFor="name">Display Name</Label>
                     <Input
@@ -326,24 +329,24 @@ export const Settings = () => {
                       onChange={(e) => {
                         setProfileData(prev => ({ ...prev, name: e.target.value }))
                       }}
-                      className="cursor-text"
+                      className="cursor-text text-sm py-2"
                     />
                   </div>
                   <div>
                     <Label htmlFor="email">Bio</Label>
                     <Input
-                      id="email"
+                      id="bio"
                       value={profileData.bio}
                       onChange={(e) => {
-                        setProfileData(prev => ({ ...prev, email: e.target.value }))
+                        setProfileData(prev => ({ ...prev, bio: e.target.value }))
                       }}
-                      type="email"
-                      className="cursor-text"
+                      type="text"
+                      className="cursor-text text-sm py-2"
                     />
                   </div>
                 </div>
               </div>
-              <Button type="button" onClick={handleProfileSave} className="cursor-pointer">
+              <Button type="button" onClick={handleProfileSave} className="cursor-pointer w-full sm:w-auto">
                 <Save className="h-4 w-4 mr-2" />
                 Save Changes
               </Button>
@@ -393,14 +396,14 @@ export const Settings = () => {
               <CardDescription>Control how you receive notifications</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label>Push Notifications</Label>
                   <p className="text-sm text-muted-foreground">Receive notifications on this device</p>
                 </div>
                 <Switch
                   checked={settings.notificationEnabled}
-                  onCheckedChange={(checked) => handleNotificationChange('pushNotifications', checked)}
+                  onCheckedChange={(checked) => handleNotificationChange('notificationEnabled', checked)}
                 />
               </div>
 

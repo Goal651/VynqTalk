@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { adminService } from "@/api/services/admin";
-import { AdminStats, Group, User, SystemMetric, ContentModerationData, Alert, ChartData } from '@/types';
+import { AdminStats, Group, User, SystemMetric, ContentModerationData, Alert, ChartData, UpdateUserStatusRequest } from '@/types';
 import { useSocket } from "@/contexts/SocketContext";
 
 export const useAdminData = () => {
@@ -46,7 +46,7 @@ export const useAdminData = () => {
 
 
 
-  const updateUser = async (userId: number, updates: User) => {
+  const updateUser = async (userId: number, updates: UpdateUserStatusRequest) => {
     try {
       const response = await adminService.updateUser(userId, updates);
       if (response.success) {

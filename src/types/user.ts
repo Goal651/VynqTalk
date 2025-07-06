@@ -1,3 +1,4 @@
+import { Group } from "./group";
 import { Theme } from "./system";
 
 /**
@@ -53,10 +54,7 @@ export interface UserProfile {
 
 
 
-export interface PrivacySettings {
-  allowMessageRequests: boolean;
-  blockedUsers: string[];
-  profileVisibility: 'public' | 'friends' | 'private';
-  readReceipts: boolean;
-  showOnlineStatus: boolean;
+export interface ExportUser {
+  user: User
+  groups: Group[]
 } 

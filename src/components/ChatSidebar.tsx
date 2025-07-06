@@ -5,14 +5,16 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
+import clsx from "clsx";
 
 interface ChatSidebarProps {
   users: User[];
   onUserClick: (user: User) => void;
   activeChat?: User | null;
+  className?: string;
 }
 
-export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps) => {
+export const ChatSidebar = ({ users, onUserClick, activeChat, className }: ChatSidebarProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [callType, setCallType] = useState<"audio" | "video" | null>(null);
   const [callingUser, setCallingUser] = useState<User | null>(null);
@@ -52,7 +54,7 @@ export const ChatSidebar = ({ users, onUserClick, activeChat }: ChatSidebarProps
   };
 
   return (
-    <div className="w-80 border-r border-border flex flex-col h-full bg-card relative z-10">
+    <div className={clsx("w-80 border-r border-border flex flex-col h-full bg-card relative z-10", className)}>
       <div className="p-2 border-b border-border bg-background/80 flex-shrink-0">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />

@@ -3,11 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Users, MessageCircle, MessageSquare, Activity, AlertTriangle, UserCheck, Server, BarChart3 } from "lucide-react";
 import { useAdminMetrics, useDashboardStats, useRecentAlerts } from "../hooks/useAdminData";
 import { useToast } from "@/hooks/use-toast";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export const AdminDashboard = () => {
   const { stats, loading, error } = useDashboardStats();
   const { alerts, loading: alertsLoading, error: alertsError } = useRecentAlerts();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   const handleQuickAction = (action: string) => {
     console.log("Quick action:", action);
@@ -18,8 +20,8 @@ export const AdminDashboard = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className={isMobile ? "flex flex-col gap-3" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"}>
         <Card className="cursor-pointer hover:shadow-lg transition-all duration-200 bg-gradient-to-br from-card to-card/50 border-border/30">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Users</CardTitle>
@@ -70,7 +72,7 @@ export const AdminDashboard = () => {
 
       {error && <div className="text-red-500">Error loading dashboard stats: {error}</div>}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className={isMobile ? "flex flex-col gap-3" : "grid grid-cols-1 lg:grid-cols-2 gap-6"}>
         <Card className="bg-gradient-to-br from-card to-card/50 border-border/30">
           <CardHeader>
             <CardTitle>Recent Alerts</CardTitle>
@@ -98,7 +100,7 @@ export const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-card to-card/50 border-border/30">
+        {/* <Card className="bg-gradient-to-br from-card to-card/50 border-border/30">
           <CardHeader>
             <CardTitle>Quick Actions</CardTitle>
             <CardDescription>Common administrative tasks</CardDescription>
@@ -137,7 +139,7 @@ export const AdminDashboard = () => {
               Generate Reports
             </Button>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );

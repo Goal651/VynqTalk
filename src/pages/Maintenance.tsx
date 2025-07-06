@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const MaintenancePage = ({ message }: { message: string }) => {
   const { logout } = useAuth();
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-muted/30 via-background to-primary/10 relative overflow-hidden animate-fade-in">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-muted/30 via-background to-primary/10 relative overflow-auto animate-fade-in">
       {/* Decorative blurred background shapes */}
       <div className="absolute -top-32 -left-32 w-96 h-96 bg-primary/10 rounded-full blur-3xl z-0" />
       <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-accent/10 rounded-full blur-3xl z-0" />

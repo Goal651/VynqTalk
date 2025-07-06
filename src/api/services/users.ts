@@ -1,4 +1,5 @@
-import { User, ApiResponse } from '@/types';
+import { authService } from './auth';
+import { User, ApiResponse, ExportUser, UpdateProfileRequest } from '@/types';
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../constants';
 
@@ -12,29 +13,25 @@ export class UserService {
   }
 
 
-  async deleteUser(id: string): Promise<ApiResponse<void>> {
-    return await apiClient.delete<void>(API_ENDPOINTS.USER.DELETE(id));
+  async deleteUser(): Promise<ApiResponse<void>> {
+    return await apiClient.delete<void>(API_ENDPOINTS.USER.DELETE);
   }
 
 
-  async updateProfile(id:number,updates:User): Promise<ApiResponse<User>> {
-    return await apiClient.put<User>(API_ENDPOINTS.USER.UPDATE(id),updates);
+  async updateProfile( updates: UpdateProfileRequest): Promise<ApiResponse> {
+    const response=await apiClient.put(API_ENDPOINTS.USER.UPDATE, updates);
+    await authService.refreshUser()
+    return response 
   }
 
-  async uploadAvatar(id:number,file: File): Promise<ApiResponse<string>> {
-    return await apiClient.uploadFile<string>(API_ENDPOINTS.USER.UPLOAD_AVATAR(id), file);
+  async uploadAvatar( file: File): Promise<ApiResponse<string>> {
+    return await apiClient.uploadFile<string>(API_ENDPOINTS.USER.UPLOAD_AVATAR, file);
   }
 
-  async blockUser(userId: string): Promise<ApiResponse<void>> {
-    return await apiClient.post<void>('/users/block', { userId });
-  }
 
-  async unblockUser(userId: string): Promise<ApiResponse<void>> {
-    return await apiClient.post<void>('/users/unblock', { userId });
-  }
 
-  async getOnlineUsers(): Promise<ApiResponse<User[]>> {
-    return await apiClient.get<User[]>('/users/online');
+  async getUserData(): Promise<ApiResponse<ExportUser>> {
+    return await apiClient.get<ExportUser>(API_ENDPOINTS.USER.EXPORT)
   }
 }
 

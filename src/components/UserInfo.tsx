@@ -8,9 +8,10 @@ import { toast } from "@/hooks/use-toast";
 interface UserInfoProps {
   user: User;
   onClose: () => void;
+  className?: string;
 }
 
-export const UserInfo = ({ user, onClose }: UserInfoProps) => {
+export const UserInfo = ({ user, onClose, className }: UserInfoProps) => {
   const [isBlocked, setIsBlocked] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
 
@@ -35,7 +36,7 @@ export const UserInfo = ({ user, onClose }: UserInfoProps) => {
   };
 
   return (
-    <div className="w-80 border-l border-border bg-card h-full flex flex-col">
+    <div className={`w-80 border-l border-border bg-card h-full flex flex-col ${className ?? ""}`}>
       <div className="p-4 border-b border-border flex items-center justify-between">
         <h2 className="text-lg font-semibold">User Info</h2>
         <Button type="button" size="icon" variant="ghost" onClick={onClose}>

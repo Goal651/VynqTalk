@@ -11,7 +11,7 @@ import axios from "axios";
 import { toast } from "sonner";
 
 interface MessageInputProps {
-  onSendMessage: (content: string, type: MessageType, replyTo?: Message) => void;
+  onSendMessage: (content: string, type: MessageType, fileName: string|null, replyTo?: Message) => void;
   currentUser: User;
   replyTo?: Message;
   onCancelReply?: () => void;
@@ -50,7 +50,7 @@ export const MessageInput = ({
     setIsUploading(true);
     // Send text message if present
     if (message.trim()) {
-      onSendMessage(message.trim(), 'TEXT', replyTo);
+      onSendMessage(message.trim(), 'TEXT',null, replyTo);
     }
 
     // Upload and send each file with progress and cancel support
@@ -64,7 +64,7 @@ export const MessageInput = ({
         }, source.token, 60000);
         if (response.success && response.data) {
           const msgType = getMessageTypeForFile(file);
-          onSendMessage(response.data, msgType, replyTo);
+          onSendMessage(response.data, msgType, file.name,replyTo);
         }
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -91,7 +91,6 @@ export const MessageInput = ({
   };
 
   const handleEmojiSelect = (emoji: string) => {
-    console.log("Emoji selected:", emoji);
     setMessage((prev) => prev + emoji);
     setShowEmojiPicker(false);
   };
@@ -104,17 +103,14 @@ export const MessageInput = ({
   };
 
   const handleFileButtonClick = () => {
-    console.log("File button clicked");
     fileInputRef.current?.click();
   };
 
   const handleEmojiButtonClick = () => {
-    console.log("Emoji button clicked");
     setShowEmojiPicker(!showEmojiPicker);
   };
 
   const handleAudioButtonClick = () => {
-    console.log("Audio button clicked");
     setShowAudioRecorder(true);
   };
 
@@ -241,7 +237,7 @@ export const MessageInput = ({
             const audioFile = new File([audioBlob], `audio-${Date.now()}.webm`, { type: 'audio/webm' });
             const response = await messageService.uploadMessage(audioFile, undefined, undefined, 60000);
             if (response.success && response.data) {
-              onSendMessage(response.data, 'AUDIO', replyTo);
+              onSendMessage(response.data, 'AUDIO', 'Voice message',replyTo);
             }
             setIsUploading(false);
             setShowAudioRecorder(false);

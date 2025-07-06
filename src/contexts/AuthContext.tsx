@@ -1,8 +1,9 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { User } from "@/types";
 import { useToast } from "@/hooks/use-toast";
-import { authService, LoginRequest, SignupRequest, ApiError } from "@/api";
+import { LoginRequest, SignupRequest, ApiError } from "@/types";
 import { useNavigate, useLocation } from "react-router-dom";
+import { authService } from "@/api";
 
 interface AuthContextType {
   user: User | null;
@@ -10,6 +11,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   signup: (email: string, password: string, name: string) => Promise<boolean>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -57,13 +59,13 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         const apiUser = response.data.user;
         const user: User = {
           id: apiUser.id,
+          bio: apiUser.bio,
           lastActive: apiUser.lastActive,
           createdAt: apiUser.createdAt,
           status: apiUser.status,
           name: apiUser.name,
           email: apiUser.email,
           avatar: apiUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${apiUser.name}`,
-          isOnline: apiUser.isOnline,
           userRole: apiUser.userRole || "USER"
         };
 
@@ -110,10 +112,10 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
           createdAt: Date(),
           lastActive: Date.now().toString(),
           id: apiUser.id,
+          bio: apiUser.bio,
           name: apiUser.name,
           email: apiUser.email,
           avatar: apiUser.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${apiUser.name}`,
-          isOnline: apiUser.isOnline,
           userRole: apiUser.userRole || "USER"
         };
 
@@ -144,6 +146,20 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+
+
+  const refreshUser = async (): Promise<void> => {
+    try {
+      const response = await authService.refreshUser()
+      if (response) {
+        setUser(response)
+      }
+    } catch (error) {
+      console.error('Refresh user error:', error);
+    }
+  }
+
+
   const logout = async () => {
     try {
       await authService.logout();
@@ -161,7 +177,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, signup, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

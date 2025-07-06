@@ -16,6 +16,7 @@ import { userService } from "@/api/services/users"
 import { groupService } from "@/api/services/groups"
 import { useAuth } from "@/contexts/AuthContext"
 import { GroupChat } from "./GroupChat"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface GroupSettingsProps {
   group: Group
@@ -48,6 +49,7 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
   const [searchResults, setSearchResults] = useState<User[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<"chat" | "settings">("settings")
+  const isMobile = useIsMobile()
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -201,23 +203,23 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
   }
 
   return (
-    <div className="flex flex-col h-full px-40">
+    <div className={`flex flex-col h-full ${isMobile ? 'px-2' : 'px-40'}`}>
       <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full">
-          <div className="p-6 space-y-6">
-            <div className="flex items-center space-x-4">
+          <div className={`${isMobile ? 'p-2 space-y-4' : 'p-6 space-y-6'}`}>
+            <div className={`flex items-center ${isMobile ? 'gap-2' : 'space-x-4'}`}>
               <Button
                 type="button"
                 variant="ghost"
-                size="icon"
+                size={isMobile ? 'default' : 'icon'}
                 onClick={onBack}
-                className="cursor-pointer hover:bg-accent"
+                className={`cursor-pointer hover:bg-accent ${isMobile ? 'rounded-lg p-2' : ''}`}
               >
-                <ArrowLeft className="h-4 w-4" />
+                <ArrowLeft className={isMobile ? 'h-6 w-6' : 'h-4 w-4'} />
               </Button>
               <div>
-                <h1 className="text-2xl font-bold">Group Settings</h1>
-                <p className="text-muted-foreground">Manage your group settings and preferences</p>
+                <h1 className={`${isMobile ? 'text-2xl' : 'text-2xl'} sm:text-3xl font-bold`}>Group Settings</h1>
+                <p className="text-muted-foreground text-sm sm:text-base">Manage your group settings and preferences</p>
               </div>
             </div>
 

@@ -37,6 +37,13 @@ export class AuthService {
   }
 
   /**
+   * Verify logged in user
+   */
+  async checkToken(): Promise<ApiResponse<User>> {
+    return await apiClient.get<User>(API_ENDPOINTS.AUTH.VERIFY_USER)
+  }
+
+  /**
    * Log out the user and clear tokens.
    */
   async logout(): Promise<ApiResponse<void>> {
@@ -91,11 +98,16 @@ export class AuthService {
     } as ResetPasswordRequest);
   }
 
-  /**
-   * Verify the user's email address.
-   */
-  async verifyEmail(token: string): Promise<ApiResponse<void>> {
-    return apiClient.post<void>(API_ENDPOINTS.AUTH.VERIFY_EMAIL, { token });
+
+
+  async refreshUser(): Promise<User> {
+    try {
+      const response = await this.checkToken()
+      if (response.data) localStorage.setItem('user', JSON.stringify(response.data))
+      return response.data
+    } catch (error) {
+      console.error('Refresh user error:', error);
+    }
   }
 
   /**
@@ -111,7 +123,8 @@ export class AuthService {
    * Check if the user is authenticated.
    */
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('access_token');
+    return !!localStorage.getItem('access_token')
+
   }
 
   /**
@@ -122,41 +135,6 @@ export class AuthService {
     return user ? JSON.parse(user) : null;
   }
 
-  /**
-   * Check if the current token is valid.
-   */
-  async checkToken(): Promise<{ valid: boolean; user?: unknown; message?: string }> {
-    try {
-      const response = await apiClient.post('/api/v1/auth/check-token');
-      if (response && typeof response.data === 'object' && response.data !== null) {
-        const data = response.data as { user?: unknown; message?: string };
-        return { valid: true, user: data.user, message: data.message };
-      }
-      return { valid: false, message: 'Invalid response' };
-    } catch (error: unknown) {
-      if (
-        typeof error === 'object' &&
-        error !== null &&
-        'status' in error &&
-        (error as { status?: number }).status === 401
-      ) {
-        return {
-          valid: false,
-          message:
-            typeof (error as { message?: string }).message === 'string'
-              ? (error as { message?: string }).message
-              : 'Token invalid or expired',
-        };
-      }
-      return {
-        valid: false,
-        message:
-          typeof error === 'object' && error !== null && 'message' in error && typeof (error as { message?: string }).message === 'string'
-            ? (error as { message?: string }).message
-            : 'Unknown error',
-      };
-    }
-  }
 }
 
 export const authService = new AuthService();
