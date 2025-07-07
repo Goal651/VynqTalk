@@ -95,6 +95,7 @@ export const Navbar = ({ onLogout, user }: NavbarProps) => {
           </div>
         </div>
       </header>
+
       {/* Mobile Bottom Nav - fixed to bottom */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex justify-around bg-background/90 backdrop-blur-sm border-t border-border/50 shadow-2xl">
         {navItems.slice(0, 4).map((item) => (
@@ -117,6 +118,7 @@ export const Navbar = ({ onLogout, user }: NavbarProps) => {
             </Button>
           </Link>
         ))}
+
         {/* More menu for overflow nav items and logout */}
         <Sheet>
           <SheetTrigger asChild>
@@ -156,10 +158,6 @@ export const Navbar = ({ onLogout, user }: NavbarProps) => {
           </SheetContent>
         </Sheet>
       </nav>
-      {/*
-        IMPORTANT: To avoid content being hidden behind the fixed mobile nav,
-        add `pb-20` (or similar) to your main content container on mobile.
-      */}
     </>
   );
 };

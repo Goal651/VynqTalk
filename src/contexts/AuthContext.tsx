@@ -150,6 +150,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshUser = async (): Promise<void> => {
     try {
+      if(!isAuthenticated)return
       const response = await authService.refreshUser()
       if (response) {
         setUser(response)

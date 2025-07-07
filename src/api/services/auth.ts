@@ -40,7 +40,7 @@ export class AuthService {
    * Verify logged in user
    */
   async checkToken(): Promise<ApiResponse<User>> {
-    return await apiClient.get<User>(API_ENDPOINTS.AUTH.VERIFY_USER)
+        return await apiClient.get<User>(API_ENDPOINTS.AUTH.VERIFY_USER)
   }
 
   /**
