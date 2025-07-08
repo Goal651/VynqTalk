@@ -4,7 +4,7 @@ import { API_ENDPOINTS } from '@/api';
 
 export class NotificationService {
   async getAllNotifications(userId: number): Promise<ApiResponse<Notification[]>> {
-    return await apiClient.get<Notification[]>(API_ENDPOINTS.NOTIFICATIONS.LIST(userId));
+    return await apiClient.get<Notification[]>(API_ENDPOINTS.NOTIFICATIONS.LIST);
   }
 
   async getNotificationById(id: number): Promise<ApiResponse<Notification>> {
@@ -16,7 +16,7 @@ export class NotificationService {
   }
 
   async markAllAsRead(userId: number): Promise<ApiResponse<void>> {
-    return await apiClient.put<void>(API_ENDPOINTS.NOTIFICATIONS.MARK_ALL_READ(userId));
+    return await apiClient.put<void>(API_ENDPOINTS.NOTIFICATIONS.MARK_ALL_READ);
   }
 
   async deleteNotification(id: number): Promise<ApiResponse<void>> {

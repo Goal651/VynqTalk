@@ -82,14 +82,14 @@ export class AuthService {
    * Request a password reset email.
    */
   async forgotPassword(data: ForgotPasswordRequest): Promise<ApiResponse<void>> {
-    return apiClient.post<void>(API_ENDPOINTS.AUTH.FORGOT_PASSWORD,data)
+    return apiClient.post<void>(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, data)
   }
 
   /**
    * Reset the user's password.
    */
-  async resetPassword(data:ResetPasswordRequest): Promise<ApiResponse<void>> {
-    return apiClient.post<void>(API_ENDPOINTS.AUTH.RESET_PASSWORD,data)
+  async resetPassword(data: ResetPasswordRequest): Promise<ApiResponse<void>> {
+    return apiClient.post<void>(API_ENDPOINTS.AUTH.RESET_PASSWORD, data)
   }
 
 
@@ -115,8 +115,13 @@ export class AuthService {
    * Get the stored user from localStorage.
    */
   getStoredUser(): User | null {
-    const user = localStorage.getItem('user')
-    return user ? JSON.parse(user) : null
+    try {
+      const user = localStorage.getItem('user')
+      return user ? JSON.parse(user) : null
+    }
+    catch (error) {
+      localStorage.clear()
+    }
   }
 
 }

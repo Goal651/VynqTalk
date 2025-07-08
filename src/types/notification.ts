@@ -7,7 +7,7 @@ export interface Notification {
   id: number
   title: string
   user: User
-  details: string
+  message: string
   timestamp: string
   isRead: boolean
   type: "INFO" | "WARNING" | "ERROR" | "SUCCESS"

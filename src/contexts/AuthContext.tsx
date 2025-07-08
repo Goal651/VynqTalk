@@ -54,7 +54,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const credentials: LoginRequest = { email, password };
       const response = await authService.login(credentials);
-
       if (response.success && response.data) {
         const apiUser = response.data.user;
         const user: User = {

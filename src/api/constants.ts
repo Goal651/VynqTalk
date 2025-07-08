@@ -55,9 +55,9 @@ export const API_ENDPOINTS = {
     LEAVE: '/group/leave',
   },
   GROUP_MEMBERS: {
-    GET_MEMBERS: (groupId: number) => `/group_member/${groupId}`,
-    ADD_MEMBER: (groupId: number) => `/group_member/${groupId}`,
-    REMOVE_MEMBER: (groupId: number) => `/group_member/${groupId}`
+    GET_MEMBERS: (groupId: number) => `/member/${groupId}`,
+    ADD_MEMBER: (groupId: number,userId:number) => `/member/${groupId}/${userId}`,
+    REMOVE_MEMBER: (groupId: number,userId:number) => `/member/${groupId}/${userId}`
   },
   GROUP_MESSAGES: {
     ALL: (groupId: number) => `/group_messages/conv/${groupId}`,
@@ -68,10 +68,10 @@ export const API_ENDPOINTS = {
     REMOVE_REACTION: (id: number) => `/group_messages/${id}/reactions`,
   },
   NOTIFICATIONS: {
-    LIST: (userId: number) => `/notifications/user/${userId}`,
+    LIST: '/notifications',
     BY_ID: (id: number) => `/notifications/${id}`,
     MARK_READ: (id: number) => `/notifications/${id}/read`,
-    MARK_ALL_READ: (userId: number) => `/notifications/user/${userId}/mark-all-read`,
+    MARK_ALL_READ: '/notifications/mark-all-read',
     DELETE: (id: number) => `/notifications/${id}`,
     SETTINGS: (userId: number) => `/notifications/user/${userId}/settings`,
     DEVICE_REGISTER: '/notifications/device/register',

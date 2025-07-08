@@ -26,11 +26,11 @@ export class GroupService {
   }
 
   async addMember(groupId: number, user: User): Promise<ApiResponse<Group>> {
-    return await apiClient.post<Group>(API_ENDPOINTS.GROUP_MEMBERS.ADD_MEMBER(groupId), user)
+    return await apiClient.post<Group>(API_ENDPOINTS.GROUP_MEMBERS.ADD_MEMBER(groupId,user.id))
   }
 
   async removeMember(groupId: number, userId: number): Promise<ApiResponse<Group>> {
-    return await apiClient.delete<Group>(`${API_ENDPOINTS.GROUP_MEMBERS.REMOVE_MEMBER(groupId)}/${userId}`)
+    return await apiClient.delete<Group>(API_ENDPOINTS.GROUP_MEMBERS.REMOVE_MEMBER(groupId,userId))
   }
 
 

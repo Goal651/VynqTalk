@@ -204,8 +204,6 @@ export const useChat = () => {
   }
 
   const handleReactToMessage = (messageId: number, reaction: Reaction) => {
-    console.log("React to message:", messageId, "with emoji:", reaction.emoji)
-
     setMessages(prevMessages => {
       let hasExistingReaction = false
       const updatedMessages = prevMessages.map(message => {
