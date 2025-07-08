@@ -1,21 +1,17 @@
 import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, Search, Users, MessageSquare, BarChart3, TrendingUp, Server } from "lucide-react";
+import { Shield, Users,BarChart3, TrendingUp, Server } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile ,toast} from "@/hooks";
 import { Button } from "@/components/ui/button";
-
 import { AdminDashboard } from "./admin/components/AdminDashboard";
 import { UserManagement } from "./admin/components/UserManagement";
 import { GroupManagement } from "./admin/components/GroupManagement";
 import { Analytics } from "./admin/components/Analytics";
 import { SystemMetrics } from "./admin/components/SystemMetrics";
 import { SystemControl } from "./admin/components/SystemControl";
-import { toast } from "@/hooks/use-toast";
 
 export const AdminPanel = () => {
   const [searchQuery, setSearchQuery] = useState("");

@@ -1,4 +1,3 @@
-import { formatDistanceToNow } from "date-fns";
 import { Message, User, Reaction } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -13,9 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useUsers } from "@/contexts/UsersContext";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { motion, AnimatePresence } from "framer-motion";
-import { useRef } from "react";
 import { CustomVideoPlayer } from "./CustomVideoPlayer";
 import { CustomAudioPlayer } from "./CustomAudioPlayer";
 

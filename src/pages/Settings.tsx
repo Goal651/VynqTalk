@@ -11,12 +11,10 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useAuth } from "@/contexts/AuthContext"
 import { useTheme } from "@/contexts/ThemeContext"
 import { Camera, Save, Bell, Shield, Palette, Download, Upload, Trash2, UserCircle } from "lucide-react"
-import { useCamera } from "@/hooks/use-camera"
-import { useToast } from "@/hooks/use-toast"
-import { userService } from "@/api/services/users"
-import { settingsService } from "@/api/services/settings"
+import { useCamera ,useToast} from "@/hooks"
+import { settingsService,userService,notificationService } from "@/api"
 import { UserSettings } from '@/types'
-import { base64ToFile } from "@/lib/utils"
+import { base64ToFile ,requestNotificationPermission, subscribeUserToPush} from "@/lib"
 
 export const Settings = () => {
   const { user } = useAuth()
@@ -286,6 +284,27 @@ export const Settings = () => {
     }
   }
 
+  const handleEnableNotifications = async () => {
+    if (!('Notification' in window)) {
+      toast({ title: 'Not supported', description: 'Notifications are not supported in this browser.', variant: 'destructive' });
+      return;
+    }
+    const permission = await requestNotificationPermission();
+    if (permission === 'granted') {
+      const subscription = await subscribeUserToPush();
+      if (subscription) {
+        try {
+          await notificationService.registerDevice(subscription);
+          toast({ title: 'Notifications enabled', description: 'You will now receive notifications.' });
+        } catch (err) {
+          toast({ title: 'Error', description: 'Failed to register for notifications.', variant: 'destructive' });
+        }
+      }
+    } else {
+      toast({ title: 'Permission denied', description: 'You must allow notifications in your browser.' });
+    }
+  };
+
   return (
     <div className="h-full flex flex-col">
       <div className="text-center p-3 sm:p-6 border-b ">
@@ -467,6 +486,18 @@ export const Settings = () => {
               >
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete Account
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Notifications</CardTitle>
+              <CardDescription>Enable or disable browser notifications for new messages.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={handleEnableNotifications} variant="outline" className="flex items-center gap-2">
+                <Bell className="h-4 w-4" /> Enable Notifications
               </Button>
             </CardContent>
           </Card>

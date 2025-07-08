@@ -1,5 +1,4 @@
-import { User } from "@/types/user";
-import { Message } from "@/types/message";
+import { User,Message } from "@/types";
 import { ChatSidebar } from "./ChatSidebar";
 import { MessageList } from "./MessageList";
 import { MessageInput } from "./MessageInput";
@@ -8,23 +7,25 @@ import { UserInfo } from "./UserInfo";
 import { MessageDialogs } from "./MessageDialogs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
-import { useChat } from "@/hooks/useChat";
-import { useMessageOperations } from "@/hooks/useMessageOperations";
+import { useChat,useIsMobile,useMessageOperations  } from "@/hooks";
 import { MediaGalleryModal } from "./MediaGalleryModal";
-import { useState, useMemo } from "react";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useState, useMemo, useEffect } from "react";
+import { useSocket } from "@/contexts/SocketContext";
+import { userService } from '@/api';
 
 
 interface ChatViewProps {
-  onlineUsers: Map<string, string>;
   onMessageDelete?: (messageId: number) => void;
   onMessageEdit?: (message: Message) => void;
   users?: User[];
 }
 
-export const ChatView = ({ onMessageDelete, onMessageEdit, users, onlineUsers }: ChatViewProps) => {
+export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProps) => {
   const { user } = useAuth();
   const isMobile = useIsMobile();
+  const socket = useSocket();
+  const [onlineUserIds, setOnlineUserIds] = useState<Set<number>>(new Set());
+  const [unreadMessages, setUnreadMessages] = useState<import("@/types/message").Message[]>([]);
   
   // Add state to control sidebar visibility on mobile
   const [showSidebar, setShowSidebar] = useState(true);
@@ -88,6 +89,31 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users, onlineUsers }:
     setShowSidebar(true);
   };
 
+  useEffect(() => {
+    if (!socket) return;
+    const handleOnlineUsers = (ids: Set<number>) => setOnlineUserIds(new Set<number>(ids));
+    socket.onOnlineUsersChange(handleOnlineUsers);
+    // Initialize with current value
+    const initial = socket.getOnlineUsers?.();
+    if (initial instanceof Set) {
+      setOnlineUserIds(new Set<number>(Array.from(initial).filter((v): v is number => typeof v === 'number')));
+    } else {
+      setOnlineUserIds(new Set<number>());
+    }
+    return () => {
+      socket.removeOnlineUsersListener(handleOnlineUsers);
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    if (!user) return;
+    userService.getUserData().then(res => {
+      if (res?.data?.unreadMessages) {
+        setUnreadMessages(res.data.unreadMessages);
+      }
+    });
+  }, [user]);
+
   return (
     <div className="flex h-full relative bg-gradient-to-br from-background to-secondary/10">
       {/* Show sidebar only on mobile if no active chat or showSidebar is true */}
@@ -98,6 +124,9 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users, onlineUsers }:
             activeChat={activeChat}
             onUserClick={handleUserClickMobile}
             className="w-full h-full"
+            onlineUserIds={onlineUserIds}
+            currentUserId={user?.id}
+            unreadMessages={unreadMessages}
           />
         ) : null
       ) : (
@@ -105,6 +134,9 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users, onlineUsers }:
           users={users}
           activeChat={activeChat}
           onUserClick={handleUserClick}
+          onlineUserIds={onlineUserIds}
+          currentUserId={user?.id}
+          unreadMessages={unreadMessages}
         />
       )}
 
@@ -112,7 +144,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users, onlineUsers }:
       {activeChat && (!isMobile || !showSidebar) && (
         <div className="flex-1 flex flex-col h-full border-l border-r border-border/30 bg-background/90 backdrop-blur-sm relative z-0">
           <ChatHeader
-            onlineUsers={onlineUsers}
+            onlineUsers={onlineUserIds}
             onUserClick={handleUserAvatarClick}
             activeChat={activeChat}
             onVoiceCall={() => { }}
@@ -163,6 +195,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users, onlineUsers }:
         <UserInfo
           user={selectedUser}
           onClose={handleCloseUserInfo}
+          onlineUsers={onlineUserIds}
           className={isMobile ? "fixed inset-0 w-full h-full z-50 bg-background overflow-auto" : undefined}
         />
       )}

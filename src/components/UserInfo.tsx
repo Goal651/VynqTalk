@@ -3,17 +3,19 @@ import { User } from '@/types';
 import { X, UserPlus, UserMinus, Eye, EyeOff } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
+import { toast } from "@/hooks";
 
 interface UserInfoProps {
   user: User;
   onClose: () => void;
   className?: string;
+  onlineUsers: Set<number>
 }
 
-export const UserInfo = ({ user, onClose, className }: UserInfoProps) => {
+export const UserInfo = ({ user, onClose, className, onlineUsers }: UserInfoProps) => {
   const [isBlocked, setIsBlocked] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
+  const isOnline = onlineUsers.has(user.id)
 
   const handleBlockUser = () => {
     setIsBlocked(!isBlocked);
@@ -51,7 +53,7 @@ export const UserInfo = ({ user, onClose, className }: UserInfoProps) => {
         </Avatar>
         <h3 className="text-xl font-bold">{user.name}</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          {user.isOnline ? "Online" : "Offline"}
+          {isOnline ? "Online" : "Offline"}
         </p>
 
         <div className="w-full space-y-3 mt-6">

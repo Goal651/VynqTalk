@@ -1,8 +1,8 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
-import { settingsService } from "@/api/services/settings";
+import { settingsService } from "@/api";
 import { useAuth } from "./AuthContext";
+import { Theme } from "@/types";
 
-type Theme = "BLUE" | "DARK" | "CYBERPUNK" | "NEON" | "OCEAN" | "SUNSET"
 
 interface ThemeContextType {
   theme: Theme;
@@ -27,7 +27,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       // First try to get theme from backend if user is logged in
       if (user?.id) {
         try {
-          const response = await settingsService.getSettings(user.id);
+          const response = await settingsService.getSettings();
           if (response.success && response.data?.theme) {
             setTheme(response.data.theme);
             return;

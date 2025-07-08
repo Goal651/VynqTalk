@@ -1,5 +1,5 @@
-import { apiClient } from '../client';
-import { API_ENDPOINTS } from '../constants';
+import { apiClient } from '@/api';
+import { API_ENDPOINTS } from '@/api';
 
 export interface SystemStatus {
   inMaintenance: boolean;
@@ -12,7 +12,6 @@ export const systemStatusService = {
     return res.data;
   },
   async setStatus(inMaintenance: boolean, message: string) {
-    // Manually construct the query string
     const params = new URLSearchParams({
       inMaintenance: String(inMaintenance),
       message

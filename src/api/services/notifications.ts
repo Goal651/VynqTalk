@@ -1,6 +1,6 @@
 import { Notification, NotificationSettings, ApiResponse } from '@/types';
-import { apiClient } from '../client';
-import { API_ENDPOINTS } from '../constants';
+import { apiClient } from '@/api';
+import { API_ENDPOINTS } from '@/api';
 
 export class NotificationService {
   async getAllNotifications(userId: number): Promise<ApiResponse<Notification[]>> {
@@ -29,6 +29,14 @@ export class NotificationService {
 
   async updateNotificationSettings(userId: number, settings: Partial<NotificationSettings>): Promise<ApiResponse<NotificationSettings>> {
     return await apiClient.put<NotificationSettings>(API_ENDPOINTS.NOTIFICATIONS.SETTINGS(userId), settings);
+  }
+
+  async registerDevice(subscription: PushSubscription) {
+    return apiClient.post(API_ENDPOINTS.NOTIFICATIONS.DEVICE_REGISTER, { subscription });
+  }
+
+  async unregisterDevice(subscription: PushSubscription) {
+    return apiClient.post(API_ENDPOINTS.NOTIFICATIONS.DEVICE_UNREGISTER, { subscription });
   }
 }
 

@@ -1,6 +1,6 @@
-import { ApiResponse, User, LoginRequest, SignupRequest, AuthResponse, RefreshTokenRequest, ForgotPasswordRequest, ResetPasswordRequest } from '@/types';
-import { apiClient } from '../client';
-import { API_ENDPOINTS } from '../constants';
+import { ApiResponse, User, LoginRequest, SignupRequest, AuthResponse, RefreshTokenRequest, ForgotPasswordRequest, ResetPasswordRequest } from '@/types'
+import { apiClient } from '@/api';
+import { API_ENDPOINTS } from '@/api';
 
 /**
  * Service for authentication-related API calls and local storage management.
@@ -13,12 +13,12 @@ export class AuthService {
     const response = await apiClient.post<AuthResponse>(
       API_ENDPOINTS.AUTH.LOGIN,
       credentials
-    );
+    )
     if (response.success && response.data) {
-      localStorage.setItem('access_token', response.data.accessToken);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      localStorage.setItem('access_token', response.data.accessToken)
+      localStorage.setItem('user', JSON.stringify(response.data.user))
     }
-    return response;
+    return response
   }
 
   /**
@@ -28,19 +28,19 @@ export class AuthService {
     const response = await apiClient.post<AuthResponse>(
       API_ENDPOINTS.AUTH.SIGNUP,
       userData
-    );
+    )
     if (response.success && response.data) {
-      localStorage.setItem('access_token', response.data.accessToken);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      localStorage.setItem('access_token', response.data.accessToken)
+      localStorage.setItem('user', JSON.stringify(response.data.user))
     }
-    return response;
+    return response
   }
 
   /**
    * Verify logged in user
    */
   async checkToken(): Promise<ApiResponse<User>> {
-        return await apiClient.get<User>(API_ENDPOINTS.AUTH.VERIFY_USER)
+    return await apiClient.get<User>(API_ENDPOINTS.AUTH.VERIFY_USER)
   }
 
   /**
@@ -50,12 +50,12 @@ export class AuthService {
     try {
       const response = await apiClient.post<void>(API_ENDPOINTS.AUTH.LOGOUT, {
         refreshToken: localStorage.getItem('refresh_token'),
-      });
-      this.clearTokens();
-      return response;
+      })
+      localStorage.clear()
+      return response
     } catch (error) {
-      this.clearTokens();
-      throw error;
+      localStorage.clear()
+      throw error
     }
   }
 
@@ -63,39 +63,33 @@ export class AuthService {
    * Refresh the access token using the refresh token.
    */
   async refreshToken(): Promise<ApiResponse<AuthResponse>> {
-    const refreshToken = localStorage.getItem('refresh_token');
+    const refreshToken = localStorage.getItem('refresh_token')
     if (!refreshToken) {
-      throw new Error('No refresh token available');
+      throw new Error('No refresh token available')
     }
     const response = await apiClient.post<AuthResponse>(
       API_ENDPOINTS.AUTH.REFRESH,
       { refreshToken } as RefreshTokenRequest
-    );
+    )
     if (response.success && response.data) {
-      localStorage.setItem('access_token', response.data.accessToken);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      localStorage.setItem('access_token', response.data.accessToken)
+      localStorage.setItem('user', JSON.stringify(response.data.user))
     }
-    return response;
+    return response
   }
 
   /**
    * Request a password reset email.
    */
-  async forgotPassword(email: string): Promise<ApiResponse<void>> {
-    return apiClient.post<void>(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, {
-      email,
-    } as ForgotPasswordRequest);
+  async forgotPassword(data: ForgotPasswordRequest): Promise<ApiResponse<void>> {
+    return apiClient.post<void>(API_ENDPOINTS.AUTH.FORGOT_PASSWORD,data)
   }
 
   /**
    * Reset the user's password.
    */
-  async resetPassword(token: string, password: string, confirmPassword: string): Promise<ApiResponse<void>> {
-    return apiClient.post<void>(API_ENDPOINTS.AUTH.RESET_PASSWORD, {
-      token,
-      password,
-      confirmPassword,
-    } as ResetPasswordRequest);
+  async resetPassword(data:ResetPasswordRequest): Promise<ApiResponse<void>> {
+    return apiClient.post<void>(API_ENDPOINTS.AUTH.RESET_PASSWORD,data)
   }
 
 
@@ -106,17 +100,8 @@ export class AuthService {
       if (response.data) localStorage.setItem('user', JSON.stringify(response.data))
       return response.data
     } catch (error) {
-      console.error('Refresh user error:', error);
+      console.error('Refresh user error:', error)
     }
-  }
-
-  /**
-   * Remove all authentication tokens and user info from localStorage.
-   */
-  private clearTokens(): void {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('user');
   }
 
   /**
@@ -124,17 +109,16 @@ export class AuthService {
    */
   isAuthenticated(): boolean {
     return !!localStorage.getItem('access_token')
-
   }
 
   /**
    * Get the stored user from localStorage.
    */
   getStoredUser(): User | null {
-    const user = localStorage.getItem('user');
-    return user ? JSON.parse(user) : null;
+    const user = localStorage.getItem('user')
+    return user ? JSON.parse(user) : null
   }
 
 }
 
-export const authService = new AuthService();
+export const authService = new AuthService()

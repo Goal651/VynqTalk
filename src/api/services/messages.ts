@@ -1,6 +1,6 @@
 import { Message, ApiResponse} from '@/types';
-import { apiClient } from "../client";
-import { API_ENDPOINTS } from "../constants";
+import { apiClient } from '@/api';
+import { API_ENDPOINTS } from '@/api';
 import type { AxiosProgressEvent, CancelToken } from 'axios';
 
 export class MessageService {
@@ -8,8 +8,6 @@ export class MessageService {
   async getMessages(senderId: string, receiverId: string): Promise<ApiResponse<Message[]>> {
     return await apiClient.get<Message[]>(API_ENDPOINTS.MESSAGES.CONVERSATION(senderId, receiverId));
   }
-
-
 
   // Update a message by ID
   async updateMessage(messageId: number, newMessage: Message): Promise<ApiResponse<Message>> {
@@ -41,15 +39,10 @@ export class MessageService {
     file: File,
     onUploadProgress?: (event: AxiosProgressEvent) => void,
     cancelToken?: CancelToken,
-    timeout: number = 60000 // 60 seconds default
+    timeout: number = 60000 
   ): Promise<ApiResponse<string>> {
     return await apiClient.uploadFile<string>(API_ENDPOINTS.MESSAGES.UPLOAD, file, onUploadProgress, cancelToken, timeout);
   }
 }
 
 export const messageService = new MessageService();
-
-// Keep the old functions for backward compatibility
-export const getMessages = messageService.getMessages.bind(messageService);
-export const updateMessage = messageService.updateMessage.bind(messageService);
-export const deleteMessage = messageService.deleteMessage.bind(messageService);

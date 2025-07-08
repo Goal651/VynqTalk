@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { MessageSquare, Camera, User } from "lucide-react";
-import { useCamera } from "@/hooks/use-camera";
+import { useCamera } from "@/hooks";
 import { AuthForm } from "@/components/auth/AuthForm";
 
 const Signup = () => {

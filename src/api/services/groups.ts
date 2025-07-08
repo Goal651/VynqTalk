@@ -1,14 +1,6 @@
-import { Group, User, ApiResponse } from '@/types'
-import { apiClient } from '../client'
-import { API_ENDPOINTS } from '../constants'
-import { CreateGroupRequest } from '@/types/request'
-
-export interface UpdateGroupRequest {
-  name?: string
-  description?: string
-  avatar?: string
-  isPrivate?: boolean
-}
+import { Group, User, ApiResponse, UpdateGroupRequest, CreateGroupRequest } from '@/types'
+import { apiClient } from '@/api';
+import { API_ENDPOINTS } from '@/api';
 
 export class GroupService {
   async getGroups(): Promise<ApiResponse<Group[]>> {
@@ -35,23 +27,12 @@ export class GroupService {
 
   async addMember(groupId: number, user: User): Promise<ApiResponse<Group>> {
     return await apiClient.post<Group>(API_ENDPOINTS.GROUP_MEMBERS.ADD_MEMBER(groupId), user)
-
   }
 
   async removeMember(groupId: number, userId: number): Promise<ApiResponse<Group>> {
     return await apiClient.delete<Group>(`${API_ENDPOINTS.GROUP_MEMBERS.REMOVE_MEMBER(groupId)}/${userId}`)
-
   }
 
-  async joinGroup(groupId: number): Promise<ApiResponse<void>> {
-    return await apiClient.post<void>(API_ENDPOINTS.GROUP.JOIN, { groupId })
-
-  }
-
-  async leaveGroup(groupId: number): Promise<ApiResponse<void>> {
-    return await apiClient.post<void>(API_ENDPOINTS.GROUP.LEAVE, { groupId })
-
-  }
 
   async getGroupMembers(id: number): Promise<ApiResponse<Group['members']>> {
     return await apiClient.get<Group['members']>(API_ENDPOINTS.GROUP_MEMBERS.GET_MEMBERS(id))

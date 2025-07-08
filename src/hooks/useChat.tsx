@@ -1,31 +1,32 @@
 import { useState, useEffect } from "react"
-import { User, Message, Reaction, MessageType } from '@/types'
+import { User, Message, Reaction, MessageType, SendMessageRequest, ChatReaction } from '@/types'
 import { useAuth } from "@/contexts/AuthContext"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks"
 import { useSocket } from "@/contexts/SocketContext"
-import { messageService } from "@/api/services/messages"
+import { messageService } from "@/api"
 
 // Utility to deduplicate reactions: only one per userId+emoji, ignore invalid userIds
 function deduplicateReactions(reactions: { userId: number | string | null, emoji: string }[]): { userId: number, emoji: string }[] {
-  const seen = new Set();
+  const seen = new Set()
   return reactions
     .map(r => ({
       userId: typeof r.userId === "string" ? Number(r.userId) : r.userId,
       emoji: r.emoji
     }))
     .filter(r => {
-      if (!r.userId || typeof r.userId !== "number" || isNaN(r.userId)) return false;
-      const key = `${r.userId}-${r.emoji}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
-    });
+      if (!r.userId || typeof r.userId !== "number" || isNaN(r.userId)) return false
+      const key = `${r.userId}-${r.emoji}`
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
 }
+
 
 export const useChat = () => {
   const { user } = useAuth()
   const { toast } = useToast()
-  const socket = useSocket();
+  const socket = useSocket()
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [showUserInfo, setShowUserInfo] = useState(false)
   const [activeChat, setActiveChat] = useState<User | null>(null)
@@ -55,7 +56,7 @@ export const useChat = () => {
   }, [activeChat, user, toast])
 
   useEffect(() => {
-    if (!socket) return;
+    if (!socket) return
     const handleMessage = (message: Message) => {
       console.log("Received new message:", message)
       setMessages(prevMessages => {
@@ -74,12 +75,31 @@ export const useChat = () => {
         }
         return [...prevMessages, message]
       })
+      if (message.sender.id === user?.id) return
+      // Smart notification logic
+      if (!activeChat || ((message.sender.id !== activeChat.id)) && message.sender.id !== user?.id) {
+        // Not the active chat: show browser notification
+        if (window.Notification && Notification.permission === 'granted') {
+          new Notification(message.sender.name || 'New Message ', {
+            body: message.content,
+            icon: message.sender.avatar || '/logo.svg',
+            tag: `chat-from-${message.sender.id}`,
+          })
+        }
+      } else {
+        // Active chat: show toast
+        toast({
+          title: `New message from ${message.sender.name}`,
+          description: message.content,
+
+        })
+      }
     }
 
     const handleReaction = (message: Message) => {
       console.log("Received reaction:", message)
       // Deduplicate reactions before updating state
-      const cleanedReactions = deduplicateReactions(message.reactions || []);
+      const cleanedReactions = deduplicateReactions(message.reactions || [])
       setMessages(prevMessages =>
         prevMessages.map(m =>
           m.id === message.id
@@ -96,9 +116,9 @@ export const useChat = () => {
       socket.removeMessageListener(handleMessage)
       socket.removeReactionListener(handleReaction)
     }
-  }, [user, socket])
+  }, [user, socket, activeChat])
 
-  const handleSendMessage = (content: string, type: MessageType,fileName: string|null, replyData?: Message) => {
+  const handleSendMessage = (content: string, type: MessageType, fileName: string | null, replyData?: Message) => {
     if (!user || !activeChat) {
       toast({
         title: "Error",
@@ -122,13 +142,20 @@ export const useChat = () => {
       fileName: fileName
     }
 
+    const payload: SendMessageRequest = {
+      content: newMessage.content,
+      senderId: newMessage.sender.id,
+      receiverId: newMessage.receiver.id,
+      type: newMessage.type,
+    }
+
     setMessages(prevMessages => [...prevMessages, newMessage])
 
     if (socket) {
       if (replyData) {
-        socket.messageReply(newMessage.content, activeChat, newMessage.type, user, replyData,newMessage.fileName)
+        socket.messageReply(payload)
       } else {
-        socket.sendMessage(newMessage.content, activeChat, newMessage.type, user,newMessage.fileName)
+        socket.sendMessage(payload)
       }
     }
 
@@ -143,7 +170,7 @@ export const useChat = () => {
     setActiveChat(clickedUser)
     setShowUserInfo(false)
     setReplyTo(null)
-
+    console.log("testing notification user", clickedUser)
     toast({
       title: "Chat opened",
       description: `Now chatting with ${clickedUser.name}`,
@@ -184,31 +211,20 @@ export const useChat = () => {
       const updatedMessages = prevMessages.map(message => {
         if (message.id === messageId) {
           const reactions = message.reactions || []
-          const existingReaction = reactions.find(
-            r => r.emoji === reaction.emoji && r.userId === reaction.userId
-          );
+          const existingReaction = reactions.find(r => r.emoji === reaction.emoji && r.userId === reaction.userId)
+
           let updatedReactions: Reaction[]
           if (existingReaction) {
-            // Remove only this user's reaction for this emoji
-            updatedReactions = reactions.filter(
-              r => !(r.emoji === reaction.emoji && r.userId === reaction.userId)
-            );
+            updatedReactions = reactions.filter(r => !(r.emoji === reaction.emoji && r.userId === reaction.userId))
             hasExistingReaction = true
           } else {
-            // Add this user's reaction for this emoji
-            updatedReactions = [
-              ...reactions,
-              { userId: reaction.userId, emoji: reaction.emoji }
-            ];
+            updatedReactions = [...reactions, { userId: reaction.userId, emoji: reaction.emoji }]
             hasExistingReaction = false
           }
-          const updatedMessage = {
-            ...message,
-            reactions: updatedReactions
-          }
-          if (socket) {
-            socket.messageReact(messageId, updatedReactions)
-          }
+
+          const updatedMessage = { ...message, reactions: updatedReactions }
+          const payload: ChatReaction = { messageId, reactions: updatedReactions }
+          if (socket) socket.messageReact(payload)
           return updatedMessage
         }
         return message

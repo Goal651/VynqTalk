@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
-import { adminService } from "@/api/services/admin";
+import { useToast } from "@/hooks";
+import { adminService } from "@/api";
 import { AdminStats, Group, User, SystemMetric, ContentModerationData, Alert, ChartData, UpdateUserStatusRequest } from '@/types';
 import { useSocket } from "@/contexts/SocketContext";
 
@@ -111,6 +111,7 @@ export const useAdminData = () => {
 
 export const useAdminMetrics = () => {
   const [systemMetrics, setSystemMetrics] = useState<SystemMetric[]>([]);
+  const [userActivityData, setUserActivityData] = useState<ChartData[]>([]);
   const socket = useSocket();
 
   useEffect(() => {
@@ -144,15 +145,14 @@ export const useAdminMetrics = () => {
     };
   }, [socket]);
 
-  const userActivityData: ChartData[] = [
-    { date: "Jan 1", activeUsers: 120, newUsers: 15, messages: 450 },
-    { date: "Jan 2", activeUsers: 135, newUsers: 22, messages: 520 },
-    { date: "Jan 3", activeUsers: 142, newUsers: 18, messages: 480 },
-    { date: "Jan 4", activeUsers: 158, newUsers: 25, messages: 680 },
-    { date: "Jan 5", activeUsers: 165, newUsers: 30, messages: 720 },
-    { date: "Jan 6", activeUsers: 178, newUsers: 28, messages: 850 },
-    { date: "Jan 7", activeUsers: 185, newUsers: 35, messages: 920 },
-  ];
+  useEffect(() => {
+    // Fetch real chart data from backend
+    adminService.getAnalytics().then(res => {
+      if (res && res.data) {
+        setUserActivityData(res.data);
+      }
+    });
+  }, []);
 
   const contentModerationData: ContentModerationData[] = [
     { name: "Approved", value: 850, color: "#22c55e" },

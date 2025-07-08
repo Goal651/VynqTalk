@@ -1,6 +1,6 @@
 import { UserSettings, ApiResponse, UpdateUserSettingsRequest } from '@/types';
-import { apiClient } from '../client';
-import { API_ENDPOINTS } from '../constants';
+import { apiClient } from '@/api';
+import { API_ENDPOINTS } from '@/api';
 
 export class SettingsService {
   async getSettings(): Promise<ApiResponse<UserSettings>> {

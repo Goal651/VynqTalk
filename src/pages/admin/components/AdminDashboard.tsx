@@ -1,9 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Users, MessageCircle, MessageSquare, Activity, AlertTriangle, UserCheck, Server, BarChart3 } from "lucide-react";
-import { useAdminMetrics, useDashboardStats, useRecentAlerts } from "../hooks/useAdminData";
-import { useToast } from "@/hooks/use-toast";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { Users, MessageCircle, MessageSquare, Activity, AlertTriangle, } from "lucide-react";
+import { useDashboardStats, useRecentAlerts } from "../hooks/useAdminData";
+import { useToast ,useIsMobile} from "@/hooks";
 
 export const AdminDashboard = () => {
   const { stats, loading, error } = useDashboardStats();

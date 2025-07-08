@@ -1,5 +1,5 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Message } from "@/types/message";
+import { Message } from "@/types";
 import { Button } from "@/components/ui/button";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -78,7 +78,6 @@ export const MediaGalleryModal = ({
                                     <div className="w-full max-w-2xl rounded-lg overflow-hidden shadow-xl">
                                         <CustomVideoPlayer
                                             src={current.content}
-                                            style={{ background: "#000", maxHeight: 360 }}
                                         />
                                     </div>
                                 )}

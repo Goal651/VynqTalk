@@ -14,8 +14,8 @@ import { Plus, Users, Settings, MessageCircle, Search, Crown } from "lucide-reac
 import { Group} from '@/types';
 import { GroupChatView } from "@/components/GroupChatView";
 import { GroupSettings } from "@/components/GroupSettings";
-import { useToast } from "@/hooks/use-toast";
-import { groupService } from "@/api/services/groups";
+import { useToast } from "@/hooks";
+import { groupService } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { ScrollArea } from "@/components/ui/scroll-area";
 

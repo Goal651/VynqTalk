@@ -1,6 +1,6 @@
 import { Home, Users, Settings, Bell, LogOut, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { User } from "@/types/user";
+import { User } from "@/types";
 import { Link, useLocation } from "react-router-dom";
 import { WebSocketStatus } from "./WebSocketStatus";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";

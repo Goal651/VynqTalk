@@ -7,16 +7,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Switch } from "@/components/ui/switch"
-import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, Camera, UserPlus, UserMinus, Crown, Shield, Trash2, Plus, X, Search } from "lucide-react"
+import { ArrowLeft, Camera,  Trash2, Plus, X, Search } from "lucide-react"
 import { Group, User } from '@/types'
-import { useToast } from "@/hooks/use-toast"
+import { useToast,useIsMobile  } from "@/hooks"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { userService } from "@/api/services/users"
-import { groupService } from "@/api/services/groups"
+import { userService,groupService } from "@/api"
 import { useAuth } from "@/contexts/AuthContext"
-import { GroupChat } from "./GroupChat"
-import { useIsMobile } from "@/hooks/use-mobile"
 
 interface GroupSettingsProps {
   group: Group
@@ -42,7 +38,6 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
 
   const [showAddMember, setShowAddMember] = useState(false)
   const [newMember, setNewMember] = useState<User | null>(null)
-  const [isAdding, setIsAdding] = useState(false)
   const [suggestions, setSuggestions] = useState<User[]>([])
   const [users, setUsers] = useState<User[]>([])
   const [searchQuery, setSearchQuery] = useState("")

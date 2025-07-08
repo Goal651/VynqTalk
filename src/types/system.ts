@@ -1,1 +1,1 @@
-export type Theme = "BLUE" | "DARK" | "CYBERPUNK" | "NEON" | "OCEAN" | "SUNSET";
+export type Theme = "BLUE" | "DARK" | "CYBERPUNK" | "NEON" | "OCEAN" | "SUNSET"

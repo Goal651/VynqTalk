@@ -3,37 +3,32 @@ import { useEffect, useState } from "react"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { BrowserRouter, useNavigate } from "react-router-dom"
-import { AuthProvider, useAuth } from "./contexts/AuthContext"
-import { ThemeProvider } from "./contexts/ThemeContext"
-import { SocketProvider } from "./contexts/SocketContext"
-import MaintenancePage from "./pages/Maintenance"
-import { systemStatusService, SystemStatus } from "@/api/services/systemStatus"
+import { AuthProvider, useAuth } from "@/contexts/AuthContext"
+import { ThemeProvider } from "@/contexts/ThemeContext"
+import { SocketProvider } from "@/contexts/SocketContext"
+import MaintenancePage from "@/pages/Maintenance"
+import { systemStatusService, SystemStatus ,userService } from "@/api"
 import { Routes, Route, Navigate, useLocation } from "react-router-dom"
-import Index from "./pages/Index"
-import { Groups } from "./pages/Groups"
-import { Settings } from "./pages/Settings"
-import { Notifications } from "./pages/Notifications"
-import { AdminPanel } from "./pages/AdminPanel"
-import Login from "./pages/Login"
-import Signup from "./pages/Signup"
-import NotFound from "./pages/NotFound"
-import { useToast } from "@/hooks/use-toast"
-import { Message } from "@/types/message"
-import { User } from "@/types/user"
-import { userService } from "@/api/services/users"
-import { messageService } from "@/api/services/messages"
-import { useSocket } from "@/contexts/SocketContext"
-import { ChatView } from "./components/ChatView"
+import Index from "@/pages/Index"
+import { Groups } from "@/pages/Groups"
+import { Settings } from "@/pages/Settings"
+import { Notifications } from "@/pages/Notifications"
+import { AdminPanel } from "@/pages/AdminPanel"
+import Login from "@/pages/Login"
+import Signup from "@/pages/Signup"
+import NotFound from "@/pages/NotFound"
+import { useToast } from "@/hooks"
+import { User } from "@/types"
+import { ChatView } from "@/components/ChatView"
 import { UsersProvider, useUsers } from "@/contexts/UsersContext"
-import { Toaster } from './components/ui/toaster'
-import { authService } from './api'
+import { Toaster } from '@/components/ui/toaster'
 
 const queryClient = new QueryClient()
 
 const AppWithMaintenance = () => {
   const [maintenance, setMaintenance] = useState<SystemStatus | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const { user, refreshUser } = useAuth()
+  const { user } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -44,7 +39,7 @@ const AppWithMaintenance = () => {
       .catch(err => {
         setError("Unable to fetch system status. Please try again later.")
       })
-    refreshUser()
+   
   }, [])
 
   useEffect(() => {
@@ -168,8 +163,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const ChatViewWrapper = () => {
   const { toast } = useToast()
   const [users, setUsers] = useState<User[]>([])
-  const [onlineUsers, setOnlineUsers] = useState<Map<string, string>>(new Map())
-  const socket = useSocket()
   const usersContext = useUsers()
 
   useEffect(() => {
@@ -191,60 +184,9 @@ const ChatViewWrapper = () => {
       }
     }
     fetchUsers()
-
   }, [])
 
-  useEffect(() => {
-    if (!socket) return
-    const handleUsers = (users: Map<string, string>) => {
-      setOnlineUsers(users)
-    }
-    socket.onOnlineUsersChange(handleUsers)
-    return () => {
-      socket.removeOnlineUsersListener(handleUsers)
-    }
-  }, [socket])
-
-  const handleMessageDeleted = async (messageId: number) => {
-    try {
-      await messageService.deleteMessage(messageId)
-      toast({
-        title: "Message deleted",
-        description: "Your message has been deleted successfully.",
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "There was an error deleting your message.",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const handleMessageEdit = async (message: Message) => {
-    try {
-      await messageService.updateMessage(message.id, message)
-      toast({
-        title: "Message updated",
-        description: "Your message has been updated successfully.",
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "There was an error updating your message.",
-        variant: "destructive",
-      })
-    }
-  }
-
-  return (
-    <ChatView
-      onMessageDelete={handleMessageDeleted}
-      onMessageEdit={handleMessageEdit}
-      users={users}
-      onlineUsers={onlineUsers}
-    />
-  )
+  return <ChatView users={users} />
 }
 
 export default App

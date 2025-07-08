@@ -1,6 +1,6 @@
-import { Group, User, ApiResponse, SystemMetric, Alert, AdminStats, UpdateUserStatusRequest } from '@/types';
-import { apiClient } from '../client';
-import { API_ENDPOINTS } from '../constants';
+import { Group, User, ApiResponse, SystemMetric, Alert, AdminStats, UpdateUserStatusRequest, ChartData } from '@/types';
+import { apiClient } from '@/api';
+import { API_ENDPOINTS } from '@/api';
 
 export class AdminService {
   // User Management
@@ -52,8 +52,12 @@ export class AdminService {
   }
 
   // Analytics & Metrics
-  async getAnalytics(): Promise<ApiResponse<unknown>> {
-    return await apiClient.get<unknown>(API_ENDPOINTS.ADMIN.ANALYTICS);
+  /**
+   * Fetch daily statistics for admin analytics (ChartData[]).
+   * Each entry includes: date, activeUsers, newUsers, messages.
+   */
+  async getAnalytics(): Promise<ApiResponse<ChartData[]>> {
+    return await apiClient.get<ChartData[]>(API_ENDPOINTS.ADMIN.ANALYTICS);
   }
 
   async getSystemMetrics(): Promise<ApiResponse<SystemMetric[]>> {

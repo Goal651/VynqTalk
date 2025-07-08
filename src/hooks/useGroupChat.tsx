@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react"
-import { Group, GroupMessage, User } from '@/types';
+import { ChatReaction, Group, GroupMessage, SendGroupMessageRequest, User } from '@/types';
 import { useAuth } from "@/contexts/AuthContext"
-import { useToast } from "@/hooks/use-toast"
+import { useToast } from "@/hooks"
 import { useSocket } from "@/contexts/SocketContext"
-import { groupMessageService } from "@/api/services/groupMessages"
+import { groupMessageService } from "@/api"
 
 // Utility to deduplicate reactions: only one per userId+emoji, ignore invalid userIds
-function deduplicateReactions(reactions: { userId: number|string|null, emoji: string }[]): { userId: number, emoji: string }[] {
+function deduplicateReactions(reactions: { userId: number | string | null, emoji: string }[]): { userId: number, emoji: string }[] {
   const seen = new Set();
   return reactions
     .map(r => ({
@@ -58,7 +58,7 @@ export const useGroupChat = (group: Group) => {
         if (message.sender.id === user?.id) {
           return prevMessages.map(m =>
             m.content === message.content &&
-            m.sender.id === message.sender.id
+              m.sender.id === message.sender.id
               ? { ...m, id: message.id, reactions: cleanedReactions }
               : m
           );
@@ -98,10 +98,16 @@ export const useGroupChat = (group: Group) => {
       reactions: [],
       isEdited: false,
     }
-    setMessages(prevMessages => [...prevMessages, newMessage])
-    if (socket) {
-      socket.sendGroupMessage(newMessage.content, group, newMessage.type, user)
+    const payload: SendGroupMessageRequest = {
+      content: newMessage.content,
+      senderId: newMessage.sender.id,
+      groupId: newMessage.group.id,
+      type: newMessage.type,
+      replyToId: newMessage.replyTo.id
     }
+    setMessages(prevMessages => [...prevMessages, newMessage])
+    if (socket) socket.sendGroupMessage(payload)
+
     toast({
       title: "Message sent",
       description: `Message sent to ${group.name}`,
@@ -140,8 +146,13 @@ export const useGroupChat = (group: Group) => {
             { userId: user.id, emoji }
           ];
         }
+
+        const payload: ChatReaction = {
+          messageId,
+          reaction: updatedReactions
+        }
         if (socket) {
-          socket.messageReact(messageId, updatedReactions);
+          socket.messageReact(payload);
         }
         return { ...message, reactions: updatedReactions };
       });

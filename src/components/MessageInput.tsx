@@ -6,7 +6,7 @@ import { MessageCircle, Smile, Paperclip, Mic, X, Loader2 } from "lucide-react";
 import { EmojiPicker } from "./EmojiPicker";
 import { AudioRecorder } from "./AudioRecorder";
 import { FilePreview } from "./FilePreview";
-import { messageService } from "@/api/services/messages";
+import { messageService } from "@/api";
 import axios from "axios";
 import { toast } from "sonner";
 

@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Message, Reaction } from "@/types/message";
-import { User } from "@/types/user";
+import { Message, Reaction,User } from "@/types";
 import { MessageBubble } from "./MessageBubble";
 import { format, isToday, isYesterday } from "date-fns";
 

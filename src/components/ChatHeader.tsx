@@ -1,13 +1,13 @@
-import { User } from "@/types/user";
+import { User } from "@/types";
 import { Button } from "@/components/ui/button";
 import { MoreVertical, ChevronLeft } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { CallControls } from "./CallControls";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks";
 
 interface ChatHeaderProps {
-  onlineUsers: Map<string, string>;
+  onlineUsers: Set<number>;
   onUserClick?: (user: User) => void;
   activeChat?: User | null;
   onVoiceCall?: () => void;
@@ -25,7 +25,7 @@ export const ChatHeader = ({
   onBack,
 }: ChatHeaderProps) => {
   const isMobile = useIsMobile();
-  const isOnline = onlineUsers.has(activeChat?.email);
+  const isOnline = !!(activeChat && onlineUsers.has(activeChat.id));
 
   const handleUserClick = () => {
     if (onUserClick) onUserClick(activeChat);
@@ -55,7 +55,7 @@ export const ChatHeader = ({
             <div className="flex items-center space-x-3 cursor-pointer" onClick={handleUserClick}>
               <div className="relative">
                 <Avatar
-                  className={`cursor-pointer transition-transform hover:scale-105 ${
+                  className={`rounded-full w-12 h-12 cursor-pointer transition-transform hover:scale-105 ${
                     isOnline ? "ring-2 ring-green-500" : ""
                   }`}
                 >
@@ -64,7 +64,7 @@ export const ChatHeader = ({
                     alt={activeChat.name}
                     className="w-10 h-10 rounded-full"
                   />
-                  <AvatarFallback className="rounded-full p-3 bg-primary/10 text-primary font-bold">
+                  <AvatarFallback className="rounded-full h-10 w-10 p-3 bg-primary/10 text-primary font-bold">
                     {activeChat.name.substring(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>

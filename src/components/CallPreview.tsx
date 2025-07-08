@@ -1,4 +1,4 @@
-import { User } from "@/types/user";
+import { User } from "@/types";
 import { Phone, Video, X, Mic, MicOff, VideoOff } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";

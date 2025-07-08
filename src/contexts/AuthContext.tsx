@@ -1,6 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { User } from "@/types";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks";
 import { LoginRequest, SignupRequest, ApiError } from "@/types";
 import { useNavigate, useLocation } from "react-router-dom";
 import { authService } from "@/api";
@@ -71,6 +71,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
         setUser(user);
         setIsAuthenticated(true);
+
+        // (Notification permission and push subscription now handled in Settings)
 
         toast({
           title: "Login successful",

@@ -1,9 +1,10 @@
 // API Configuration Constants
-//DEDPLOY_URL=https://vynqtalk-server-production.up.railway.app
+
+const SERVER_URL = 'https://vynqtalk-server-production.up.railway.app'
 
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.MODE === 'development' ? 'http://localhost:8080' : 'https://vynqtalk-server-production.up.railway.app',
-  API_VERSION: 'v1',
+  BASE_URL: import.meta.env.MODE === 'development' ? 'http://localhost:8080' : SERVER_URL,
+  API_VERSION: 'v2',
   TIMEOUT: 10000,
 };
 
@@ -21,6 +22,7 @@ export const API_ENDPOINTS = {
     ALL: '/user/all',
     PROFILE: (fileName: string) => `/profile/${fileName}`,
     UPDATE_PROFILE: (id: number) => `/user/profile/${id}`,
+    GET_DATA: '/user',
     UPLOAD_AVATAR: '/upload/user',
     BY_ID: (id: number | string) => `/user/${id}`,
     UPDATE: '/user',
@@ -72,6 +74,8 @@ export const API_ENDPOINTS = {
     MARK_ALL_READ: (userId: number) => `/notifications/user/${userId}/mark-all-read`,
     DELETE: (id: number) => `/notifications/${id}`,
     SETTINGS: (userId: number) => `/notifications/user/${userId}/settings`,
+    DEVICE_REGISTER: '/notifications/device/register',
+    DEVICE_UNREGISTER: '/notifications/device/register',
   },
   ADMIN: {
     USERS: '/admin/users',
@@ -105,15 +109,17 @@ export const HTTP_STATUS = {
   FORBIDDEN: 403,
   NOT_FOUND: 404,
   INTERNAL_SERVER_ERROR: 500,
-} as const;
+};
 
 export const SOCKET_EVENTS = {
-  SEND_MESSAGE: 'chat:send',
-  RECEIVE_MESSAGE: 'chat:receive',
-  USER_TYPING: 'user:typing',
-  USER_STOP_TYPING: 'user:stopTyping',
-  USER_ONLINE: 'user:online',
-  USER_OFFLINE: 'user:offline',
-  JOIN_GROUP: 'group:join',
-  LEAVE_GROUP: 'group:leave',
+  MESSAGE: {
+    SEND_MESSAGE: '/app/chat.sendMessage',
+    REPLY_MESSAGE: '/app/chat.sendMessageReply',
+    REACT_MESSAGE: '/app/chat.sendMessageReaction',
+  },
+  GROUP_MESSAGE: {
+    SEND_MESSAGE: '/app/group.sendMessage',
+    REPLY_MESSAGE: '/app/group.sendMessageReply',
+    REACT_MESSAGE: '/app/group.sendMessageReaction',
+  }
 };

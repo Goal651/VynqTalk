@@ -1,20 +1,21 @@
 import { Outlet } from "react-router-dom"
-import { Navbar } from "../components/Navbar"
-import { ThemeProvider } from "../contexts/ThemeContext"
+import { Navbar } from "@/components/Navbar"
+import { ThemeProvider } from "@/contexts/ThemeContext"
 import { useAuth } from "@/contexts/AuthContext"
+import { useEffect } from "react"
 
 const Index = () => {
-  const { user, logout } = useAuth()
+  const { user, logout, refreshUser } = useAuth()
 
-  const handleLogout = () => {
-    logout()
-  }
+  useEffect(() => {
+    refreshUser()
+  }, [])
 
   return (
     <ThemeProvider>
       <div className="flex flex-col h-screen bg-background">
         <Navbar
-          onLogout={handleLogout}
+          onLogout={logout}
           user={user}
         />
         <main className="flex-1 overflow-hidden relative pb-20 md:pb-0">

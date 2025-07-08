@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { systemStatusService, SystemStatus } from "@/api/services/systemStatus";
+import { systemStatusService, SystemStatus } from "@/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";

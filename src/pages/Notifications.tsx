@@ -1,138 +1,138 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { formatDistanceToNow } from "date-fns";
-import { Bell, MessageCircle, Users, UserPlus, Settings, Trash2, Check, Filter, X } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { notificationService } from "@/api/services/notifications";
-import { Notification } from "@/types";
-import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "@/contexts/AuthContext";
+import { useState, useEffect } from "react"
+import { Card, CardContent} from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { formatDistanceToNow } from "date-fns"
+import { Bell, MessageCircle, Users, UserPlus, Settings, Trash2, Check,} from "lucide-react"
+import { useToast } from "@/hooks"
+import { notificationService } from "@/api"
+import { Notification } from "@/types"
+import { cn } from "@/lib"
+import { motion, AnimatePresence } from "framer-motion"
+import { useAuth } from "@/contexts/AuthContext"
 
 export const Notifications = () => {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState("all");
-  const { toast } = useToast();
-  const { user } = useAuth();
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [activeFilter, setActiveFilter] = useState("all")
+  const { toast } = useToast()
+  const { user } = useAuth()
   useEffect(() => {
-    fetchNotifications();
-  }, []);
+    fetchNotifications()
+  }, [])
 
   const fetchNotifications = async () => {
     try {
-      setIsLoading(true);
-      const response = await notificationService.getAllNotifications(user?.id || 0);
-      console.log("Notification response", response);
+      setIsLoading(true)
+      const response = await notificationService.getAllNotifications(user?.id || 0)
+      console.log("Notification response", response)
       if (response.success && response.data) {
-        setNotifications(response.data);
+        setNotifications(response.data)
       }
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to fetch notifications",
         variant: "destructive",
-      });
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter(n => !n.isRead).length
 
   const markAsRead = async (id: number) => {
     try {
-      await notificationService.markAsRead(id);
+      await notificationService.markAsRead(id)
       setNotifications(prev => 
         prev.map(n => n.id === id ? { ...n, isRead: true } : n)
-      );
+      )
       toast({
         title: "Success",
         description: "Notification marked as read",
-      });
+      })
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to mark notification as read",
         variant: "destructive",
-      });
+      })
     }
-  };
+  }
 
   const markAllAsRead = async () => {
     try {
-      await notificationService.markAllAsRead(user?.id || 0 );
-      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+      await notificationService.markAllAsRead(user?.id || 0 )
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
       toast({
         title: "Success",
         description: "All notifications marked as read",
-      });
+      })
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to mark all notifications as read",
         variant: "destructive",
-      });
+      })
     }
-  };
+  }
 
     const deleteNotification = async (id: number) => {
     try {
-      await notificationService.deleteNotification(id);
-      setNotifications(prev => prev.filter(n => n.id !== id));
+      await notificationService.deleteNotification(id)
+      setNotifications(prev => prev.filter(n => n.id !== id))
       toast({
         title: "Success",
         description: "Notification deleted",
-      });
+      })
     } catch (error) {
       toast({
         title: "Error",
         description: "Failed to delete notification",
         variant: "destructive",
-      });
+      })
     }
-  };
+  }
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "message":
-        return <MessageCircle className="h-4 w-4" />;
+        return <MessageCircle className="h-4 w-4" />
       case "group_invite":
-        return <Users className="h-4 w-4" />;
+        return <Users className="h-4 w-4" />
       case "mention":
-        return <UserPlus className="h-4 w-4" />;
+        return <UserPlus className="h-4 w-4" />
       case "system":
-        return <Settings className="h-4 w-4" />;
+        return <Settings className="h-4 w-4" />
       default:
-        return <Bell className="h-4 w-4" />;
+        return <Bell className="h-4 w-4" />
     }
-  };
+  }
 
   const getNotificationColor = (type: string) => {
     switch (type) {
       case "message":
-        return "bg-blue-500";
+        return "bg-blue-500"
       case "group_invite":
-        return "bg-green-500";
+        return "bg-green-500"
       case "mention":
-        return "bg-orange-500";
+        return "bg-orange-500"
       case "system":
-        return "bg-red-500";
+        return "bg-red-500"
       default:
-        return "bg-gray-500";
+        return "bg-gray-500"
     }
-  };
+  }
 
   const filterNotifications = (filter: string) => {
-    if (filter === "all") return notifications;
-    if (filter === "unread") return notifications.filter(n => !n.isRead);
-    return notifications.filter(n => n.type === filter);
-  };
+    if (filter === "all") return notifications
+    if (filter === "unread") return notifications.filter(n => !n.isRead)
+    return notifications.filter(n => n.type === filter)
+  }
 
   return (
     <div className="h-full flex flex-col bg-gradient-to-br from-background to-secondary/5">
@@ -300,5 +300,5 @@ export const Notifications = () => {
         </div>
       </ScrollArea>
     </div>
-  );
-};
+  )
+}
