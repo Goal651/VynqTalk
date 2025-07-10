@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { User, Message, MessageType } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,9 +9,11 @@ import { FilePreview } from "./FilePreview";
 import { messageService } from "@/api";
 import axios from "axios";
 import { toast } from "sonner";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { X as CloseIcon } from "lucide-react";
 
 interface MessageInputProps {
-  onSendMessage: (content: string, type: MessageType, fileName: string|null, replyTo?: Message) => void;
+  onSendMessage: (content: string, type: MessageType, fileName: string | null, replyTo?: Message) => void;
   currentUser: User;
   replyTo?: Message;
   onCancelReply?: () => void;
@@ -24,6 +26,8 @@ function getMessageTypeForFile(file: File): MessageType {
   if (file.type.startsWith("video/")) return "VIDEO";
   return "FILE";
 }
+
+const LINK_PREVIEW_API_KEY = "3b3f4d51fc1a85aeab5c0e15b90913fa";
 
 export const MessageInput = ({
   onSendMessage,
@@ -42,6 +46,51 @@ export const MessageInput = ({
     progress: number;
     cancel: () => void;
   }[]>([]);
+  const [linkPreview, setLinkPreview] = useState<null | { url: string; title?: string; description?: string; image: string }>(null);
+
+  // Regex to detect URLs
+  const urlRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
+
+  // Fetch link preview (placeholder logic)
+  const fetchLinkPreview = async (url: string) => {
+    try {
+      const apiUrl = `https://api.linkpreview.net/?key=${LINK_PREVIEW_API_KEY}&q=${encodeURIComponent(url)}`;
+      const res = await fetch(apiUrl);
+      if (!res.ok) throw new Error("API error");
+      const data = await res.json();
+      setLinkPreview({
+        url,
+        title: data.title,
+        description: data.description,
+        image: data.image || `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`,
+      });
+    } catch (err) {
+      // Fallback: just show the URL
+      setLinkPreview({ url, title: url, image: `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}` });
+    }
+  };
+
+  // Watch for URLs in the message
+  useEffect(() => {
+    const urls = message.match(urlRegex);
+    if (urls && urls.length > 0) {
+      // Only preview the first URL
+      if (!linkPreview || linkPreview.url !== urls[0]) {
+        fetchLinkPreview(urls[0]);
+      }
+    } else if (linkPreview) {
+      setLinkPreview(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message]);
+
+  // Helper: get all file URLs (data URLs, blob URLs, or file names if available)
+  const fileUrls = files.map(f => {
+    if (typeof f === 'object' && f instanceof File) {
+      return f.name;
+    }
+    return '';
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +99,7 @@ export const MessageInput = ({
     setIsUploading(true);
     // Send text message if present
     if (message.trim()) {
-      onSendMessage(message.trim(), 'TEXT',null, replyTo);
+      onSendMessage(message.trim(), 'TEXT', null, replyTo);
     }
 
     // Upload and send each file with progress and cancel support
@@ -64,7 +113,7 @@ export const MessageInput = ({
         }, source.token, 60000);
         if (response.success && response.data) {
           const msgType = getMessageTypeForFile(file);
-          onSendMessage(response.data, msgType, file.name,replyTo);
+          onSendMessage(response.data, msgType, file.name, replyTo);
         }
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -159,11 +208,17 @@ export const MessageInput = ({
   const isDisabled = !message.trim() && files.length === 0;
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 border-t border-border bg-secondary/50 relative z-10">
+    <form onSubmit={handleSubmit} className="sticky bottom-0 left-0 right-0 z-30 bg-secondary/70 border-t border-border shadow-lg px-4 py-3 sm:px-6 sm:py-4 flex flex-col gap-2">
       {isUploading && (
         <div className="absolute inset-0 bg-black/40 flex items-center justify-center z-50 rounded-lg">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <span className="ml-3 text-primary font-medium">Uploading...</span>
+        </div>
+      )}
+
+      {files.length > 0 && (
+        <div className="mb-2">
+          <FilePreview files={files} onRemove={i => setFiles(files => files.filter((_, idx) => idx !== i))} />
         </div>
       )}
 
@@ -218,15 +273,28 @@ export const MessageInput = ({
         </div>
       )}
 
-      {files.length > 0 && (
-        <FilePreview
-          files={files}
-          onRemove={(index) => {
-            console.log("File removed:", index);
-            setFiles(files.filter((_, i) => i !== index));
-          }}
-        />
-      )}
+      {/* Link Preview Card (only for http/https URLs and not already in files array) */}
+      {linkPreview &&
+        (linkPreview.url.startsWith('http://') || linkPreview.url.startsWith('https://')) &&
+        !fileUrls.some(fileUrl => linkPreview.url.includes(fileUrl) || fileUrl.includes(linkPreview.url)) && (
+          <div className="mt-2 mb-1 p-3 rounded-lg border border-border bg-background flex items-center gap-3 shadow-sm relative animate-fade-in max-w-full w-full overflow-hidden">
+            {linkPreview.image && (
+              <img src={linkPreview.image} alt="Preview" className="h-12 w-12 min-w-[3rem] max-w-[3rem] object-cover rounded-md border flex-shrink-0" />
+            )}
+            <div className="flex-1 min-w-0 w-0">
+              <div className="font-medium text-sm truncate w-full block">{linkPreview.title || linkPreview.url}</div>
+              {linkPreview.description && (
+                <div className="text-xs text-muted-foreground line-clamp-2 break-words w-full block">{linkPreview.description}</div>
+              )}
+              <a href={linkPreview.url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline break-all w-full block truncate">
+                {linkPreview.url}
+              </a>
+            </div>
+            <Button type="button" size="icon" variant="ghost" className="h-7 w-7 ml-2 flex-shrink-0" onClick={() => setLinkPreview(null)}>
+              <CloseIcon className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
 
       {showAudioRecorder && (
         <AudioRecorder
@@ -237,7 +305,7 @@ export const MessageInput = ({
             const audioFile = new File([audioBlob], `audio-${Date.now()}.webm`, { type: 'audio/webm' });
             const response = await messageService.uploadMessage(audioFile, undefined, undefined, 60000);
             if (response.success && response.data) {
-              onSendMessage(response.data, 'AUDIO', 'Voice message',replyTo);
+              onSendMessage(response.data, 'AUDIO', 'Voice message', replyTo);
             }
             setIsUploading(false);
             setShowAudioRecorder(false);
@@ -276,91 +344,86 @@ export const MessageInput = ({
         </div>
       )}
 
-      <div className="flex items-end space-x-2">
-        <div className="relative flex-1">
-          <Textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            placeholder={replyTo ? "Reply to message..." : "Type a message..."}
-            className="min-h-[60px] w-full resize-none bg-muted rounded-lg pr-12 cursor-text focus:ring-2 focus:ring-primary transition-all"
-            onKeyDown={(e) => {
-              if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                handleSubmit(e);
-              }
-            }}
-            onPaste={handlePaste}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-          />
-          <div className="absolute right-3 bottom-3">
-            <Button
-              type="submit"
-              size="icon"
-              className={`h-8 w-8 rounded-full cursor-pointer transition-all ${isDisabled || isUploading || uploadingFiles.length > 0
-                ? "opacity-50 cursor-not-allowed"
-                : "hover:scale-105 hover:bg-primary/90"
-                }`}
-              disabled={isDisabled || isUploading || uploadingFiles.length > 0}
-            >
-              <MessageCircle className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+      <div className="flex items-end gap-2 w-full">
+        {/* Standalone Emoji Button */}
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-10 w-10 p-0 flex items-center justify-center"
+          tabIndex={-1}
+          onClick={handleEmojiButtonClick}
+        >
+          <Smile className="h-6 w-6 text-muted-foreground" />
+        </Button>
+        {/* Standalone Attachment Button */}
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-10 w-10 p-0 flex items-center justify-center"
+          tabIndex={-1}
+          onClick={handleFileButtonClick}
+        >
+          <Paperclip className="h-5 w-5 text-muted-foreground" />
+        </Button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          className="hidden"
+          multiple
+        />
+        <Textarea
+          value={message}
+          onChange={e => setMessage(e.target.value)}
+          onPaste={handlePaste}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          placeholder="Type a message..."
+          className="flex-1 resize-none rounded-2xl px-4 py-2 min-h-[40px] max-h-32 text-base bg-background/80 border border-border focus:ring-2 focus:ring-primary/30 shadow-sm"
+          rows={1}
+          autoFocus={false}
+          disabled={isUploading}
+        />
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          onClick={handleAudioButtonClick}
+          className="h-10 w-10 p-0"
+          tabIndex={-1}
+        >
+          <Mic className="h-6 w-6 text-muted-foreground" />
+        </Button>
+        <Button
+          type="submit"
+          variant="default"
+          size="icon"
+          className="h-10 w-10 p-0 ml-1"
+          disabled={isDisabled || isUploading}
+        >
+          <MessageCircle className="h-6 w-6" />
+        </Button>
       </div>
 
-      <div className="flex items-center justify-between mt-2">
-        <div className="flex items-center space-x-2">
-          <div className="relative">
-            <Button
-              type="button"
-              size="icon"
-              variant="ghost"
-              className="h-8 w-8 rounded-full cursor-pointer hover:bg-accent transition-colors"
-              onClick={handleEmojiButtonClick}
-              title="Add emoji"
-            >
-              <Smile className="h-4 w-4" />
-            </Button>
-            {showEmojiPicker && (
-              <div className="absolute bottom-10 left-0 z-50">
-                <EmojiPicker onEmojiSelect={handleEmojiSelect} />
-              </div>
-            )}
-          </div>
-
-          <Button type="button"
-            size="icon"
-            variant="ghost"
-            className="h-8 w-8 rounded-full cursor-pointer hover:bg-accent transition-colors"
-            onClick={handleFileButtonClick}
-            title="Attach file"
-          >
-            <Paperclip className="h-4 w-4" />
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              multiple
-              onChange={handleFileChange}
-            />
-          </Button>
-
-          <Button type="button"
-            size="icon"
-            variant="ghost"
-            className="h-8 w-8 rounded-full cursor-pointer hover:bg-accent transition-colors"
-            onClick={handleAudioButtonClick}
-            title="Record audio"
-          >
-            <Mic className="h-4 w-4" />
-          </Button>
+      {showEmojiPicker && (
+        <div className="absolute bottom-16 left-0 z-50">
+          <EmojiPicker onEmojiSelect={handleEmojiSelect} />
         </div>
-
-        <div className="text-xs text-muted-foreground">
-          Press Enter to send, Shift+Enter for new line
-        </div>
-      </div>
+      )}
+      {showAudioRecorder && (
+        <AudioRecorder
+          onCancel={() => setShowAudioRecorder(false)}
+          onComplete={async (audioBlob) => {
+            // Simulate upload and get URL (replace with real upload logic if needed)
+            const audioUrl = URL.createObjectURL(audioBlob);
+            onSendMessage(audioUrl, "AUDIO", "audio.webm", replyTo);
+            setShowAudioRecorder(false);
+          }}
+        />
+      )}
+  
     </form>
   );
 };

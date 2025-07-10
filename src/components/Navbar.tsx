@@ -5,6 +5,7 @@ import { Link, useLocation } from "react-router-dom";
 import { WebSocketStatus } from "./WebSocketStatus";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { MoreHorizontal } from "lucide-react";
+import { useEffect, useState } from "react";
 
 type NavItem = {
   id: "chat" | "group" | "settings" | "notifications" | "admin";
@@ -38,6 +39,45 @@ export const Navbar = ({ onLogout, user }: NavbarProps) => {
 
   // Determine active tab based on pathname
   const activeTab = navItems.find(item => location.pathname.startsWith(item.path))?.id;
+
+  const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
+
+  useEffect(() => {
+    // Only run on mobile
+    const isMobile = window.innerWidth < 768;
+    if (!isMobile) return;
+
+    let lastInnerHeight = window.innerHeight;
+    const keyboardTimer: NodeJS.Timeout | null = null;
+
+    const handleResize = () => {
+      // If the viewport height shrinks by more than 150px, assume keyboard is open
+      if (window.innerHeight < lastInnerHeight - 150) {
+        setIsKeyboardOpen(true);
+      } else if (window.innerHeight >= lastInnerHeight - 50) {
+        setIsKeyboardOpen(false);
+      }
+      lastInnerHeight = window.innerHeight;
+    };
+
+    const handleFocusIn = (e: FocusEvent) => {
+      if ((e.target as HTMLElement).tagName === "INPUT" || (e.target as HTMLElement).tagName === "TEXTAREA") {
+        setIsKeyboardOpen(true);
+      }
+    };
+    const handleFocusOut = (e: FocusEvent) => {
+      setTimeout(() => setIsKeyboardOpen(false), 200); // Delay for keyboard animation
+    };
+
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("focusin", handleFocusIn);
+    window.addEventListener("focusout", handleFocusOut);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("focusin", handleFocusIn);
+      window.removeEventListener("focusout", handleFocusOut);
+    };
+  }, []);
 
   return (
     <>
@@ -97,7 +137,7 @@ export const Navbar = ({ onLogout, user }: NavbarProps) => {
       </header>
 
       {/* Mobile Bottom Nav - fixed to bottom */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 flex justify-around bg-background/90 backdrop-blur-sm border-t border-border/50 shadow-2xl">
+      <nav className={`md:hidden fixed bottom-0 left-0 right-0 z-50 flex justify-around bg-background/90 backdrop-blur-sm border-t border-border/50 shadow-2xl transition-transform duration-200 ${isKeyboardOpen ? 'translate-y-full' : 'translate-y-0'}`}>
         {navItems.slice(0, 4).map((item) => (
           <Link to={item.path} key={item.id} className="flex flex-col items-center py-2 w-full">
             <Button

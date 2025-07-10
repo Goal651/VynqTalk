@@ -7,9 +7,9 @@ import {
   ContextMenuTrigger,
   ContextMenuSeparator
 } from "@/components/ui/context-menu";
-import { Edit, Trash2, Reply, Copy, File } from "lucide-react";
+import { Edit, Trash2, Reply, Copy, File, X as CloseIcon, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useUsers } from "@/contexts/UsersContext";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
@@ -43,6 +43,52 @@ export const MessageBubble = ({
   const isCurrentUser = user.id === currentUserId;
   const formattedTime = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const { getUserName, users } = useUsers();
+
+  // --- Link Preview Logic ---
+  const urlRegex = /(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|www\.[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|www\.[a-zA-Z0-9]+\.[^\s]{2,})/gi;
+  const LINK_PREVIEW_API_KEY = "3b3f4d51fc1a85aeab5c0e15b90913fa";
+  const [linkPreviews, setLinkPreviews] = useState<Record<string, { url: string; title?: string; description?: string; image: string }>>({});
+  const fetchedUrls = useRef<Set<string>>(new Set());
+
+  // Regex for image URLs
+  const imageUrlRegex = /(https?:\/\/[\w\-._~:/?#[\]@!$&'()*+,;=%]+\.(?:png|jpg|jpeg|gif|webp|bmp|svg))/i;
+
+  useEffect(() => {
+    if (message.type !== "TEXT" || !message.content) return;
+    const urls = message.content.match(urlRegex) || [];
+    urls.forEach((url) => {
+      if (!linkPreviews[url] && !fetchedUrls.current.has(url)) {
+        fetchedUrls.current.add(url);
+        (async () => {
+          try {
+            const apiUrl = `https://api.linkpreview.net/?key=${LINK_PREVIEW_API_KEY}&q=${encodeURIComponent(url)}`;
+            const res = await fetch(apiUrl);
+            if (!res.ok) throw new Error("API error");
+            const data = await res.json();
+            setLinkPreviews(prev => ({
+              ...prev,
+              [url]: {
+                url,
+                title: data.title,
+                description: data.description,
+                image: data.image || `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`,
+              }
+            }));
+          } catch (err) {
+            setLinkPreviews(prev => ({
+              ...prev,
+              [url]: {
+                url,
+                title: url,
+                image: `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`,
+              }
+            }));
+          }
+        })();
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message.content, message.type]);
 
   const handleAvatarClick = () => {
     console.log("Avatar clicked:", user.name);
@@ -177,7 +223,51 @@ export const MessageBubble = ({
 
         {/* Message content rendering based on type */}
         {message.type === "TEXT" && (
-          <div className="break-words whitespace-pre-wrap mb-2">{message.content}</div>
+          <>
+            <div className="break-words whitespace-pre-wrap mb-2">{message.content}</div>
+            {/* Link Previews and Inline Images */}
+            {message.type === "TEXT" && (message.content.match(urlRegex) || []).map((url, idx) => {
+              if (imageUrlRegex.test(url)) {
+                return (
+                  <div key={url} className="mt-3 mb-2 flex justify-center animate-fade-in">
+                    <img src={url} alt="Image" className="max-w-full max-h-64 rounded-lg border bg-muted" />
+                  </div>
+                );
+              } else if (linkPreviews[url]) {
+                return (
+                  <div key={url} className="mt-3 mb-2 p-4 rounded-2xl border-l-4 border border-border/70 bg-background/90 flex items-center gap-4 shadow-md hover:shadow-lg transition-all duration-200 relative animate-fade-in max-w-2xl sm:max-w-sm md:max-w-md w-full max-h-56 overflow-hidden group">
+                    {linkPreviews[url].image && !linkPreviews[url].image.includes('google.com/s2/favicons') ? (
+                      <img src={linkPreviews[url].image} alt="Preview" className="h-16 w-16 min-w-[4rem] max-w-[4rem] object-cover rounded-lg border flex-shrink-0 bg-muted" />
+                    ) : (
+                      <div className="h-16 w-16 min-w-[4rem] max-w-[4rem] flex items-center justify-center rounded-lg border flex-shrink-0 bg-muted">
+                        <Globe className="h-8 w-8 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0 w-0">
+                      <div className="font-semibold text-base truncate w-full block mb-1 break-words">{linkPreviews[url].title || linkPreviews[url].url}</div>
+                      {linkPreviews[url].description && (
+                        <div className="text-sm text-muted-foreground line-clamp-2 break-words w-full block mb-1 overflow-hidden">{linkPreviews[url].description}</div>
+                      )}
+                      <a href={linkPreviews[url].url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline break-all w-full block truncate">
+                        {linkPreviews[url].url}
+                      </a>
+                    </div>
+                  </div>
+                );
+              } else {
+                return (
+                  <div key={url + idx} className="mt-2 mb-1 p-3 rounded-lg border border-border bg-background flex items-center gap-3 shadow-sm relative animate-fade-in max-w-full w-full overflow-hidden opacity-60">
+                    <div className="flex-1 min-w-0 w-0">
+                      <div className="font-medium text-sm truncate w-full block">Loading preview…</div>
+                      <a href={url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary underline break-all w-full block truncate">
+                        {url}
+                      </a>
+                    </div>
+                  </div>
+                );
+              }
+            })}
+          </>
         )}
         {message.type === "IMAGE" && message.content && (
           <img
@@ -193,23 +283,29 @@ export const MessageBubble = ({
             <CustomAudioPlayer src={message.content} />
           </div>
         )}
+        {/* Media: FILE */}
         {message.type === "FILE" && message.content && (
-          <div className="flex items-center gap-2 my-2">
-            <a
-              href={message.content}
-              download={message.fileName || undefined}
-              className="relative flex flex-col items-center gap-1  break-all "
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span className="">{message.fileName || "Download file"}</span>
-              
-                <File
-                  className="w-full h-full rounded-md cursor-pointer mb-2"
-                  style={{ maxHeight: 300 }}
-                />
-              
-            </a>
+          <div className="my-2 p-3 rounded-2xl border-l-4 border-primary/40 border border-border/70 bg-background/90 flex items-center gap-4 shadow-sm hover:shadow-lg transition-all duration-200 min-h-20 max-w-[98vw] sm:max-w-sm md:max-w-md w-full group">
+            <div className="flex items-center justify-center h-12 w-12 min-w-[3rem] max-w-[3rem] rounded-lg bg-muted border">
+              <File className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <div className="flex-1 min-w-0 w-0">
+              <div className="font-medium text-base truncate w-full block mb-1 break-words">{message.fileName || "Download file"}</div>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded font-bold uppercase tracking-wide border border-primary/30">
+                  {message.fileName ? message.fileName.split('.').pop()?.toUpperCase() : 'FILE'}
+                </span>
+                <a
+                  href={message.content}
+                  download={message.fileName || undefined}
+                  className="text-xs text-primary underline truncate hover:bg-primary/10 px-2 py-0.5 rounded transition-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Download
+                </a>
+              </div>
+            </div>
           </div>
         )}
         {message.type === "VIDEO" && message.content && (
