@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { ChatReaction, Group, GroupMessage, SendGroupMessageRequest, User } from '@/types';
+import { ChatReaction, Group, GroupMessage, MessageType, SendGroupMessageRequest, User } from '@/types';
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks"
 import { useSocket } from "@/contexts/SocketContext"
@@ -78,7 +78,7 @@ export const useGroupChat = (group: Group) => {
     };
   }, [user, socket]);
 
-  const handleSendMessage = (content: string, replyData?: GroupMessage) => {
+  const handleSendMessage = (content: string, type: MessageType, fileName: string | null = null, replyData?: GroupMessage) => {
     if (!user || !group) {
       toast({
         title: "Error",
@@ -93,7 +93,8 @@ export const useGroupChat = (group: Group) => {
       group: group,
       content: content,
       timestamp: new Date().toISOString(),
-      type: "TEXT",
+      type: type ,
+      fileName: fileName,
       replyTo: replyData,
       reactions: [],
       isEdited: false,
@@ -103,7 +104,7 @@ export const useGroupChat = (group: Group) => {
       senderId: newMessage.sender.id,
       groupId: newMessage.group.id,
       type: newMessage.type,
-      replyToId: newMessage.replyTo.id
+      replyToId: replyData?.id
     }
     setMessages(prevMessages => [...prevMessages, newMessage])
     if (socket) socket.sendGroupMessage(payload)
@@ -149,7 +150,7 @@ export const useGroupChat = (group: Group) => {
 
         const payload: ChatReaction = {
           messageId,
-          reaction: updatedReactions
+          reactions: updatedReactions
         }
         if (socket) {
           socket.messageReact(payload);

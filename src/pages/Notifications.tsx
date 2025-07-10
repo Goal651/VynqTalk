@@ -13,6 +13,7 @@ import { Notification } from "@/types"
 import { cn } from "@/lib"
 import { motion, AnimatePresence } from "framer-motion"
 import { useAuth } from "@/contexts/AuthContext"
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Notifications = () => {
   const [notifications, setNotifications] = useState<Notification[]>([])
@@ -188,8 +189,19 @@ export const Notifications = () => {
       <ScrollArea className="flex-1">
         <div className="p-2 sm:p-6 max-w-4xl mx-auto">
           {isLoading ? (
-            <div className="flex items-center justify-center h-64">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <div className="space-y-3 sm:space-y-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Card key={i} className="bg-background/50 backdrop-blur-sm">
+                  <CardContent className="flex items-center gap-4 py-6">
+                    <Skeleton className="h-12 w-12 rounded-full" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-32 rounded" />
+                      <Skeleton className="h-3 w-48 rounded" />
+                    </div>
+                    <Skeleton className="h-8 w-8 rounded" />
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           ) : (
             <AnimatePresence mode="wait">

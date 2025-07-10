@@ -1,25 +1,25 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Message } from "@/types";
+import { GroupMessage } from "@/types";
 import { Button } from "@/components/ui/button";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CustomVideoPlayer } from "./CustomVideoPlayer";
 
-interface MediaGalleryModalProps {
+interface GroupMediaGalleryModalProps {
     open: boolean;
-    mediaMessages: Message[];
+    mediaMessages: GroupMessage[];
     currentIndex: number;
     onClose: () => void;
     onNavigate: (index: number) => void;
 }
 
-export const MediaGalleryModal = ({
+export const GroupMediaGalleryModal = ({
     open,
     mediaMessages,
     currentIndex,
     onClose,
     onNavigate,
-}: MediaGalleryModalProps) => {
+}: GroupMediaGalleryModalProps) => {
     const current = mediaMessages[currentIndex];
     if (!current) return null;
 
@@ -32,8 +32,8 @@ export const MediaGalleryModal = ({
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            transition={{ duration: 0.2 }}
-                            className="w-full flex flex-col items-center"
+                            transition={{ duration: 0.3, ease: "easeOut" }}
+                            className="w-full h-full flex flex-col items-center justify-center relative"
                         >
                             {/* Navigation Controls */}
                             <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-20">
@@ -69,6 +69,7 @@ export const MediaGalleryModal = ({
                                     <ChevronRight className="h-6 w-6" />
                                 </Button>
                             </div>
+
                             {/* Media Content */}
                             <div className="flex items-center justify-center w-full h-full p-4">
                                 {current.type === "IMAGE" && (
@@ -101,6 +102,7 @@ export const MediaGalleryModal = ({
                                     </motion.div>
                                 )}
                             </div>
+
                             {/* File Info */}
                             {current.fileName && (
                                 <motion.div

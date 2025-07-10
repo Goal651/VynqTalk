@@ -18,9 +18,10 @@ interface ChatViewProps {
   onMessageDelete?: (messageId: number) => void;
   onMessageEdit?: (message: Message) => void;
   users?: User[];
+  isLoadingUsers?: boolean;
 }
 
-export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProps) => {
+export const ChatView = ({ onMessageDelete, onMessageEdit, users, isLoadingUsers }: ChatViewProps) => {
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const socket = useSocket();
@@ -127,6 +128,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
             onlineUserIds={onlineUserIds}
             currentUserId={user?.id}
             unreadMessages={unreadMessages}
+            isLoading={isLoadingUsers}
           />
         ) : null
       ) : (
@@ -137,6 +139,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
           onlineUserIds={onlineUserIds}
           currentUserId={user?.id}
           unreadMessages={unreadMessages}
+          isLoading={isLoadingUsers}
         />
       )}
 
@@ -157,6 +160,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users }: ChatViewProp
               <MessageList
                 messages={filteredMessages}
                 users={users || []}
+                isLoading={!!activeChat && messages.length === 0}
                 currentUserId={user?.id}
                 onUserAvatarClick={handleUserAvatarClick}
                 onDeleteMessage={handleDeleteMessage}

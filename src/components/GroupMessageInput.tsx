@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { User, Message, MessageType } from "@/types";
+import { User, GroupMessage, MessageType } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageCircle, Smile, Paperclip, Mic, X, Loader2 } from "lucide-react";
@@ -12,10 +12,10 @@ import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { X as CloseIcon } from "lucide-react";
 
-interface MessageInputProps {
-  onSendMessage: (content: string, type: MessageType, fileName: string | null, replyTo?: Message) => void;
+interface GroupMessageInputProps {
+  onSendMessage: (content: string, type: MessageType, fileName: string | null, replyTo?: GroupMessage) => void;
   currentUser: User;
-  replyTo?: Message;
+  replyTo?: GroupMessage | null;
   onCancelReply?: () => void;
 }
 
@@ -29,12 +29,12 @@ function getMessageTypeForFile(file: File): MessageType {
 
 const LINK_PREVIEW_API_KEY = "3b3f4d51fc1a85aeab5c0e15b90913fa";
 
-export const MessageInput = ({
+export const GroupMessageInput = ({
   onSendMessage,
   currentUser,
   replyTo,
   onCancelReply
-}: MessageInputProps) => {
+}: GroupMessageInputProps) => {
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showAudioRecorder, setShowAudioRecorder] = useState(false);
@@ -94,12 +94,12 @@ export const MessageInput = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Message submitted:", message);
+    console.log("Group message submitted:", message);
 
     setIsUploading(true);
     // Send text message if present
     if (message.trim()) {
-      onSendMessage(message.trim(), 'TEXT', null, replyTo);
+      onSendMessage(message.trim(), 'TEXT', null, replyTo || undefined);
     }
 
     // Upload and send each file with progress and cancel support
@@ -113,7 +113,7 @@ export const MessageInput = ({
         }, source.token, 60000);
         if (response.success && response.data) {
           const msgType = getMessageTypeForFile(file);
-          onSendMessage(response.data, msgType, file.name, replyTo);
+          onSendMessage(response.data, msgType, file.name, replyTo || undefined);
         }
       } catch (error) {
         if (axios.isCancel(error)) {
@@ -299,7 +299,7 @@ export const MessageInput = ({
             const audioFile = new File([audioBlob], `audio-${Date.now()}.webm`, { type: 'audio/webm' });
             const response = await messageService.uploadMessage(audioFile, undefined, undefined, 60000);
             if (response.success && response.data) {
-              onSendMessage(response.data, 'AUDIO', 'Voice message', replyTo);
+              onSendMessage(response.data, 'AUDIO', 'Voice message', replyTo || undefined);
             }
             setIsUploading(false);
             setShowAudioRecorder(false);
@@ -420,7 +420,7 @@ export const MessageInput = ({
           onComplete={async (audioBlob) => {
             // Simulate upload and get URL (replace with real upload logic if needed)
             const audioUrl = URL.createObjectURL(audioBlob);
-            onSendMessage(audioUrl, "AUDIO", "audio.webm", replyTo);
+            onSendMessage(audioUrl, "AUDIO", "audio.webm", replyTo || undefined);
             setShowAudioRecorder(false);
           }}
         />
@@ -429,3 +429,5 @@ export const MessageInput = ({
     </form>
   );
 };
+
+export default GroupMessageInput; 

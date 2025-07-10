@@ -12,11 +12,12 @@ export const useAdminData = () => {
 
 
   useEffect(() => {
-    setLoading(true);
-    fetchUsers();
-    fetchGroups();
-    // fetchMessages();
-    setLoading(false);
+    const fetchAll = async () => {
+      setLoading(true);
+      await Promise.all([fetchUsers(), fetchGroups()]);
+      setLoading(false);
+    };
+    fetchAll();
   }, []);
 
   const fetchUsers = async () => {

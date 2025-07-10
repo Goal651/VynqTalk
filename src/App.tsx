@@ -163,6 +163,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 const ChatViewWrapper = () => {
   const { toast } = useToast()
   const [users, setUsers] = useState<User[]>([])
+  const [isLoadingUsers, setIsLoadingUsers] = useState(true)
   const usersContext = useUsers()
 
   useEffect(() => {
@@ -173,6 +174,7 @@ const ChatViewWrapper = () => {
           setUsers(response.data)
           usersContext.setUsers(response.data)
         }
+        setIsLoadingUsers(false)
       } catch (error) {
         if (error instanceof Error) {
           toast({
@@ -181,12 +183,13 @@ const ChatViewWrapper = () => {
             variant: "destructive",
           })
         }
+        setIsLoadingUsers(false)
       }
     }
     fetchUsers()
   }, [])
 
-  return <ChatView users={users} />
+  return <ChatView users={users} isLoadingUsers={isLoadingUsers} />
 }
 
 export default App

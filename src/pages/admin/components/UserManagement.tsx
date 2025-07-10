@@ -8,9 +8,10 @@ import { useAdminData } from "../hooks/useAdminData";
 import { useIsMobile } from "@/hooks";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const UserManagement = () => {
-  const { users, updateUser, deleteUser } = useAdminData();
+  const { users, updateUser, deleteUser, loading } = useAdminData();
   const isMobile = useIsMobile();
   const [selectedUser, setSelectedUser] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -52,36 +53,54 @@ export const UserManagement = () => {
       <CardContent>
         {isMobile ? (
           <div className="flex flex-col gap-2">
-            {users.map((user) => (
-              <div
-                key={user.id}
-                className="flex items-center gap-4 p-3 rounded-lg bg-muted/40 border border-border/20 cursor-pointer hover:bg-accent/30 transition-colors"
-                onClick={() => { setSelectedUser(user); setModalOpen(true); }}
-              >
-                <Avatar className="h-12 w-12 border-2 border-border/30">
-                  <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} />
-                  <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                    {user.name.substring(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <div className="font-semibold text-base">{user.name}</div>
-                  <Badge variant={getStatusColor(user.status)} className="flex items-center gap-1 w-fit mt-1">
-                    {getStatusIcon(user.status)}
-                    {user.status}
-                  </Badge>
+            {loading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-4 p-3 rounded-lg bg-muted/40 border border-border/20">
+                  <Skeleton className="h-12 w-12 rounded-full" />
+                  <div className="flex-1">
+                    <Skeleton className="h-4 w-24 mb-2 rounded" />
+                    <Skeleton className="h-3 w-16 rounded" />
+                  </div>
+                  <Skeleton className="h-8 w-8 rounded" />
                 </div>
-                <Button
-                  type="button"
-                  size="icon"
-                  variant="ghost"
-                  onClick={e => { e.stopPropagation(); setSelectedUser(user); setModalOpen(true); }}
-                  className="ml-auto"
-                >
-                  <Eye className="h-5 w-5" />
-                </Button>
+              ))
+            ) : users.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                <Users className="h-10 w-10 mb-2" />
+                <span>No users found</span>
               </div>
-            ))}
+            ) : (
+              users.map((user) => (
+                <div
+                  key={user.id}
+                  className="flex items-center gap-4 p-3 rounded-lg bg-muted/40 border border-border/20 cursor-pointer hover:bg-accent/30 transition-colors"
+                  onClick={() => { setSelectedUser(user); setModalOpen(true); }}
+                >
+                  <Avatar className="h-12 w-12 border-2 border-border/30">
+                    <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} />
+                    <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                      {user.name.substring(0, 2)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1">
+                    <div className="font-semibold text-base">{user.name}</div>
+                    <Badge variant={getStatusColor(user.status)} className="flex items-center gap-1 w-fit mt-1">
+                      {getStatusIcon(user.status)}
+                      {user.status}
+                    </Badge>
+                  </div>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="ghost"
+                    onClick={e => { e.stopPropagation(); setSelectedUser(user); setModalOpen(true); }}
+                    className="ml-auto"
+                  >
+                    <Eye className="h-5 w-5" />
+                  </Button>
+                </div>
+              ))
+            )}
             <Dialog open={modalOpen} onOpenChange={setModalOpen}>
               <DialogContent>
                 {selectedUser && (
@@ -133,72 +152,92 @@ export const UserManagement = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id} className="cursor-pointer hover:bg-accent/30 transition-colors border-border/20">
-                  <TableCell className="flex items-center space-x-3">
-                    <Avatar className="h-10 w-10 border-2 border-border/30">
-                      <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} />
-                      <AvatarFallback className="bg-primary/10 text-primary font-medium">
-                        {user.name.substring(0, 2)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <span className="font-medium">{user.name}</span>
-                      <p className="text-xs text-muted-foreground">ID: {user.id}</p>
-                    </div>
-                  </TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>
-                    <Badge variant={getStatusColor(user.status)} className="flex items-center gap-1 w-fit">
-                      {getStatusIcon(user.status)}
-                      {user.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{new Date(user.lastActive).toLocaleString()}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{new Date(user.createdAt).toLocaleString()}</TableCell>
-                  <TableCell>
-                    <div className="flex space-x-1">
-                      <Button type="button"
-                        size="sm"
-                        variant="outline"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedUser(user);
-                          setModalOpen(true);
-                        }}
-                        className="cursor-pointer hover:bg-accent/50 transition-colors h-8 w-8 p-0"
-                      >
-                        <Eye className="h-3 w-3" />
-                      </Button>
-                      {user.status === "blocked" ? (
-                        <Button type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleUserAction("active", user.id);
-                          }}
-                          className="cursor-pointer hover:bg-green-500/10 hover:text-green-600 hover:border-green-500/50 transition-colors h-8 w-8 p-0"
-                        >
-                          <UserPlus className="h-3 w-3" />
-                        </Button>
-                      ) : (
-                        <Button type="button"
-                          size="sm"
-                          variant="outline"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleUserAction("blocked", user.id);
-                          }}
-                          className="cursor-pointer hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition-colors h-8 w-8 p-0"
-                        >
-                          <UserX className="h-3 w-3" />
-                        </Button>
-                      )}
-                    </div>
+              {loading ? (
+                Array.from({ length: 6 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell><Skeleton className="h-10 w-32 rounded" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-24 rounded" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-16 rounded" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-20 rounded" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-20 rounded" /></TableCell>
+                    <TableCell><Skeleton className="h-8 w-20 rounded" /></TableCell>
+                  </TableRow>
+                ))
+              ) : users.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                    <Users className="h-10 w-10 mb-2 mx-auto" />
+                    <div>No users found</div>
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : (
+                users.map((user) => (
+                  <TableRow key={user.id} className="cursor-pointer hover:bg-accent/30 transition-colors border-border/20">
+                    <TableCell className="flex items-center space-x-3">
+                      <Avatar className="h-10 w-10 border-2 border-border/30">
+                        <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`} />
+                        <AvatarFallback className="bg-primary/10 text-primary font-medium">
+                          {user.name.substring(0, 2)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <span className="font-medium">{user.name}</span>
+                        <p className="text-xs text-muted-foreground">ID: {user.id}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>
+                      <Badge variant={getStatusColor(user.status)} className="flex items-center gap-1 w-fit">
+                        {getStatusIcon(user.status)}
+                        {user.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{new Date(user.lastActive).toLocaleString()}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">{new Date(user.createdAt).toLocaleString()}</TableCell>
+                    <TableCell>
+                      <div className="flex space-x-1">
+                        <Button type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedUser(user);
+                            setModalOpen(true);
+                          }}
+                          className="cursor-pointer hover:bg-accent/50 transition-colors h-8 w-8 p-0"
+                        >
+                          <Eye className="h-3 w-3" />
+                        </Button>
+                        {user.status === "blocked" ? (
+                          <Button type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUserAction("active", user.id);
+                            }}
+                            className="cursor-pointer hover:bg-green-500/10 hover:text-green-600 hover:border-green-500/50 transition-colors h-8 w-8 p-0"
+                          >
+                            <UserPlus className="h-3 w-3" />
+                          </Button>
+                        ) : (
+                          <Button type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUserAction("blocked", user.id);
+                            }}
+                            className="cursor-pointer hover:bg-destructive/10 hover:text-destructive hover:border-destructive/50 transition-colors h-8 w-8 p-0"
+                          >
+                            <UserX className="h-3 w-3" />
+                          </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         )}

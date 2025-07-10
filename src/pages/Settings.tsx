@@ -401,7 +401,6 @@ export const Settings = () => {
                   </SelectContent>
                 </Select>
               </div>
-
             </CardContent>
           </Card>
 
