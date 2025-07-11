@@ -1,4 +1,4 @@
-import { User,Message } from "@/types";
+import { User, Message } from "@/types";
 import { ChatSidebar } from "./ChatSidebar";
 import { MessageList } from "./MessageList";
 import { MessageInput } from "./MessageInput";
@@ -7,7 +7,7 @@ import { UserInfo } from "./UserInfo";
 import { MessageDialogs } from "./MessageDialogs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
-import { useChat,useIsMobile,useMessageOperations  } from "@/hooks";
+import { useChat, useIsMobile, useMessageOperations } from "@/hooks";
 import { MediaGalleryModal } from "./MediaGalleryModal";
 import { useState, useMemo, useEffect } from "react";
 import { useSocket } from "@/contexts/SocketContext";
@@ -27,7 +27,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users, isLoadingUsers
   const socket = useSocket();
   const [onlineUserIds, setOnlineUserIds] = useState<Set<number>>(new Set());
   const [unreadMessages, setUnreadMessages] = useState<import("@/types/message").Message[]>([]);
-  
+
   // Add state to control sidebar visibility on mobile
   const [showSidebar, setShowSidebar] = useState(true);
 
@@ -38,6 +38,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users, isLoadingUsers
     replyTo,
     messages,
     filteredMessages,
+    isLoadingMessages,
     handleSendMessage,
     handleUserClick,
     handleUserAvatarClick,
@@ -94,13 +95,9 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users, isLoadingUsers
     if (!socket) return;
     const handleOnlineUsers = (ids: Set<number>) => setOnlineUserIds(new Set<number>(ids));
     socket.onOnlineUsersChange(handleOnlineUsers);
-    // Initialize with current value
     const initial = socket.getOnlineUsers?.();
-    if (initial instanceof Set) {
-      setOnlineUserIds(new Set<number>(Array.from(initial).filter((v): v is number => typeof v === 'number')));
-    } else {
-      setOnlineUserIds(new Set<number>());
-    }
+    if (initial instanceof Set) setOnlineUserIds(new Set<number>(Array.from(initial).filter((v): v is number => typeof v === 'number')));
+    else setOnlineUserIds(new Set<number>());
     return () => {
       socket.removeOnlineUsersListener(handleOnlineUsers);
     };
@@ -160,7 +157,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, users, isLoadingUsers
               <MessageList
                 messages={filteredMessages}
                 users={users || []}
-                isLoading={!!activeChat && messages.length === 0}
+                isLoading={isLoadingMessages}
                 currentUserId={user?.id}
                 onUserAvatarClick={handleUserAvatarClick}
                 onDeleteMessage={handleDeleteMessage}

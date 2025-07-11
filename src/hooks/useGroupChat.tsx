@@ -108,20 +108,11 @@ export const useGroupChat = (group: Group) => {
     }
     setMessages(prevMessages => [...prevMessages, newMessage])
     if (socket) socket.sendGroupMessage(payload)
-
-    toast({
-      title: "Message sent",
-      description: `Message sent to ${group.name}`,
-    })
     setReplyTo(null)
   }
 
   const handleReplyMessage = (message: GroupMessage) => {
     setReplyTo(message)
-    toast({
-      title: "Replying to message",
-      description: "Type your reply below",
-    })
   }
 
   const handleCancelReply = () => {
@@ -157,10 +148,6 @@ export const useGroupChat = (group: Group) => {
         }
         return { ...message, reactions: updatedReactions };
       });
-    });
-    toast({
-      title: "Reaction updated",
-      description: `You reacted with ${emoji}`,
     });
   }
 

@@ -36,7 +36,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
     if (authService.isAuthenticated()) {
       const storedUser = authService.getStoredUser();
       if (storedUser) {
-        console.log("User is already authenticated:", storedUser);
         setUser(storedUser);
         setIsAuthenticated(true);
       }
@@ -70,9 +69,6 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
         setUser(user);
         setIsAuthenticated(true);
-
-        // (Notification permission and push subscription now handled in Settings)
-
         toast({
           title: "Login successful",
           description: "Welcome back!",
@@ -80,7 +76,7 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
         return true;
       } else {
         toast({
-          title: "Login failed",
+          title: "Verification failed",
           description: response.message || "Invalid credentials",
           variant: "destructive",
         });
@@ -151,13 +147,17 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshUser = async (): Promise<void> => {
     try {
-      if(!isAuthenticated)return
+      if (!isAuthenticated) return
       const response = await authService.refreshUser()
       if (response) {
         setUser(response)
       }
     } catch (error) {
-      console.error('Refresh user error:', error);
+      toast({
+        title: "Verification failed",
+        description: "Redirecting to login ..",
+        variant: "destructive"
+      })
     }
   }
 

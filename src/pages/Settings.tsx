@@ -14,7 +14,7 @@ import { Camera, Save, Bell, Shield, Palette, Download, Upload, Trash2, UserCirc
 import { useCamera ,useToast} from "@/hooks"
 import { settingsService,userService,notificationService } from "@/api"
 import { UserSettings } from '@/types'
-import { base64ToFile ,requestNotificationPermission, subscribeUserToPush} from "@/lib"
+import { base64ToFile ,requestNotificationPermission, subscribeUserToPush, pushSubscriptionToToken } from "@/lib"
 
 export const Settings = () => {
   const { user } = useAuth()
@@ -33,6 +33,8 @@ export const Settings = () => {
     theme: theme,
     showOnlineStatus: true,
   })
+
+  const [vapidPublicKey, setVapidPublicKey] = useState<string | null>(null);
 
   useEffect(() => {
     if (user?.id) {
@@ -269,10 +271,10 @@ export const Settings = () => {
   const handleAccountDelete = async () => {
     try {
 
-      await userService.deleteUser()
+    const response=  await userService.deleteUser()
       toast({
         title: "Account Deletion",
-        description: "Please contact support to delete your account.",
+        description: response.message,
         variant: "destructive",
       })
     } catch (error) {
@@ -291,17 +293,53 @@ export const Settings = () => {
     }
     const permission = await requestNotificationPermission();
     if (permission === 'granted') {
-      const subscription = await subscribeUserToPush();
-      if (subscription) {
-        try {
-          await notificationService.registerDevice(subscription);
-          toast({ title: 'Notifications enabled', description: 'You will now receive notifications.' });
-        } catch (err) {
-          toast({ title: 'Error', description: 'Failed to register for notifications.', variant: 'destructive' });
+      try {
+        // Fetch VAPID public key if not already fetched
+        let key = vapidPublicKey;
+        if (!key) {
+          const response = await notificationService.getVapidPublicKey();
+          if (response.success && response.data) {
+            key = response.data;
+            setVapidPublicKey(key);
+          } else {
+            toast({ title: 'Error', description: 'Failed to fetch VAPID public key.', variant: 'destructive' });
+            return;
+          }
         }
+        // Unsubscribe any existing push subscription before creating a new one
+        const registration = await navigator.serviceWorker.ready;
+        const existingSubscription = await registration.pushManager.getSubscription();
+        if (existingSubscription) {
+          await existingSubscription.unsubscribe();
+        }
+        const subscription = await subscribeUserToPush(key);
+        if (subscription) {
+          const subObj = subscription.toJSON ? subscription.toJSON() : subscription;
+          await notificationService.registerDeviceToken(subObj);
+          toast({ title: 'Notifications enabled', description: 'You will now receive notifications.' });
+        }
+      } catch (err) {
+        toast({ title: 'Error', description: 'Failed to register for notifications.', variant: 'destructive' });
       }
     } else {
       toast({ title: 'Permission denied', description: 'You must allow notifications in your browser.' });
+    }
+  };
+
+  // Call this on logout or when disabling notifications
+  const handleDisableNotifications = async () => {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.getSubscription();
+    if (subscription) {
+      try {
+        const subObj = subscription.toJSON ? subscription.toJSON() : subscription;
+        await notificationService.unregisterDeviceToken(subObj);
+        await subscription.unsubscribe();
+        toast({ title: 'Notifications disabled', description: 'You will no longer receive notifications.' });
+      } catch (err) {
+        toast({ title: 'Error', description: 'Failed to unregister notifications.', variant: 'destructive' });
+      }
     }
   };
 

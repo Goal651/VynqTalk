@@ -32,6 +32,7 @@ export const useChat = () => {
   const [activeChat, setActiveChat] = useState<User | null>(null)
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
+  const [isLoadingMessages,setIsLoadingMessages]=useState(true)
 
   useEffect(() => {
     const loadMessages = async () => {
@@ -41,10 +42,9 @@ export const useChat = () => {
         const response = await messageService.getMessages(String(user.id), String(activeChat.id))
         if (response.success && response.data) {
           setMessages(response.data)
-          console.log("Loaded messages:", response.data)
         }
+        setIsLoadingMessages(false)
       } catch (error) {
-        console.error("Failed to load messages:", error)
         toast({
           title: "Error",
           description: "Failed to load messages",
@@ -58,7 +58,6 @@ export const useChat = () => {
   useEffect(() => {
     if (!socket) return
     const handleMessage = (message: Message) => {
-      console.log("Received new message:", message)
       setMessages(prevMessages => {
         if (message.sender.id === user?.id) {
           return prevMessages.map(m =>
@@ -76,9 +75,7 @@ export const useChat = () => {
         return [...prevMessages, message]
       })
       if (message.sender.id === user?.id) return
-      // Smart notification logic
       if (!activeChat || ((message.sender.id !== activeChat.id)) && message.sender.id !== user?.id) {
-        // Not the active chat: show browser notification
         if (window.Notification && Notification.permission === 'granted') {
           new Notification(message.sender.name || 'New Message ', {
             body: message.content,
@@ -87,7 +84,6 @@ export const useChat = () => {
           })
         }
       } else {
-        // Active chat: show toast
         toast({
           title: `New message from ${message.sender.name}`,
           description: message.content,
@@ -152,17 +148,9 @@ export const useChat = () => {
     setMessages(prevMessages => [...prevMessages, newMessage])
 
     if (socket) {
-      if (replyData) {
-        socket.messageReply(payload)
-      } else {
-        socket.sendMessage(payload)
-      }
+      if (replyData) socket.messageReply(payload)
+      else socket.sendMessage(payload)
     }
-
-    toast({
-      title: "Message sent",
-      description: `Message sent to ${activeChat.name}`,
-    })
     setReplyTo(null)
   }
 
@@ -170,36 +158,22 @@ export const useChat = () => {
     setActiveChat(clickedUser)
     setShowUserInfo(false)
     setReplyTo(null)
-    console.log("testing notification user", clickedUser)
-    toast({
-      title: "Chat opened",
-      description: `Now chatting with ${clickedUser.name}`,
-    })
   }
 
   const handleUserAvatarClick = (clickedUser: User) => {
-    console.log("User avatar clicked:", clickedUser.name)
     setSelectedUser(clickedUser)
     setShowUserInfo(true)
   }
 
   const handleCloseUserInfo = () => {
-    console.log("Closing user info")
     setShowUserInfo(false)
   }
 
   const handleReplyMessage = (message: Message) => {
-    console.log("Reply to message requested:", message.id)
     setReplyTo(message)
-
-    toast({
-      title: "Replying to message",
-      description: "Type your reply below",
-    })
   }
 
   const handleCancelReply = () => {
-    console.log("Cancel reply")
     setReplyTo(null)
   }
 
@@ -227,10 +201,6 @@ export const useChat = () => {
         }
         return message
       })
-      toast({
-        title: hasExistingReaction ? "Reaction removed" : "Reaction added",
-        description: hasExistingReaction ? `Removed ${reaction.emoji}` : `Reacted with ${reaction.emoji}`,
-      })
       return updatedMessages
     })
   }
@@ -248,6 +218,7 @@ export const useChat = () => {
     activeChat,
     replyTo,
     messages,
+    isLoadingMessages,
     filteredMessages,
     handleSendMessage,
     handleUserClick,

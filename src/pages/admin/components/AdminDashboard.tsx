@@ -125,7 +125,7 @@ export const AdminDashboard = () => {
                     }`} />
                     <div className="flex-1">
                       <p className="text-sm font-medium">{alert.message}</p>
-                      <p className="text-xs text-muted-foreground">{new Date(alert.timestamp).toLocaleString()}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(alert.createdAt).toLocaleString()}</p>
                     </div>
                   </div>
                 ))}

@@ -5,15 +5,13 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
   return await Notification.requestPermission();
 }
 
-export async function subscribeUserToPush(): Promise<PushSubscription | null> {
+export async function subscribeUserToPush(vapidPublicKey: string): Promise<PushSubscription | null> {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return null;
   const registration = await navigator.serviceWorker.ready;
-  // Use VAPID public key if your backend requires it (replace with your key)
-  const vapidPublicKey = undefined; // e.g., 'BEl...yourkey...';
   try {
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      ...(vapidPublicKey ? { applicationServerKey: urlBase64ToUint8Array(vapidPublicKey) } : {})
+      applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
     });
     return subscription;
   } catch (err) {
@@ -32,4 +30,9 @@ function urlBase64ToUint8Array(base64String: string) {
     outputArray[i] = rawData.charCodeAt(i);
   }
   return outputArray;
+}
+
+export function pushSubscriptionToToken(subscription: PushSubscription): string {
+  // Most backends expect the full subscription object as JSON string
+  return JSON.stringify(subscription);
 } 

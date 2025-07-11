@@ -14,13 +14,11 @@ export const useMessageOperations = (
   const [editedContent, setEditedContent] = useState("");
 
   const handleDeleteMessage = (messageId: number) => {
-    console.log("Delete message requested:", messageId);
     setMessageToDelete(messageId);
   };
 
   const confirmDeleteMessage = () => {
     if (messageToDelete) {
-      console.log("Confirming delete message:", messageToDelete);
       setMessages(messages.filter(message => message.id !== messageToDelete));
       if (onMessageDelete) onMessageDelete(messageToDelete);
       setMessageToDelete(null);
@@ -33,15 +31,12 @@ export const useMessageOperations = (
   };
 
   const handleEditMessage = (message: Message) => {
-    console.log("Edit message requested:", message.id);
     setMessageToEdit(message);
     setEditedContent(message.content);
-
   };
 
   const confirmEditMessage = () => {
     if (messageToEdit) {
-      console.log("Confirming edit message:", messageToEdit.id, "new content:", editedContent);
       setMessages(messages.map(message =>
         message.id === messageToEdit.id
           ? { ...message, content: editedContent, edited: true }

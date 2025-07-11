@@ -17,7 +17,7 @@ export interface Alert {
   id: number
   message: string
   level: 'info' | 'warning' | 'critical'
-  timestamp: string
+  createdAt: string
 }
 
 export interface ChartData {

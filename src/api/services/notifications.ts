@@ -31,12 +31,19 @@ export class NotificationService {
     return await apiClient.put<NotificationSettings>(API_ENDPOINTS.NOTIFICATIONS.SETTINGS(userId), settings);
   }
 
-  async registerDevice(subscription: PushSubscription) {
-    return apiClient.post(API_ENDPOINTS.NOTIFICATIONS.DEVICE_REGISTER, { subscription });
+  // Register device token for push notifications
+  async registerDeviceToken(subscription: PushSubscription | PushSubscriptionJSON) {
+    return apiClient.post(API_ENDPOINTS.NOTIFICATIONS.DEVICE_REGISTER, subscription);
   }
 
-  async unregisterDevice(subscription: PushSubscription) {
-    return apiClient.post(API_ENDPOINTS.NOTIFICATIONS.DEVICE_UNREGISTER, { subscription });
+  // Unregister device token for push notifications
+  async unregisterDeviceToken(subscription: PushSubscription | PushSubscriptionJSON) {
+    return apiClient.post(API_ENDPOINTS.NOTIFICATIONS.DEVICE_UNREGISTER, subscription);
+  }
+
+  // Fetch the VAPID public key for push subscription
+  async getVapidPublicKey() {
+    return apiClient.get<string>(API_ENDPOINTS.VAPID_PUBLIC_KEY);
   }
 }
 
