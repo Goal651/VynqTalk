@@ -3,7 +3,7 @@
 const SERVER_URL = 'https://vynqtalk-server-production.up.railway.app'
 
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.MODE !== 'development' ? 'http://localhost:8080' : SERVER_URL,
+  BASE_URL: import.meta.env.MODE === 'development' ? 'http://localhost:8080' : SERVER_URL,
   API_VERSION: 'v2',
   TIMEOUT: 10000,
 };
