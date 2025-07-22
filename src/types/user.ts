@@ -16,7 +16,7 @@ export interface User {
   userRole: "USER" | "ADMIN"
   status: "active" | "blocked" | "suspended"
   latestMessage?: Message | null
-  online?: boolean
+  isOnline?: boolean
   unreadMessages?: Message[]
 }
 

@@ -21,7 +21,7 @@ interface ChatSidebarProps {
   isLoading?: boolean;
 }
 
-export const ChatSidebar = ({ users, onUserClick, activeChat, className, onlineUserIds = new Set(), currentUserId, unreadMessages = [], isLoading = false }: ChatSidebarProps) => {
+export const ChatSidebar = ({ users, onUserClick, activeChat, className, currentUserId, unreadMessages = [], isLoading = false }: ChatSidebarProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [callType, setCallType] = useState<"audio" | "video" | null>(null);
   const [callingUser, setCallingUser] = useState<User | null>(null);
@@ -93,7 +93,6 @@ export const ChatSidebar = ({ users, onUserClick, activeChat, className, onlineU
           ) : (
             filteredUsers.map((user) => {
               const isCurrentUser = user.id === currentUserId;
-              const isOnline = onlineUserIds.has(user.id);
               const latestMessage = user.latestMessage;
               const unreadCount = unreadCountByUser[user.id] || 0;
               return (
@@ -112,8 +111,8 @@ export const ChatSidebar = ({ users, onUserClick, activeChat, className, onlineU
                     </Avatar>
                     {!isCurrentUser && (
                       <span
-                        className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white shadow ${isOnline ? "bg-green-500 animate-pulse" : "bg-gray-400"}`}
-                        title={isOnline ? "Online" : "Offline"}
+                        className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-white shadow ${user.isOnline ? "bg-green-500 animate-pulse" : "bg-gray-400"}`}
+                        title={user.isOnline ? "Online" : "Offline"}
                       />
                     )}
                     {unreadCount > 0 && (
