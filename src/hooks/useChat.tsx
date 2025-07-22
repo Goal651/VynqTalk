@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks"
 import { useSocket } from "@/contexts/SocketContext"
 import { messageService } from "@/api"
+import { useUsers } from "@/contexts/UsersContext"
 
 // Utility to deduplicate reactions: only one per userId+emoji, ignore invalid userIds
 function deduplicateReactions(reactions: { userId: number | string | null, emoji: string }[]): { userId: number, emoji: string }[] {
@@ -25,6 +26,7 @@ function deduplicateReactions(reactions: { userId: number | string | null, emoji
 
 export const useChat = () => {
   const { user } = useAuth()
+  const { updateLatestMessage } = useUsers()
   const { toast } = useToast()
   const socket = useSocket()
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
@@ -32,7 +34,7 @@ export const useChat = () => {
   const [activeChat, setActiveChat] = useState<User | null>(null)
   const [replyTo, setReplyTo] = useState<Message | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
-  const [isLoadingMessages,setIsLoadingMessages]=useState(true)
+  const [isLoadingMessages, setIsLoadingMessages] = useState(true)
 
   useEffect(() => {
     const loadMessages = async () => {
@@ -124,7 +126,6 @@ export const useChat = () => {
       return
     }
 
-    console.log("Sending message:", content, "to user:", activeChat.name, "reply:", replyData)
 
     const newMessage: Message = {
       id: Date.now(),
@@ -137,6 +138,7 @@ export const useChat = () => {
       reactions: [],
       fileName: fileName
     }
+    updateLatestMessage(newMessage)
 
     const payload: SendMessageRequest = {
       content: newMessage.content,

@@ -122,12 +122,16 @@ export const ChatSidebar = ({ users, onUserClick, activeChat, className, onlineU
                   </div>
                   <div className="ml-3 flex-1 overflow-hidden">
                     <div className="font-medium text-foreground truncate">{user.name}</div>
-                    {latestMessage && (
+                    {latestMessage ? (
                       <div className="text-xs text-muted-foreground truncate flex items-center gap-2">
                         <span className="truncate max-w-[10rem]">{latestMessage.content}</span>
                         {latestMessage.timestamp && (
                           <span className="whitespace-nowrap">· {formatDistanceToNow(new Date(latestMessage.timestamp), { addSuffix: true })}</span>
                         )}
+                      </div>
+                    ) : (
+                      <div className="text-xs text-muted-foreground truncate flex items-center gap-2">
+                        Say hi to your new friend
                       </div>
                     )}
                   </div>

@@ -162,7 +162,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 // Wrapper to provide ChatView props from Index
 const ChatViewWrapper = () => {
   const { toast } = useToast()
-  const [users, setUsers] = useState<User[]>([])
   const [isLoadingUsers, setIsLoadingUsers] = useState(true)
   const usersContext = useUsers()
 
@@ -171,7 +170,6 @@ const ChatViewWrapper = () => {
       try {
         const response = await userService.getAllUsers()
         if (response && response.data) {
-          setUsers(response.data)
           usersContext.setUsers(response.data)
         }
         setIsLoadingUsers(false)
@@ -189,7 +187,7 @@ const ChatViewWrapper = () => {
     fetchUsers()
   }, [])
 
-  return <ChatView users={users} isLoadingUsers={isLoadingUsers} />
+  return <ChatView  isLoadingUsers={isLoadingUsers} />
 }
 
 export default App

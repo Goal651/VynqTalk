@@ -1,30 +1,39 @@
-import  { createContext, useContext, useState, ReactNode } from "react";
-import { User } from "@/types";
+import { createContext, useContext, useState, ReactNode } from "react";
+import { Message, User } from "@/types";
 
-// The context type
+
 interface UsersContextType {
-    users: Record<number, User>;
+    users: User[];
     setUsers: (users: User[]) => void;
     getUserName: (userId: number) => string;
+    updateLatestMessage: (message: Message) => void
 }
 
 const UsersContext = createContext<UsersContextType | undefined>(undefined);
 
 export const UsersProvider = ({ children }: { children: ReactNode }) => {
-    const [users, setUsersState] = useState<Record<number, User>>({});
+    const [users, setUsersState] = useState<User[]>([]);
 
-    // Set users from an array
     const setUsers = (usersArr: User[]) => {
-        const map: Record<number, User> = {};
-        usersArr.forEach(user => { map[user.id] = user; });
-        setUsersState(map);
+        setUsersState(usersArr);
     };
+
+    const updateLatestMessage = (message: Message) => {
+        const receiver = message.receiver
+        users.map((user) => {
+            if (!user) return []
+            if (user.id == receiver.id) {
+                user.latestMessage = message
+            }
+            return user
+        })
+    }
 
     // Get user name by id
     const getUserName = (userId: number) => users[userId]?.name || `User ${userId}`;
 
     return (
-        <UsersContext.Provider value={{ users, setUsers, getUserName }}>
+        <UsersContext.Provider value={{ users, setUsers, getUserName, updateLatestMessage }}>
             {children}
         </UsersContext.Provider>
     );

@@ -12,17 +12,18 @@ import { MediaGalleryModal } from "./MediaGalleryModal";
 import { useState, useMemo, useEffect } from "react";
 import { useSocket } from "@/contexts/SocketContext";
 import { userService } from '@/api';
+import { useUsers } from "@/contexts/UsersContext";
 
 
 interface ChatViewProps {
   onMessageDelete?: (messageId: number) => void;
   onMessageEdit?: (message: Message) => void;
-  users?: User[];
   isLoadingUsers?: boolean;
 }
 
-export const ChatView = ({ onMessageDelete, onMessageEdit, users, isLoadingUsers }: ChatViewProps) => {
+export const ChatView = ({ onMessageDelete, onMessageEdit, isLoadingUsers }: ChatViewProps) => {
   const { user } = useAuth();
+  const {users } = useUsers()
   const isMobile = useIsMobile();
   const socket = useSocket();
   const [onlineUserIds, setOnlineUserIds] = useState<Set<number>>(new Set());
