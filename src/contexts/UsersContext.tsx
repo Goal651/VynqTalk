@@ -15,6 +15,11 @@ export const UsersProvider = ({ children }: { children: ReactNode }) => {
     const [users, setUsersState] = useState<User[]>([]);
 
     const setUsers = (usersArr: User[]) => {
+        usersArr.map((user) => {
+            if (!user.avatar) user.avatar = `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`
+            return user
+        })
+        console.log('updated user avatar ', usersArr)
         setUsersState(usersArr);
     };
 
