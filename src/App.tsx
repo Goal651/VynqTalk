@@ -7,7 +7,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext"
 import { ThemeProvider } from "@/contexts/ThemeContext"
 import { SocketProvider } from "@/contexts/SocketContext"
 import MaintenancePage from "@/pages/Maintenance"
-import { systemStatusService, SystemStatus ,userService } from "@/api"
+import { systemStatusService, SystemStatus, userService } from "@/api"
 import { Routes, Route, Navigate, useLocation } from "react-router-dom"
 import Index from "@/pages/Index"
 import { Groups } from "@/pages/Groups"
@@ -19,8 +19,8 @@ import Signup from "@/pages/Signup"
 import NotFound from "@/pages/NotFound"
 import { useToast } from "@/hooks"
 import { User } from "@/types"
-import { ChatView } from "@/components/ChatView"
-import { UsersProvider, useUsers } from "@/contexts/UsersContext"
+import { ChatView } from "@/components/chat/dm/ChatView"
+import { UserProvider, useUsers } from "@/contexts/UserContext"
 import { Toaster } from '@/components/ui/toaster'
 
 const queryClient = new QueryClient()
@@ -39,7 +39,7 @@ const AppWithMaintenance = () => {
       .catch(err => {
         setError("Unable to fetch system status. Please try again later.")
       })
-   
+
   }, [])
 
   useEffect(() => {
@@ -117,11 +117,11 @@ const App = () => (
         <AuthProvider>
           <ThemeProvider>
             <SocketProvider>
-              <UsersProvider>
+              <UserProvider>
                 <div className='overflow-hidden h-screen'>
                   <AppWithMaintenance />
                 </div>
-              </UsersProvider>
+              </UserProvider>
             </SocketProvider>
           </ThemeProvider>
         </AuthProvider>
@@ -187,7 +187,7 @@ const ChatViewWrapper = () => {
     fetchUsers()
   }, [])
 
-  return <ChatView  isLoadingUsers={isLoadingUsers} />
+  return <ChatView isLoadingUsers={isLoadingUsers} />
 }
 
 export default App

@@ -12,7 +12,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Users, Settings, MessageCircle, Search, Crown } from "lucide-react";
 import { Group} from '@/types';
-import { GroupChatView } from "@/components/GroupChatView";
+import { GroupChatView } from "@/components/chat/group/GroupChatView";
 import { GroupSettings } from "@/components/GroupSettings";
 import { useToast } from "@/hooks";
 import { groupService } from "@/api";

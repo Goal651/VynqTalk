@@ -1,4 +1,4 @@
-import { Message, User, Reaction, GroupMessage } from '@/types';
+import { Message, User, Reaction, GroupMessage, MessageType } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     ContextMenu,
@@ -10,11 +10,11 @@ import {
 import { Edit, Trash2, Reply, Copy, File, X as CloseIcon, Globe, Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
-import { useUsers } from "@/contexts/UsersContext";
+import { useUsers } from "@/contexts/UserContext";
 import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
-import { CustomVideoPlayer } from "./CustomVideoPlayer";
-import { CustomAudioPlayer } from "./CustomAudioPlayer";
+import { CustomVideoPlayer } from "../../CustomVideoPlayer";
+import { CustomAudioPlayer } from "../../CustomAudioPlayer";
 import { Badge } from "@/components/ui/badge";
 
 interface GroupMessageBubbleProps {
@@ -59,7 +59,7 @@ export const GroupMessageBubble = ({
     const imageUrlRegex = /(https?:\/\/[\w\-._~:/?#[\]@!$&'()*+,;=%]+\.(?:png|jpg|jpeg|gif|webp|bmp|svg))/i;
 
     useEffect(() => {
-        if (message.type !== "TEXT" || !message.content) return;
+        if (message.type !== MessageType.TEXT || !message.content) return;
         const urls = message.content.match(urlRegex) || [];
         urls.forEach((url) => {
             if (!linkPreviews[url] && !fetchedUrls.current.has(url)) {
@@ -174,7 +174,7 @@ export const GroupMessageBubble = ({
                         {(() => {
                             const r = message.replyTo;
                             switch (r.type) {
-                                case "IMAGE":
+                                case MessageType.IMAGE:
                                     return (
                                         <img
                                             src={r.content}
@@ -182,21 +182,21 @@ export const GroupMessageBubble = ({
                                             className="h-8 w-8 object-cover rounded-md border ml-2"
                                         />
                                     );
-                                case "VIDEO":
+                                case MessageType.VIDEO:
                                     return (
                                         <span className="flex items-center gap-1 text-xs text-muted-foreground ml-2">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h12a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" /></svg>
                                             {r.fileName || "Video"}
                                         </span>
                                     );
-                                case "AUDIO":
+                                case MessageType.AUDIO:
                                     return (
                                         <span className="flex items-center gap-1 text-xs text-muted-foreground ml-2">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l-2 2H5a2 2 0 00-2 2v4a2 2 0 002 2h2l2 2zm7-2a2 2 0 100-4 2 2 0 000 4z" /></svg>
                                             {r.fileName || "Audio"}
                                         </span>
                                     );
-                                case "FILE":
+                                case MessageType.FILE:
                                     return (
                                         <span className="flex items-center gap-1 text-xs text-muted-foreground ml-2">
                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" /></svg>
@@ -247,11 +247,11 @@ export const GroupMessageBubble = ({
                 )}
 
                 {/* Message content rendering based on type */}
-                {message.type === "TEXT" && (
+                {message.type === MessageType.TEXT && (
                     <>
                         <div className="break-words whitespace-pre-wrap mb-2">{message.content}</div>
                         {/* Link Previews and Inline Images */}
-                        {message.type === "TEXT" && (message.content.match(urlRegex) || []).map((url, idx) => {
+                        {message.type === MessageType.TEXT && (message.content.match(urlRegex) || []).map((url, idx) => {
                             if (imageUrlRegex.test(url)) {
                                 return (
                                     <div key={url} className="mt-3 mb-2 flex justify-center animate-fade-in">
@@ -294,7 +294,7 @@ export const GroupMessageBubble = ({
                         })}
                     </>
                 )}
-                {message.type === "IMAGE" && message.content && (
+                {message.type === MessageType.IMAGE && message.content && (
                     <img
                         src={message.content}
                         alt={message.fileName || "Image"}
@@ -303,13 +303,13 @@ export const GroupMessageBubble = ({
                         onClick={() => onMediaClick?.(message.id)}
                     />
                 )}
-                {message.type === "AUDIO" && message.content && (
+                {message.type === MessageType.AUDIO && message.content && (
                     <div className="w-full my-2">
                         <CustomAudioPlayer src={message.content} />
                     </div>
                 )}
                 {/* Media: FILE */}
-                {message.type === "FILE" && message.content && (
+                {message.type === MessageType.FILE && message.content && (
                     <div className="my-2 p-3 rounded-2xl border-l-4 border border-border/70 bg-background/90 flex items-center gap-4 shadow-sm hover:shadow-lg transition-all duration-200 min-h-20 max-w-[98vw] sm:max-w-sm md:max-w-md w-full group">
                         <div className="flex items-center justify-center h-12 w-12 min-w-[3rem] max-w-[3rem] rounded-lg bg-muted border">
                             <File className="h-6 w-6 text-muted-foreground" />
@@ -333,7 +333,7 @@ export const GroupMessageBubble = ({
                         </div>
                     </div>
                 )}
-                {message.type === "VIDEO" && message.content && (
+                {message.type === MessageType.VIDEO && message.content && (
                     <div className="w-full mt-2 rounded-md overflow-hidden">
                         <CustomVideoPlayer
                             src={message.content}

@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useIsMobile, useGroupChat } from "@/hooks"
 import { useState, useMemo } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
-import { GroupMessage, Reaction } from "@/types"
+import { GroupMessage, MessageType, Reaction } from "@/types"
 import GroupMessageList from "./GroupMessageList"
 import GroupMessageInput from "./GroupMessageInput"
 import GroupMediaGallery from "./GroupMediaGallery"
@@ -59,7 +59,7 @@ export const GroupChatView = ({
 
   // Collect all media messages (images/videos) in the current group
   const mediaMessages = useMemo(
-    () => messages.filter(m => m.type === "IMAGE" || m.type === "VIDEO"),
+    () => messages.filter(m => m.type === MessageType.IMAGE || m.type === MessageType.VIDEO),
     [messages]
   )
 

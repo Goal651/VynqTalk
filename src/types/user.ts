@@ -15,7 +15,7 @@ export interface User {
   lastActive: string
   userRole: "USER" | "ADMIN"
   status: "active" | "blocked" | "suspended"
-  latestMessage?: Message | null
+  latestMessage?: Message 
   isOnline?: boolean
   unreadMessages?: Message[]
 }

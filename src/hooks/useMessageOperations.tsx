@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Message } from "@/types";
 import { useToast } from "@/hooks";
+import { useSocket } from "@/contexts";
 
 export const useMessageOperations = (
   messages: Message[],
@@ -8,6 +9,7 @@ export const useMessageOperations = (
   onMessageDelete?: (messageId: number) => void,
   onMessageEdit?: (message: Message) => void
 ) => {
+  const socket = useSocket()
   const { toast } = useToast();
   const [messageToDelete, setMessageToDelete] = useState<number | null>(null);
   const [messageToEdit, setMessageToEdit] = useState<Message | null>(null);
@@ -20,6 +22,7 @@ export const useMessageOperations = (
   const confirmDeleteMessage = () => {
     if (messageToDelete) {
       setMessages(messages.filter(message => message.id !== messageToDelete));
+      socket.messageDeletion(messageToDelete)
       if (onMessageDelete) onMessageDelete(messageToDelete);
       setMessageToDelete(null);
 
@@ -31,8 +34,10 @@ export const useMessageOperations = (
   };
 
   const handleEditMessage = (message: Message) => {
+    console.log('editing message ' + message)
     setMessageToEdit(message);
     setEditedContent(message.content);
+
   };
 
   const confirmEditMessage = () => {
@@ -42,7 +47,11 @@ export const useMessageOperations = (
           ? { ...message, content: editedContent, edited: true }
           : message
       ));
-      if (onMessageEdit) onMessageEdit({...messageToEdit, content: editedContent, edited: true});
+      socket.messageEdition({
+        id: messageToEdit.id,
+        newMessage: editedContent
+      })
+      if (onMessageEdit) onMessageEdit({ ...messageToEdit, content: editedContent, edited: true });
       setMessageToEdit(null);
 
       toast({

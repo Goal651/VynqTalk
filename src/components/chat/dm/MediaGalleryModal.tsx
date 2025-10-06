@@ -1,42 +1,42 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { GroupMessage } from "@/types";
+import { Message } from "@/types";
 import { Button } from "@/components/ui/button";
 import { X, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CustomVideoPlayer } from "./CustomVideoPlayer";
+import { CustomVideoPlayer } from "../../CustomVideoPlayer";
 
-interface GroupMediaGalleryModalProps {
+interface MediaGalleryModalProps {
     open: boolean;
-    mediaMessages: GroupMessage[];
+    mediaMessages: Message[];
     currentIndex: number;
     onClose: () => void;
     onNavigate: (index: number) => void;
 }
 
-export const GroupMediaGalleryModal = ({
+export const MediaGalleryModal = ({
     open,
     mediaMessages,
     currentIndex,
     onClose,
     onNavigate,
-}: GroupMediaGalleryModalProps) => {
+}: MediaGalleryModalProps) => {
     const current = mediaMessages[currentIndex];
     if (!current) return null;
 
     return (
         <AnimatePresence>
             {open && (
-                <Dialog open={open} onOpenChange={onClose}>
-                    <DialogContent className="flex flex-col items-center justify-center bg-black/95 p-0 max-w-4xl w-[95vw] h-[95vh] relative overflow-hidden border-0">
+                <Dialog open={open} onOpenChange={onClose} >
+                    <DialogContent className="flex flex-col items-center justify-center bg-black/95 p-0 max-w-4xl w-[95vw] h-[95vh] absolute overflow-hidden border-0">
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             animate={{ opacity: 1, scale: 1 }}
                             exit={{ opacity: 0, scale: 0.95 }}
-                            transition={{ duration: 0.3, ease: "easeOut" }}
-                            className="w-full h-full flex flex-col items-center justify-center relative"
+                            transition={{ duration: 0.2 }}
+                            className="w-full flex flex-col items-center"
                         >
                             {/* Navigation Controls */}
-                            <div className="absolute top-4 left-4 right-4 flex justify-between items-center z-20">
+                            <div className="absolute top-0 left-4 right-4 flex justify-between items-center z-20  mr-10">
                                 <Button
                                     variant="ghost"
                                     size="icon"
@@ -46,33 +46,19 @@ export const GroupMediaGalleryModal = ({
                                 >
                                     <ChevronLeft className="h-6 w-6" />
                                 </Button>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-white text-sm bg-black/60 px-3 py-1 rounded-full backdrop-blur-sm">
-                                        {currentIndex + 1} / {mediaMessages.length}
-                                    </span>
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        onClick={onClose}
-                                        className="text-white bg-black/50 hover:bg-black/70 rounded-full shadow-lg backdrop-blur-sm"
-                                    >
-                                        <X className="h-5 w-5" />
-                                    </Button>
-                                </div>
                                 <Button
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => onNavigate(currentIndex + 1)}
                                     disabled={currentIndex === mediaMessages.length - 1}
-                                    className="text-white bg-black/50 hover:bg-black/70 rounded-full shadow-lg backdrop-blur-sm"
+                                    className="text-white2 bg-black/50 hover:bg-black/70 rounded-full shadow-lg backdrop-blur-sm"
                                 >
                                     <ChevronRight className="h-6 w-6" />
                                 </Button>
                             </div>
-
                             {/* Media Content */}
                             <div className="flex items-center justify-center w-full h-full p-4">
-                                {current.type === "IMAGE" && (
+                                {current.type === "image" && (
                                     <motion.img
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
@@ -88,7 +74,7 @@ export const GroupMediaGalleryModal = ({
                                         }}
                                     />
                                 )}
-                                {current.type === "VIDEO" && (
+                                {current.type === "video" && (
                                     <motion.div
                                         initial={{ opacity: 0, scale: 0.9 }}
                                         animate={{ opacity: 1, scale: 1 }}
@@ -102,7 +88,6 @@ export const GroupMediaGalleryModal = ({
                                     </motion.div>
                                 )}
                             </div>
-
                             {/* File Info */}
                             {current.fileName && (
                                 <motion.div

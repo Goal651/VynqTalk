@@ -22,7 +22,6 @@ class ApiClient {
       (config) => {
         try {
           const token = this.getAuthToken();
-          console.log('Token in interceptor:', token, 'For URL:', config.url);
           if (token) {
             config.headers.Authorization = `Bearer ${token}`;
           }
@@ -99,7 +98,6 @@ class ApiClient {
       if (response.status === HTTP_STATUS.OK) {
         const { accessToken } = response.data;
         localStorage.setItem('access_token', accessToken);
-        console.log('Token refreshed successfully');
         this.refreshAttempts = 0;
       } else {
         throw new Error('Refresh token invalid or expired');
@@ -113,7 +111,6 @@ class ApiClient {
 
   public async logout() {
     try {
-      console.log('Logging out user');
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       this.logoutListeners.forEach((callback) => {
@@ -170,7 +167,6 @@ class ApiClient {
   async post<T>(endpoint: string, data?: unknown): Promise<ApiResponse<T>> {
     try {
       const response = await this.axiosInstance.post<ApiResponse<T>>(endpoint, data);
-      console.log("This is the response", response, "endpoint", endpoint)
       return response.data;
     } catch (error) {
       console.error(`POST ${endpoint} failed:`, error.request);

@@ -1,8 +1,8 @@
-import { SendGroupMessageRequest } from '@/types/message';
+import { EditMessageRequest, SendGroupMessageRequest } from '@/types/message';
 import SockJS from 'sockjs-client'
 import { Client, IMessage } from '@stomp/stompjs'
-import { Message, GroupMessage, User, Group, Reaction, MessageType, SendMessageRequest, ChatReaction } from '@/types'
-import { apiClient ,API_CONFIG, SOCKET_EVENTS} from '@/api';
+import { Message, GroupMessage, User, Group, Reaction, MessageType, SendMessageRequest, ChatReaction, SocketResponse } from '@/types'
+import { apiClient, API_CONFIG, SOCKET_EVENTS } from '@/api';
 import { API_ENDPOINTS } from '@/api';
 
 
@@ -13,6 +13,8 @@ class SocketService {
     private messageListeners: ((message: Message) => void)[] = []
     private groupMessageListeners: ((message: GroupMessage) => void)[] = []
     private reactionListeners: ((message: Message) => void)[] = []
+    private messageDeletionListeners: ((id: number) => void)[] = []
+    private messageEditionListeners: ((message: Message) => void)[] = []
     private logoutListeners: (() => void)[] = []
     private connectionAttempts: number = 0
     private maxConnectionAttempts: number = 3
@@ -39,7 +41,7 @@ class SocketService {
                     throw error // Prevent client activation
                 }
             },
-            reconnectDelay: 5000,
+            reconnectDelay: 3000,
             onConnect: () => {
                 try {
                     this.connectionAttempts = 0 // Reset attempts
@@ -216,17 +218,41 @@ class SocketService {
             this.stompClient.subscribe('/topic/reactions', (message) => this.handleReaction(message))
             this.stompClient.subscribe('/topic/groupMessages', (message) => this.handleGroupMessage(message))
             this.stompClient.subscribe('/topic/systemMetrics', (message) => this.handleSystemMetrics(message))
+            this.stompClient.subscribe('/topic/messageDeletion', (message) => this.handleMessageDeletion(message))
+            this.stompClient.subscribe('/topic/messageEdition', (message) => this.handleMessageEdition(message))
         } catch (error) {
             console.error('❌ Error subscribing to public topics:', error.message)
         }
     }
 
+    private handleMessageDeletion(message: IMessage) {
+        try {
+            const body = JSON.parse(message.body) as SocketResponse<number>
+            this.messageDeletionListeners.forEach((callback) => {
+                callback(body.data)
+            })
+        } catch (error) {
+            console.error('error receiving deleted message', error)
+        }
+    }
+
+    private handleMessageEdition(message: IMessage) {
+        try {
+            const body = JSON.parse(message.body) as SocketResponse<Message>
+            this.messageEditionListeners.forEach((callback) => {
+                callback(body.data)
+            })
+        } catch (error) {
+            console.error('error receiving edited message', error)
+        }
+    }
+
     private handleReaction(message: IMessage) {
         try {
-            const body = JSON.parse(message.body) as Message
+            const body = JSON.parse(message.body) as SocketResponse<Message>
             this.reactionListeners.forEach((callback) => {
                 try {
-                    callback(body)
+                    callback(body.data)
                 } catch (error) {
                     console.error('Error in reaction callback:', error.message)
                 }
@@ -238,10 +264,10 @@ class SocketService {
 
     private handleMessage(message: IMessage) {
         try {
-            const body = JSON.parse(message.body) as Message
+            const body = JSON.parse(message.body) as SocketResponse<Message>
             this.messageListeners.forEach((callback) => {
                 try {
-                    callback(body)
+                    callback(body.data)
                 } catch (error) {
                     console.error('Error in message callback:', error.message)
                 }
@@ -270,10 +296,10 @@ class SocketService {
 
     private handleGroupMessage(message: IMessage) {
         try {
-            const body = JSON.parse(message.body) as GroupMessage
+            const body = JSON.parse(message.body) as SocketResponse<GroupMessage>
             this.groupMessageListeners.forEach((callback) => {
                 try {
-                    callback(body)
+                    callback(body.data)
                 } catch (error) {
                     console.error('Error in group message callback:', error.message)
                 }
@@ -298,13 +324,13 @@ class SocketService {
         }
     }
 
-    public sendMessage(data:SendMessageRequest) {
+    public sendMessage(data: SendMessageRequest) {
         try {
             if (!this.stompClient.connected) {
                 console.warn('Cannot send message: WebSocket not connected')
                 return
             }
-            const payload = data 
+            const payload = data
             this.stompClient.publish({
                 destination: SOCKET_EVENTS.MESSAGE.SEND_MESSAGE,
                 body: JSON.stringify(payload),
@@ -317,7 +343,7 @@ class SocketService {
         }
     }
 
-    public messageReply(data:SendMessageRequest) {
+    public messageReply(data: SendMessageRequest) {
         try {
             if (!this.stompClient.connected) {
                 console.warn('Cannot send message: WebSocket not connected')
@@ -336,7 +362,7 @@ class SocketService {
         }
     }
 
-    public messageReact(data:ChatReaction) {
+    public messageReact(data: ChatReaction) {
         try {
             if (!this.stompClient.connected) {
                 console.warn('Cannot send message: WebSocket not connected')
@@ -352,6 +378,38 @@ class SocketService {
             if (error.message?.includes('Unauthorized') || error.message?.includes('401')) {
                 this.handleUnauthorized()
             }
+        }
+    }
+
+    public messageEdition(data: EditMessageRequest) {
+        try {
+            if (!this.stompClient.connected) {
+                console.warn('Cannot edit message: WebSocket not connected')
+                return
+            }
+            const payload = data
+            this.stompClient.publish({
+                destination: SOCKET_EVENTS.MESSAGE.EDIT_MESSAGE,
+                body: JSON.stringify(payload)
+            })
+        } catch (error) {
+            console.error('Error editing message: ', error.message)
+        }
+    }
+
+    public messageDeletion(data: number) {
+        try {
+            if (!this.stompClient.connected) {
+                console.warn('Cannot edit message: WebSocket not connected')
+                return
+            }
+            const payload = data
+            this.stompClient.publish({
+                destination: SOCKET_EVENTS.MESSAGE.DELETE_MESSAGE,
+                body: JSON.stringify(payload)
+            })
+        } catch (error) {
+            console.error('Error editing message: ', error.message)
         }
     }
 
@@ -412,7 +470,41 @@ class SocketService {
         }
     }
 
-    public sendGroupMessage(data:SendGroupMessageRequest) {
+    public onMessageDeletion(callBack: (id: number) => void) {
+        try {
+            this.messageDeletionListeners.push(callBack)
+        } catch (error) {
+            console.error('Error adding message deletion: ', error.message)
+        }
+    }
+
+    public removeMessageDeletionListener(callBack: (id: number) => void) {
+        try {
+            this.messageDeletionListeners = this.messageDeletionListeners.filter(cb => cb !== callBack)
+        } catch (error) {
+            console.error('Error removing message deletion listener:', error.message)
+        }
+    }
+
+
+    public onMessageEdition(callBack: (message: Message) => void) {
+        try {
+            this.messageEditionListeners.push(callBack)
+        } catch (error) {
+            console.error('Error adding message edition: ', error.message)
+        }
+    }
+
+    public removeMessageEditionListener(callBack: (message: Message) => void) {
+        try {
+            this.messageEditionListeners = this.messageEditionListeners.filter(cb => cb !== callBack)
+        } catch (error) {
+            console.error('Error removing message edition listener:', error.message)
+        }
+    }
+
+
+    public sendGroupMessage(data: SendGroupMessageRequest) {
         try {
             if (!this.stompClient.connected) {
                 console.warn('Cannot send group message: WebSocket not connected')
@@ -431,7 +523,7 @@ class SocketService {
         }
     }
 
-    public sendGroupMessageReply(data:SendGroupMessageRequest) {
+    public sendGroupMessageReply(data: SendGroupMessageRequest) {
         try {
             if (!this.stompClient.connected) {
                 console.warn('Cannot send group message: WebSocket not connected')

@@ -1,10 +1,10 @@
-import { User, Message } from "@/types";
+import { User, Message, MessageType } from "@/types";
 import { ChatSidebar } from "./ChatSidebar";
 import { MessageList } from "./MessageList";
 import { MessageInput } from "./MessageInput";
 import { ChatHeader } from "./ChatHeader";
-import { UserInfo } from "./UserInfo";
-import { MessageDialogs } from "./MessageDialogs";
+import { UserInfo } from "../../UserInfo";
+import { MessageDialogs } from "../../MessageDialogs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChat, useIsMobile, useMessageOperations } from "@/hooks";
@@ -12,7 +12,7 @@ import { MediaGalleryModal } from "./MediaGalleryModal";
 import { useState, useMemo, useEffect } from "react";
 import { useSocket } from "@/contexts/SocketContext";
 import { userService } from '@/api';
-import { useUsers } from "@/contexts/UsersContext";
+import { useUsers } from "@/contexts/UserContext";
 
 
 interface ChatViewProps {
@@ -69,7 +69,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, isLoadingUsers }: Cha
   const [galleryIndex, setGalleryIndex] = useState(0);
   // Collect all media messages (images/videos) in the current chat
   const mediaMessages = useMemo(
-    () => filteredMessages.filter(m => m.type === "IMAGE" || m.type === "VIDEO"),
+    () => filteredMessages.filter(m => m.type === MessageType.IMAGE || m.type === MessageType.VIDEO),
     [filteredMessages]
   );
   // Handler to open gallery modal

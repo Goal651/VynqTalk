@@ -1,7 +1,7 @@
-import { GroupMessage } from '@/types';
+import { GroupMessage, MessageType } from '@/types';
 import { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { CustomVideoPlayer } from './CustomVideoPlayer';
+import { CustomVideoPlayer } from '../../CustomVideoPlayer';
 
 interface GroupMediaGalleryProps {
     mediaMessages: GroupMessage[];
@@ -33,13 +33,13 @@ export const GroupMediaGallery = ({ mediaMessages, onMediaClick }: GroupMediaGal
                             className="relative cursor-pointer group aspect-square"
                             onClick={() => handleThumbnailClick(idx)}
                         >
-                            {msg.type === 'IMAGE' ? (
+                            {msg.type === MessageType.IMAGE ? (
                                 <img
                                     src={msg.content}
                                     alt={msg.fileName || 'Image'}
                                     className="object-cover w-full h-full rounded-lg border shadow-sm group-hover:opacity-80 transition-all duration-200 group-hover:scale-105"
                                 />
-                            ) : msg.type === 'VIDEO' ? (
+                            ) : msg.type === MessageType.VIDEO ? (
                                 <div className="relative w-full h-full bg-black rounded-lg flex items-center justify-center border shadow-sm group-hover:opacity-80 transition-all duration-200 group-hover:scale-105">
                                     <div className="absolute inset-0 flex items-center justify-center">
                                         <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center">

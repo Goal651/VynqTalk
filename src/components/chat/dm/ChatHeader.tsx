@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { MoreVertical, ChevronLeft } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
-import { CallControls } from "./CallControls";
+import { CallControls } from "../../CallControls";
 import { useIsMobile } from "@/hooks";
 
 interface ChatHeaderProps {

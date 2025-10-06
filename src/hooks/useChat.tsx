@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks"
 import { useSocket } from "@/contexts/SocketContext"
 import { messageService } from "@/api"
-import { useUsers } from "@/contexts/UsersContext"
+import { useUsers } from "@/contexts/UserContext"
 
 // Utility to deduplicate reactions: only one per userId+emoji, ignore invalid userIds
 function deduplicateReactions(reactions: { userId: number | string | null, emoji: string }[]): { userId: number, emoji: string }[] {
@@ -71,16 +71,14 @@ export const useChat = () => {
           )
         }
         const messageExists = prevMessages.some(m => m.id === message.id)
-        if (messageExists) {
-          return prevMessages
-        }
+        if (messageExists) return prevMessages
         return [...prevMessages, message]
       })
       if (message.sender.id === user?.id) return
       if (!activeChat || ((message.sender.id !== activeChat.id)) && message.sender.id !== user?.id) {
         if (window.Notification && Notification.permission === 'granted') {
           new Notification(message.sender.name || 'New Message ', {
-            body: message.content,
+            body: message.type === MessageType.TEXT  ? message.content : 'Sent file',
             icon: message.sender.avatar || '/logo.svg',
             tag: `chat-from-${message.sender.id}`,
           })
@@ -92,6 +90,35 @@ export const useChat = () => {
 
         })
       }
+    }
+
+    const handleMessageEdition = (message: Message) => {
+      setMessages(prevMessages =>
+        prevMessages.map((m) => (
+          m.id === message.id ? { ...m, content: message.content, edited: true } : m
+        ))
+      )
+      if (message.sender.id === user?.id) return
+      if (!activeChat || ((message.sender.id !== activeChat.id)) && message.sender.id !== user?.id) {
+        if (window.Notification && Notification.permission === 'granted') {
+          new Notification(message.sender.name + 'Edited message ', {
+            body: message.type === MessageType.TEXT ? message.content : 'Sent file',
+            icon: message.sender.avatar || '/logo.svg',
+            tag: `chat-from-${message.sender.id}`,
+          })
+        }
+      } else {
+        toast({
+          title: `${message.sender.name} edited message`,
+          description: message.type === MessageType.TEXT ? message.content : 'Sent file',
+        })
+      }
+    }
+
+    const handleMessageDeletion = (id: number) => {
+      setMessages(prevMessages => prevMessages.filter((m) => m.id !== id)
+
+      )
     }
 
     const handleReaction = (message: Message) => {
@@ -109,12 +136,16 @@ export const useChat = () => {
 
     socket.onMessage(handleMessage)
     socket.onReaction(handleReaction)
-    // No need to call socket.connect/disconnect, context handles it
+    socket.onMessageEdition(handleMessageEdition)
+    socket.onMessageDeletion(handleMessageDeletion)
+
     return () => {
       socket.removeMessageListener(handleMessage)
       socket.removeReactionListener(handleReaction)
+      socket.removeMessageEditionListener(handleMessageEdition)
+      socket.removeMessageDeletionListener(handleMessageDeletion)
     }
-  }, [user, socket, activeChat])
+  }, [user, socket, activeChat, toast])
 
   const handleSendMessage = (content: string, type: MessageType, fileName: string | null, replyData?: Message) => {
     if (!user || !activeChat) {

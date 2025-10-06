@@ -3,7 +3,7 @@
 const SERVER_URL = 'https://vynqtalk-server-production.up.railway.app'
 
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.MODE === 'development' ? 'http://localhost:8080' : SERVER_URL,
+  BASE_URL: import.meta.env.MODE === 'development' ?'http://localhost:8080' : SERVER_URL,
   API_VERSION: 'v2',
   TIMEOUT: 10000,
 };
@@ -116,6 +116,8 @@ export const SOCKET_EVENTS = {
     SEND_MESSAGE: '/app/chat.sendMessage',
     REPLY_MESSAGE: '/app/chat.sendMessageReply',
     REACT_MESSAGE: '/app/chat.sendMessageReaction',
+    EDIT_MESSAGE:'/app/chat.editMessage',
+    DELETE_MESSAGE:'/app/chat.deleteMessage'
   },
   GROUP_MESSAGE: {
     SEND_MESSAGE: '/app/group.sendMessage',

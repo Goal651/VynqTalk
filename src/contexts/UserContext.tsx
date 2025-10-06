@@ -3,16 +3,16 @@ import { Message, User } from "@/types";
 import { useSocket } from "./SocketContext";
 
 
-interface UsersContextType {
+interface UserContextType {
     users: User[];
     setUsers: (users: User[]) => void;
     getUserName: (userId: number) => string;
     updateLatestMessage: (message: Message) => void
 }
 
-const UsersContext = createContext<UsersContextType | undefined>(undefined);
+const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export const UsersProvider = ({ children }: { children: ReactNode }) => {
+export const UserProvider = ({ children }: { children: ReactNode }) => {
     const socket = useSocket()
     const [users, setUsersState] = useState<User[]>([]);
 
@@ -42,7 +42,7 @@ export const UsersProvider = ({ children }: { children: ReactNode }) => {
             if (user.id == receiver.id) user.latestMessage = message
             return user
         })
-      setUsersState(sortUsers(users))
+        setUsersState(sortUsers(users))
     }
 
     const sortUsers = (users: User[]): User[] => {
@@ -61,14 +61,14 @@ export const UsersProvider = ({ children }: { children: ReactNode }) => {
     const getUserName = (userId: number) => users[userId]?.name || `User ${userId}`;
 
     return (
-        <UsersContext.Provider value={{ users, setUsers, getUserName, updateLatestMessage }}>
+        <UserContext.Provider value={{ users, setUsers, getUserName, updateLatestMessage }}>
             {children}
-        </UsersContext.Provider>
+        </UserContext.Provider>
     );
 };
 
 export const useUsers = () => {
-    const ctx = useContext(UsersContext);
+    const ctx = useContext(UserContext);
     if (!ctx) throw new Error("useUsers must be used within a UsersProvider");
     return ctx;
 }; 

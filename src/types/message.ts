@@ -2,7 +2,13 @@
 import type { User } from "./user"
 import type { Group } from "./group"
 
-export type MessageType = "TEXT" | "IMAGE" | "AUDIO" | "FILE" | "VIDEO"
+export enum MessageType {
+  TEXT = "TEXT",
+  IMAGE = "IMAGE",
+  AUDIO = "AUDIO",
+  FILE = "FILE",
+  VIDEO = "VIDEO"
+}
 
 /**
  * Represents a direct message between users.
@@ -60,6 +66,11 @@ export interface SendMessageRequest {
   type: MessageType
   fileName?: string
   replyToId?: number
+}
+
+export interface EditMessageRequest{
+  newMessage:string
+  id:number
 }
 
 /**
