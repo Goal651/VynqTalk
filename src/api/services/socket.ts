@@ -217,6 +217,9 @@ class SocketService {
             this.stompClient.subscribe('/topic/messages', (message) => this.handleMessage(message))
             this.stompClient.subscribe('/topic/reactions', (message) => this.handleReaction(message))
             this.stompClient.subscribe('/topic/groupMessages', (message) => this.handleGroupMessage(message))
+            this.stompClient.subscribe('/topic/groupReactions', (message) => this.handleGroupReaction(message))
+            this.stompClient.subscribe('/topic/groupMessageDeletion', (message) => this.handleGroupMessageDeletion(message))
+            this.stompClient.subscribe('/topic/groupMessageEdition', (message) => this.handleGroupMessageEdition(message))
             this.stompClient.subscribe('/topic/systemMetrics', (message) => this.handleSystemMetrics(message))
             this.stompClient.subscribe('/topic/messageDeletion', (message) => this.handleMessageDeletion(message))
             this.stompClient.subscribe('/topic/messageEdition', (message) => this.handleMessageEdition(message))
@@ -306,6 +309,47 @@ class SocketService {
             })
         } catch (error) {
             console.error('Failed to parse group message:', error.message)
+        }
+    }
+
+    private handleGroupReaction(message: IMessage) {
+        try {
+            const body = JSON.parse(message.body) as SocketResponse<GroupMessage>
+            this.groupMessageListeners.forEach((callback) => {
+                try {
+                    callback(body.data)
+                } catch (error) {
+                    console.error('Error in group reaction callback:', error.message)
+                }
+            })
+        } catch (error) {
+            console.error('Failed to parse group reaction:', error.message)
+        }
+    }
+
+    private handleGroupMessageDeletion(message: IMessage) {
+        try {
+            const body = JSON.parse(message.body) as SocketResponse<number>
+            this.messageDeletionListeners.forEach((callback) => {
+                callback(body.data)
+            })
+        } catch (error) {
+            console.error('Error receiving deleted group message', error)
+        }
+    }
+
+    private handleGroupMessageEdition(message: IMessage) {
+        try {
+            const body = JSON.parse(message.body) as SocketResponse<GroupMessage>
+            this.groupMessageListeners.forEach((callback) => {
+                try {
+                    callback(body.data)
+                } catch (error) {
+                    console.error('Error in group message edition callback:', error.message)
+                }
+            })
+        } catch (error) {
+            console.error('Error receiving edited group message', error)
         }
     }
 
