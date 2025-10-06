@@ -41,6 +41,14 @@ export class GroupService {
   async createGroup(newGroup: CreateGroupRequest): Promise<ApiResponse<Group>> {
     return await apiClient.post(API_ENDPOINTS.GROUP.CREATE, newGroup)
   }
+
+  async joinGroup(groupId: number): Promise<ApiResponse<void>> {
+    return await apiClient.post<void>(API_ENDPOINTS.GROUP.JOIN, { groupId })
+  }
+
+  async leaveGroup(groupId: number): Promise<ApiResponse<void>> {
+    return await apiClient.post<void>(API_ENDPOINTS.GROUP.LEAVE, { groupId })
+  }
 }
 
 export const groupService = new GroupService()

@@ -123,5 +123,7 @@ export const SOCKET_EVENTS = {
     SEND_MESSAGE: '/app/group.sendMessage',
     REPLY_MESSAGE: '/app/group.sendMessageReply',
     REACT_MESSAGE: '/app/group.sendMessageReaction',
+    EDIT_MESSAGE: '/app/group.editMessage',
+    DELETE_MESSAGE: '/app/group.deleteMessage'
   }
 };

@@ -16,6 +16,7 @@ export class AuthService {
     )
     if (response.success && response.data) {
       localStorage.setItem('access_token', response.data.accessToken)
+      localStorage.setItem('refresh_token', response.data.refreshToken)
       localStorage.setItem('user', JSON.stringify(response.data.user))
     }
     return response
@@ -31,6 +32,7 @@ export class AuthService {
     )
     if (response.success && response.data) {
       localStorage.setItem('access_token', response.data.accessToken)
+      localStorage.setItem('refresh_token', response.data.refreshToken)
       localStorage.setItem('user', JSON.stringify(response.data.user))
     }
     return response
@@ -73,6 +75,7 @@ export class AuthService {
     )
     if (response.success && response.data) {
       localStorage.setItem('access_token', response.data.accessToken)
+      localStorage.setItem('refresh_token', response.data.refreshToken)
       localStorage.setItem('user', JSON.stringify(response.data.user))
     }
     return response

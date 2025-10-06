@@ -25,6 +25,16 @@ export class GroupMessageService {
         return await apiClient.get<GroupMessage>(`${API_ENDPOINTS.GROUP_MESSAGES.BY_ID(messageId)}`);
     }
 
+    // React to a group message
+    async reactToMessage(messageId: number, emoji: string): Promise<ApiResponse<void>> {
+        return await apiClient.post<void>(API_ENDPOINTS.GROUP_MESSAGES.REACT(messageId), { emoji });
+    }
+
+    // Remove reaction from a group message
+    async removeReaction(messageId: number, reactionId: string): Promise<ApiResponse<void>> {
+        return await apiClient.delete<void>(`${API_ENDPOINTS.GROUP_MESSAGES.REMOVE_REACTION(messageId)}/${reactionId}`);
+    }
+
 }
 
 export const groupMessageService = new GroupMessageService();

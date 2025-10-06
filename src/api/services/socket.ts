@@ -542,6 +542,57 @@ class SocketService {
         }
     }
 
+    public sendGroupMessageReaction(data: ChatReaction) {
+        try {
+            if (!this.stompClient.connected) {
+                console.warn('Cannot send group message reaction: WebSocket not connected')
+                return
+            }
+            const payload = data
+            this.stompClient.publish({
+                destination: SOCKET_EVENTS.GROUP_MESSAGE.REACT_MESSAGE,
+                body: JSON.stringify(payload),
+            })
+        } catch (error) {
+            console.error('Error sending group message reaction:', error.message)
+            if (error.message?.includes('Unauthorized') || error.message?.includes('401')) {
+                this.handleUnauthorized()
+            }
+        }
+    }
+
+    public editGroupMessage(data: EditMessageRequest) {
+        try {
+            if (!this.stompClient.connected) {
+                console.warn('Cannot edit group message: WebSocket not connected')
+                return
+            }
+            const payload = data
+            this.stompClient.publish({
+                destination: SOCKET_EVENTS.GROUP_MESSAGE.EDIT_MESSAGE,
+                body: JSON.stringify(payload)
+            })
+        } catch (error) {
+            console.error('Error editing group message: ', error.message)
+        }
+    }
+
+    public deleteGroupMessage(messageId: number) {
+        try {
+            if (!this.stompClient.connected) {
+                console.warn('Cannot delete group message: WebSocket not connected')
+                return
+            }
+            const payload = messageId
+            this.stompClient.publish({
+                destination: SOCKET_EVENTS.GROUP_MESSAGE.DELETE_MESSAGE,
+                body: JSON.stringify(payload)
+            })
+        } catch (error) {
+            console.error('Error deleting group message: ', error.message)
+        }
+    }
+
     public onGroupMessage(callback: (message: GroupMessage) => void) {
         try {
             this.groupMessageListeners.push(callback)
