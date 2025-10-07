@@ -82,6 +82,17 @@ export const useChat = () => {
             icon: message.sender.avatar || '/logo.svg',
             tag: `chat-from-${message.sender.id}`,
           })
+        } else if (window.Notification && Notification.permission === 'default') {
+          // Automatically request permission for first-time users
+          Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+              new Notification(message.sender.name || 'New Message ', {
+                body: message.type === MessageType.TEXT  ? message.content : 'Sent file',
+                icon: message.sender.avatar || '/logo.svg',
+                tag: `chat-from-${message.sender.id}`,
+              })
+            }
+          })
         }
       } else {
         toast({
@@ -105,6 +116,17 @@ export const useChat = () => {
             body: message.type === MessageType.TEXT ? message.content : 'Sent file',
             icon: message.sender.avatar || '/logo.svg',
             tag: `chat-from-${message.sender.id}`,
+          })
+        } else if (window.Notification && Notification.permission === 'default') {
+          // Automatically request permission for first-time users
+          Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+              new Notification(message.sender.name + 'Edited message ', {
+                body: message.type === MessageType.TEXT ? message.content : 'Sent file',
+                icon: message.sender.avatar || '/logo.svg',
+                tag: `chat-from-${message.sender.id}`,
+              })
+            }
           })
         }
       } else {
@@ -191,6 +213,7 @@ export const useChat = () => {
     setActiveChat(clickedUser)
     setShowUserInfo(false)
     setReplyTo(null)
+    
   }
 
   const handleUserAvatarClick = (clickedUser: User) => {

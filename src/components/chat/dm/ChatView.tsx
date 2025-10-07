@@ -5,6 +5,7 @@ import { MessageInput } from "./MessageInput";
 import { ChatHeader } from "./ChatHeader";
 import { UserInfo } from "../../UserInfo";
 import { MessageDialogs } from "../../MessageDialogs";
+import { NotificationPermissionModal } from "../../NotificationPermissionModal";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
 import { useChat, useIsMobile, useMessageOperations } from "@/hooks";
@@ -67,6 +68,9 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, isLoadingUsers }: Cha
   // Gallery modal state
   const [galleryOpen, setGalleryOpen] = useState(false);
   const [galleryIndex, setGalleryIndex] = useState(0);
+  
+  // Notification modal state
+  const [showNotificationModal, setShowNotificationModal] = useState(false);
   // Collect all media messages (images/videos) in the current chat
   const mediaMessages = useMemo(
     () => filteredMessages.filter(m => m.type === MessageType.IMAGE || m.type === MessageType.VIDEO),
@@ -83,13 +87,27 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, isLoadingUsers }: Cha
 
   // Handler for user click in sidebar (mobile aware)
   const handleUserClickMobile = (user: User) => {
-    handleUserClick(user); // existing logic
-    if (isMobile) setShowSidebar(false); // hide sidebar, show chat area
+    handleUserClick(user); 
+    if (isMobile) setShowSidebar(false);
   };
 
   // Handler for back button in chat area
   const handleBackToSidebar = () => {
     setShowSidebar(true);
+  };
+
+  // Handler for notification permission
+  const handleNotificationPermissionChange = (granted: boolean) => {
+    if (granted) {
+      console.log('Notifications enabled successfully');
+    } else {
+      console.log('Notifications denied or failed to enable');
+    }
+  };
+
+  // Function to trigger notification modal (you can call this from anywhere)
+  const triggerNotificationModal = () => {
+    setShowNotificationModal(true);
   };
 
   useEffect(() => {
@@ -150,6 +168,7 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, isLoadingUsers }: Cha
             activeChat={activeChat}
             onVoiceCall={() => { }}
             onVideoCall={() => { }}
+            onNotificationClick={triggerNotificationModal}
             {...(isMobile ? { onBack: handleBackToSidebar } : {})}
           />
 
@@ -218,6 +237,12 @@ export const ChatView = ({ onMessageDelete, onMessageEdit, isLoadingUsers }: Cha
         currentIndex={galleryIndex}
         onClose={() => setGalleryOpen(false)}
         onNavigate={setGalleryIndex}
+      />
+      
+      <NotificationPermissionModal
+        open={showNotificationModal}
+        onClose={() => setShowNotificationModal(false)}
+        onPermissionChanged={handleNotificationPermissionChange}
       />
     </div>
   );

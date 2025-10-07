@@ -62,7 +62,7 @@ const AppWithMaintenance = () => {
     if (user && isPushSupported) {
       subscribeToPush().catch(console.error);
     }
-  }, [user, isPushSupported, subscribeToPush]);
+  }, [user]);
 
   if (error) return <div className="flex items-center justify-center h-screen text-destructive">{error}</div>
   if (!maintenance) return (

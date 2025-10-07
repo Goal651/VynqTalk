@@ -7,7 +7,6 @@ import App from './App';
 if ('serviceWorker' in navigator && 'PushManager' in window) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/push-sw.js').then(registration => {
-      console.log('Push Service Worker registered:', registration);
     }).catch(error => {
       console.error('Push Service Worker registration failed:', error);
     });

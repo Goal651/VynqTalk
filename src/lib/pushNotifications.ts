@@ -68,8 +68,6 @@ export class PushNotificationManager {
 
             // Register subscription with server
             await notificationService.registerDeviceToken(subscription);
-
-            console.log('Push subscription successful');
             return subscription;
         } catch (error) {
             console.error('Failed to subscribe to push notifications:', error);

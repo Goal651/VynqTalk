@@ -1,6 +1,6 @@
 // Service Worker for VynqTalk Push Notifications
 
-const CACHE_NAME = 'vynqtalk-v1';
+const CACHE_NAME = 'vynqtalk-v2';
 const urlsToCache = [
   '/',
   '/static/js/bundle.js',
@@ -44,8 +44,7 @@ self.addEventListener('fetch', (event) => {
 
 // Push event
 self.addEventListener('push', (event) => {
-  console.log('Push received:', event);
-  
+ 
   let notificationData = {};
   
   if (event.data) {
@@ -89,8 +88,6 @@ self.addEventListener('push', (event) => {
 
 // Notification click event
 self.addEventListener('notificationclick', (event) => {
-  console.log('Notification clicked:', event);
-  
   event.notification.close();
   
   if (event.action === 'open' || !event.action) {

@@ -52,6 +52,7 @@ export const ChatSidebar = ({ users, onUserClick, activeChat, className, current
   };
 
   const handleUserClick = (user: User) => {
+   
     onUserClick(user);
   };
 

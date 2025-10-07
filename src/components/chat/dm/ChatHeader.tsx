@@ -1,6 +1,6 @@
 import { User } from "@/types";
 import { Button } from "@/components/ui/button";
-import { MoreVertical, ChevronLeft } from "lucide-react";
+import { MoreVertical, ChevronLeft, Bell } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarImage, AvatarFallback } from "@radix-ui/react-avatar";
 import { CallControls } from "../../CallControls";
@@ -12,6 +12,7 @@ interface ChatHeaderProps {
   activeChat?: User | null;
   onVoiceCall?: () => void;
   onVideoCall?: () => void;
+  onNotificationClick?: () => void;
   onBack?: () => void;
 }
 
@@ -22,6 +23,7 @@ export const ChatHeader = ({
   onVoiceCall,
   onVideoCall,
   onUserClick,
+  onNotificationClick,
   onBack,
 }: ChatHeaderProps) => {
   const isMobile = useIsMobile();
@@ -88,6 +90,20 @@ export const ChatHeader = ({
         {activeChat && (
           <div className="flex items-center space-x-2">
             <CallControls activeChat={activeChat} />
+            
+            {/* Notification Settings Button */}
+            {onNotificationClick && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onNotificationClick}
+                className="h-9 w-9 p-0 hover:bg-accent transition-all duration-200 rounded-full"
+                title="Notification Settings"
+              >
+                <Bell className="h-4 w-4" />
+              </Button>
+            )}
+            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

@@ -59,7 +59,6 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
   }, []);
 
   const handleSave = () => {
-    console.log("Saving group settings:", groupData)
     const updatedGroup: Group = {
       ...group,
       name: groupData.name,
@@ -75,7 +74,6 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
   }
 
   const handleSettingChange = (key: string, value: boolean) => {
-    console.log(`Setting ${key} changed to:`, value)
     setSettings(prev => ({ ...prev, [key]: value }))
 
     toast({
@@ -158,7 +156,6 @@ export const GroupSettings = ({ group, onBack, onSave }: GroupSettingsProps) => 
   }
 
   const handleMemberAction = (action: string, memberId: number, memberName: string) => {
-    console.log(`Member action: ${action} for member ${memberId}`)
 
     toast({
       title: "Member action",
