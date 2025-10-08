@@ -43,21 +43,21 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 sm:space-y-6">
         {type === 'signup' && (
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm sm:text-base font-medium text-foreground">Full Name</FormLabel>
+              <FormItem className="space-y-2">
+                <FormLabel className="text-sm font-medium text-foreground">Full Name</FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
-                      placeholder="John Doe" 
+                      placeholder="Enter your full name" 
                       {...field} 
-                      className="pl-10 bg-background/50 border-border/50 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm sm:text-base h-11 sm:h-12"
+                      className="pl-10 h-11 sm:h-12 bg-background border-input rounded-lg focus:border-ring focus:ring-2 focus:ring-ring/20 transition-colors text-foreground placeholder-muted-foreground"
                     />
                   </div>
                 </FormControl>
@@ -71,15 +71,15 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
           control={form.control}
           name="email"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm sm:text-base font-medium text-foreground">Email</FormLabel>
+            <FormItem className="space-y-2">
+              <FormLabel className="text-sm font-medium text-foreground">Email</FormLabel>
               <FormControl>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input 
-                    placeholder="your.email@example.com" 
+                    placeholder="Enter your email" 
                     {...field} 
-                    className="pl-10 bg-background/50 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm sm:text-base h-11 sm:h-12 rounded-lg"
+                    className="pl-10 h-11 sm:h-12 bg-background border-input rounded-lg focus:border-ring focus:ring-2 focus:ring-ring/20 transition-colors text-foreground placeholder-muted-foreground"
                   />
                 </div>
               </FormControl>
@@ -92,22 +92,22 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
           control={form.control}
           name="password"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel className="text-sm sm:text-base font-medium text-foreground">Password</FormLabel>
+            <FormItem className="space-y-2">
+              <FormLabel className="text-sm font-medium text-foreground">Password</FormLabel>
               <FormControl>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input 
                     type={showPassword ? "text" : "password"} 
-                    placeholder="••••••••" 
+                    placeholder="Enter your password" 
                     {...field} 
-                    className="pl-10 pr-10 bg-background/50 border-border/50 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm sm:text-base h-11 sm:h-12"
+                    className="pl-10 pr-10 h-11 sm:h-12 bg-background border-input rounded-lg focus:border-ring focus:ring-2 focus:ring-ring/20 transition-colors text-foreground placeholder-muted-foreground"
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="absolute right-0 top-0 w-10 sm:w-12 h-full flex items-center justify-center hover:bg-muted/50 transition-colors duration-200"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center hover:bg-accent rounded-md transition-colors"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
@@ -128,22 +128,22 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
             control={form.control}
             name="confirmPassword"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-sm sm:text-base font-medium text-foreground">Confirm Password</FormLabel>
+              <FormItem className="space-y-2">
+                <FormLabel className="text-sm font-medium text-foreground">Confirm Password</FormLabel>
                 <FormControl>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
                       type={showConfirmPassword ? "text" : "password"} 
-                      placeholder="••••••••" 
+                      placeholder="Confirm your password" 
                       {...field} 
-                      className="pl-10 pr-10 bg-background/50 border-border/50 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm sm:text-base h-11 sm:h-12"
+                      className="pl-10 pr-10 h-11 sm:h-12 bg-background border-input rounded-lg focus:border-ring focus:ring-2 focus:ring-ring/20 transition-colors text-foreground placeholder-muted-foreground"
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="absolute right-0 top-0 w-10 sm:w-12 h-full flex items-center justify-center hover:bg-muted/50 transition-colors duration-200"
+                      className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9 flex items-center justify-center hover:bg-accent rounded-md transition-colors"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                       {showConfirmPassword ? (
@@ -162,11 +162,11 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
         
         <Button 
           type="submit" 
-          className="w-full font-medium py-3 sm:py-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl bg-primary hover:bg-primary/90 text-primary-foreground h-11 sm:h-12 text-sm sm:text-base" 
+          className="w-full h-11 sm:h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-lg transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed" 
           disabled={isLoading}
         >
           {isLoading ? (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center justify-center space-x-2">
               <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin"></div>
               <span>{type === 'login' ? 'Signing in...' : 'Creating account...'}</span>
             </div>

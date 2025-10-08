@@ -62,11 +62,11 @@ const AppWithMaintenance = () => {
     if (user && isPushSupported) {
       subscribeToPush().catch(console.error);
     }
-  }, [user]);
+  }, [user, isPushSupported, subscribeToPush]);
 
-  if (error) return <div className="flex items-center justify-center h-screen text-destructive">{error}</div>
+  if (error) return <div className="flex items-center justify-center min-h-screen text-destructive">{error}</div>
   if (!maintenance) return (
-    <div className="flex items-center justify-center h-screen bg-background">
+    <div className="flex items-center justify-center min-h-screen bg-background">
       <div className="flex flex-col items-center gap-4">
         <span className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
         <span className="text-lg text-muted-foreground font-medium">Checking system status...</span>
@@ -127,9 +127,7 @@ const App = () => (
           <ThemeProvider>
             <SocketProvider>
               <UserProvider>
-                <div className='overflow-hidden h-screen'>
-                  <AppWithMaintenance />
-                </div>
+                <AppWithMaintenance />
               </UserProvider>
             </SocketProvider>
           </ThemeProvider>
@@ -155,7 +153,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-background">
+      <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="animate-pulse text-primary">Loading...</div>
       </div>
     )
