@@ -222,7 +222,7 @@ export const Settings = () => {
     }
   }
 
-  const handleThemeChange = async (newTheme: "BLUE" | "DARK" | "CYBERPUNK" | "NEON" | "OCEAN" | "SUNSET") => {
+  const handleThemeChange = async (newTheme: "LIGHT" | "DARK" | "SYSTEM") => {
     if (!user?.id) return
     try {
       const updatedSettings = {
@@ -235,7 +235,7 @@ export const Settings = () => {
         setSettings(updatedSettings)
         toast({
           title: "Theme Updated",
-          description: `Switched to ${newTheme} theme.`,
+          description: `Switched to ${newTheme.toLowerCase()} theme.`,
         })
       }
     } catch (error) {
@@ -424,18 +424,15 @@ export const Settings = () => {
                 <Label>Theme</Label>
                 <Select
                   value={theme}
-                  onValueChange={(value: "BLUE" | "DARK" | "CYBERPUNK" | "NEON" | "OCEAN" | "SUNSET") => handleThemeChange(value)}
+                  onValueChange={(value: "LIGHT" | "DARK" | "SYSTEM") => handleThemeChange(value)}
                 >
                   <SelectTrigger className="cursor-pointer">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="BLUE">Classic</SelectItem>
+                    <SelectItem value="LIGHT">Light</SelectItem>
                     <SelectItem value="DARK">Dark</SelectItem>
-                    <SelectItem value="CYBERPUNK">Cyberpunk</SelectItem>
-                    <SelectItem value="NEON">Neon</SelectItem>
-                    <SelectItem value="OCEAN">Ocean</SelectItem>
-                    <SelectItem value="SUNSET">Sunset</SelectItem>
+                    <SelectItem value="SYSTEM">System</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -2,12 +2,9 @@ import React, { useRef } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 
 const THEMES = [
-  { name: "OCEAN", label: "Ocean", color: "#00bcd4" },
+  { name: "LIGHT", label: "Light", color: "#2563eb" },
   { name: "DARK", label: "Dark", color: "#23272f" },
-  { name: "BLUE", label: "Blue", color: "#2563eb" },
-  { name: "CYBERPUNK", label: "Cyberpunk", color: "#ff00ea" },
-  { name: "NEON", label: "Neon", color: "#39ff14" },
-  { name: "SUNSET", label: "Sunset", color: "#ff5e62" },
+  { name: "SYSTEM", label: "System", color: "linear-gradient(45deg, #2563eb 50%, #23272f 50%)" },
 ];
 
 export const ThemeSelector: React.FC = () => {
@@ -16,11 +13,21 @@ export const ThemeSelector: React.FC = () => {
 
   // Live preview on hover/focus
   const previewTheme = (t: string) => {
-    document.documentElement.setAttribute("data-theme", t);
+    if (t === "SYSTEM") {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.setAttribute("data-theme", prefersDark ? "DARK" : "LIGHT");
+    } else {
+      document.documentElement.setAttribute("data-theme", t);
+    }
   };
   // Restore theme on mouse leave/blur
   const restoreTheme = () => {
-    document.documentElement.setAttribute("data-theme", theme);
+    if (theme === "SYSTEM") {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.setAttribute("data-theme", prefersDark ? "DARK" : "LIGHT");
+    } else {
+      document.documentElement.setAttribute("data-theme", theme);
+    }
   };
 
   return (
@@ -31,15 +38,13 @@ export const ThemeSelector: React.FC = () => {
           aria-label={`Switch to ${t.label} theme`}
           className={`w-8 h-8 rounded-full border-2 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/70
             ${theme === t.name ? "ring-2 ring-primary border-primary scale-110" : "border-border hover:scale-105"}
-            ${t.name === "CYBERPUNK" ? "cyberpunk-glow" : ""}
-            ${t.name === "NEON" ? "neon-glow" : ""}
           `}
           style={{ background: t.color }}
           onMouseEnter={() => previewTheme(t.name)}
           onFocus={() => previewTheme(t.name)}
           onMouseLeave={restoreTheme}
           onBlur={restoreTheme}
-          onClick={() => setTheme(t.name as any)}
+          onClick={() => setTheme(t.name as "LIGHT" | "DARK" | "SYSTEM")}
           tabIndex={0}
         >
           <span className="sr-only">{t.label}</span>

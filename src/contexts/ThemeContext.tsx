@@ -12,13 +12,30 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>("OCEAN");
+  const [theme, setTheme] = useState<Theme>("LIGHT");
   const { user } = useAuth();
   
   // Apply theme to document
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
+    const applyTheme = (themeToApply: Theme) => {
+      if (themeToApply === "SYSTEM") {
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        document.documentElement.setAttribute("data-theme", prefersDark ? "DARK" : "LIGHT");
+      } else {
+        document.documentElement.setAttribute("data-theme", themeToApply);
+      }
+    };
+    
+    applyTheme(theme);
     localStorage.setItem("vynq-theme", theme);
+    
+    // Listen for system theme changes when using SYSTEM theme
+    if (theme === "SYSTEM") {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      const handleChange = () => applyTheme("SYSTEM");
+      mediaQuery.addEventListener("change", handleChange);
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    }
   }, [theme]);
   
   // Load saved theme on initial render
@@ -39,7 +56,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       
       // Fallback to localStorage if backend fails or user is not logged in
       const savedTheme = localStorage.getItem("vynq-theme") as Theme | null;
-      if (savedTheme && [ "BLUE" , "DARK" , "CYBERPUNK" , "NEON" , "OCEAN" , "SUNSET"].includes(savedTheme)) {
+      if (savedTheme && ["LIGHT", "DARK", "SYSTEM"].includes(savedTheme)) {
         setTheme(savedTheme);
       }
     };

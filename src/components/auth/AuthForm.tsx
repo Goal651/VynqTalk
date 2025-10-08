@@ -50,14 +50,14 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium">Full Name</FormLabel>
+                <FormLabel className="text-sm sm:text-base font-medium text-foreground">Full Name</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                     <Input 
                       placeholder="John Doe" 
                       {...field} 
-                      className="pl-10 bg-background/40 border-border/60 rounded-lg focus:border-primary transition-colors login-ocean-input"
+                      className="pl-10 bg-background/50 border-border/50 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm sm:text-base h-11 sm:h-12"
                     />
                   </div>
                 </FormControl>
@@ -72,14 +72,14 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium">Email</FormLabel>
+              <FormLabel className="text-sm sm:text-base font-medium text-foreground">Email</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input 
                     placeholder="your.email@example.com" 
                     {...field} 
-                    className="pl-10 bg-background/40 border-border/60 focus:border-primary transition-colors login-ocean-input rounded-lg"
+                    className="pl-10 bg-background/50 border-border/50 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm sm:text-base h-11 sm:h-12 rounded-lg"
                   />
                 </div>
               </FormControl>
@@ -93,7 +93,7 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="text-sm font-medium">Password</FormLabel>
+              <FormLabel className="text-sm sm:text-base font-medium text-foreground">Password</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -101,13 +101,13 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
                     type={showPassword ? "text" : "password"} 
                     placeholder="••••••••" 
                     {...field} 
-                    className="pl-10 pr-10 bg-background/40 border-border/60 rounded-lg focus:border-primary transition-colors login-ocean-input"
+                    className="pl-10 pr-10 bg-background/50 border-border/50 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm sm:text-base h-11 sm:h-12"
                   />
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    className="absolute right-0 top-0 w-10 h-full flex items-center justify-center hover:bg-muted/50"
+                    className="absolute right-0 top-0 w-10 sm:w-12 h-full flex items-center justify-center hover:bg-muted/50 transition-colors duration-200"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
@@ -129,7 +129,7 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
             name="confirmPassword"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-sm font-medium">Confirm Password</FormLabel>
+                <FormLabel className="text-sm sm:text-base font-medium text-foreground">Confirm Password</FormLabel>
                 <FormControl>
                   <div className="relative">
                     <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -137,13 +137,13 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
                       type={showConfirmPassword ? "text" : "password"} 
                       placeholder="••••••••" 
                       {...field} 
-                      className="pl-10 pr-10 bg-background/40 border-border/60 rounded-lg focus:border-primary transition-colors login-ocean-input"
+                      className="pl-10 pr-10 bg-background/50 border-border/50 rounded-lg focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm sm:text-base h-11 sm:h-12"
                     />
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
-                      className="absolute right-0 top-0 w-10 h-full flex items-center justify-center hover:bg-muted/50"
+                      className="absolute right-0 top-0 w-10 sm:w-12 h-full flex items-center justify-center hover:bg-muted/50 transition-colors duration-200"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                       {showConfirmPassword ? (
@@ -162,7 +162,7 @@ export const AuthForm = ({ type, onSubmit, isLoading }: AuthFormProps) => {
         
         <Button 
           type="submit" 
-          className="w-full font-medium py-6 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl ocean-btn" 
+          className="w-full font-medium py-3 sm:py-4 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl bg-primary hover:bg-primary/90 text-primary-foreground h-11 sm:h-12 text-sm sm:text-base" 
           disabled={isLoading}
         >
           {isLoading ? (
