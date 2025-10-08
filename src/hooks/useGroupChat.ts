@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { ChatReaction, Group, GroupMessage, MessageType, SendGroupMessageRequest, User } from '@/types';
+import { ChatReaction, Group, GroupMessage, MessageType, Reaction, SendGroupMessageRequest, User } from '@/types';
 import { useAuth } from "@/contexts/AuthContext"
 import { useToast } from "@/hooks"
 import { useSocket } from "@/contexts/SocketContext"
@@ -127,7 +127,7 @@ export const useGroupChat = (group: Group) => {
         const existingReaction = message.reactions.find(
           r => r.emoji === emoji && r.userId === user.id
         );
-        let updatedReactions;
+        let updatedReactions: Reaction[] = [];
         if (existingReaction) {
           updatedReactions = message.reactions.filter(
             r => !(r.emoji === emoji && r.userId === user.id)
