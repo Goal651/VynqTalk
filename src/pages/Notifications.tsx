@@ -136,8 +136,8 @@ export const Notifications = () => {
   }
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-background to-secondary/5">
-      <div className="flex-shrink-0 text-center p-3 sm:p-6 border-b space-y-4 sm:space-y-6 bg-background/50 backdrop-blur-sm">
+    <div className="h-full flex flex-col bg-background">
+      <div className="flex-shrink-0 text-center p-3 sm:p-6 border-b border-border space-y-4 sm:space-y-6 bg-background">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 w-full">
           <h1 className="text-xl sm:text-2xl font-bold flex justify-center items-center gap-2">
             <Bell className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -162,8 +162,8 @@ export const Notifications = () => {
         </div>
 
         <Tabs defaultValue="all" className="w-full" onValueChange={setActiveFilter}>
-          <TabsList className="bg-background/50 backdrop-blur-sm flex flex-wrap">
-            <TabsTrigger value="all" className="relative text-xs sm:text-base">
+          <TabsList className="bg-muted flex flex-wrap p-1 h-auto min-h-[44px] gap-1">
+            <TabsTrigger value="all" className="relative text-xs sm:text-base px-3 py-2 data-[state=active]:bg-background data-[state=active]:text-foreground">
               All
               {notifications.length > 0 && (
                 <Badge variant="secondary" className="ml-1">
@@ -171,7 +171,7 @@ export const Notifications = () => {
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="unread" className="relative text-xs sm:text-base">
+            <TabsTrigger value="unread" className="relative text-xs sm:text-base px-3 py-2 data-[state=active]:bg-background data-[state=active]:text-foreground">
               Unread
               {unreadCount > 0 && (
                 <Badge variant="destructive" className="ml-1">
@@ -179,9 +179,9 @@ export const Notifications = () => {
                 </Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="message" className="text-xs sm:text-base">Messages</TabsTrigger>
-            <TabsTrigger value="group_invite" className="text-xs sm:text-base">Groups</TabsTrigger>
-            <TabsTrigger value="system" className="text-xs sm:text-base">System</TabsTrigger>
+            <TabsTrigger value="message" className="text-xs sm:text-base px-3 py-2 data-[state=active]:bg-background data-[state=active]:text-foreground">Messages</TabsTrigger>
+            <TabsTrigger value="group_invite" className="text-xs sm:text-base px-3 py-2 data-[state=active]:bg-background data-[state=active]:text-foreground">Groups</TabsTrigger>
+            <TabsTrigger value="system" className="text-xs sm:text-base px-3 py-2 data-[state=active]:bg-background data-[state=active]:text-foreground">System</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
@@ -191,7 +191,7 @@ export const Notifications = () => {
           {isLoading ? (
             <div className="space-y-3 sm:space-y-4">
               {Array.from({ length: 5 }).map((_, i) => (
-                <Card key={i} className="bg-background/50 backdrop-blur-sm">
+                <Card key={i} className="bg-card border-border">
                   <CardContent className="flex items-center gap-4 py-6">
                     <Skeleton className="h-12 w-12 rounded-full" />
                     <div className="flex-1 space-y-2">
@@ -214,10 +214,10 @@ export const Notifications = () => {
                 className="space-y-3 sm:space-y-4"
               >
                 {filterNotifications(activeFilter).length === 0 ? (
-                  <Card className="bg-background/50 backdrop-blur-sm">
+                  <Card className="bg-card border-border">
                     <CardContent className="flex items-center justify-center py-12">
                       <div className="text-center">
-                        <div className="h-16 w-16 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 mx-auto mb-4 flex items-center justify-center">
+                        <div className="h-16 w-16 rounded-full bg-muted mx-auto mb-4 flex items-center justify-center">
                           <Bell className="h-8 w-8 text-muted-foreground" />
                         </div>
                         <p className="text-muted-foreground">No notifications found</p>
@@ -235,7 +235,7 @@ export const Notifications = () => {
                     >
                       <Card
                         className={cn(
-                          "transition-all hover:shadow-md bg-background/50 backdrop-blur-sm",
+                          "transition-all hover:shadow-md bg-card border-border",
                           !notification.isRead && "ring-2 ring-primary/20 bg-primary/5"
                         )}
                       >
@@ -245,7 +245,7 @@ export const Notifications = () => {
                               {notification.user.avatar ? (
                                 <Avatar className="ring-2 ring-primary/10">
                                   <AvatarImage src={notification.user.avatar} />
-                                  <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20">
+                                  <AvatarFallback className="bg-muted">
                                     {notification.title.substring(0, 2).toUpperCase()}
                                   </AvatarFallback>
                                 </Avatar>

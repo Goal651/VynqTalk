@@ -22,7 +22,6 @@ import { User } from "@/types"
 import { ChatView } from "@/components/chat/dm/ChatView"
 import { UserProvider, useUsers } from "@/contexts/UserContext"
 import { Toaster } from '@/components/ui/toaster'
-import { usePushNotifications } from "@/hooks/usePushNotifications"
 
 const queryClient = new QueryClient()
 
@@ -32,7 +31,6 @@ const AppWithMaintenance = () => {
   const { user } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
-  const { subscribe: subscribeToPush, isSupported: isPushSupported } = usePushNotifications()
 
   useEffect(() => {
 
@@ -57,12 +55,7 @@ const AppWithMaintenance = () => {
     }
   }, [maintenance, user, location, navigate]);
 
-  // Initialize push notifications when user logs in
-  useEffect(() => {
-    if (user && isPushSupported) {
-      subscribeToPush().catch(console.error);
-    }
-  }, [user, isPushSupported, subscribeToPush]);
+
 
   if (error) return <div className="flex items-center justify-center min-h-screen text-destructive">{error}</div>
   if (!maintenance) return (

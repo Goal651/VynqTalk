@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Bell, BellOff, Info, CheckCircle, XCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { usePushNotifications } from "@/hooks/usePushNotifications";
 
 interface NotificationPermissionModalProps {
   open: boolean;
@@ -17,14 +16,7 @@ export const NotificationPermissionModal = ({
   onClose,
   onPermissionChanged
 }: NotificationPermissionModalProps) => {
-  const {
-    isSupported,
-    permission,
-    isPermissionGranted,
-    requestPermission,
-    subscribe,
-    isLoading
-  } = usePushNotifications();
+
 
   const [isRequesting, setIsRequesting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -32,9 +24,8 @@ export const NotificationPermissionModal = ({
   const handleRequestPermission = async () => {
     setIsRequesting(true);
     try {
-      const granted = await requestPermission();
+      const granted = await Notification.requestPermission();
       if (granted) {
-        await subscribe();
         setShowSuccess(true);
         onPermissionChanged?.(true);
         setTimeout(() => {
@@ -53,14 +44,14 @@ export const NotificationPermissionModal = ({
   };
 
   const getPermissionStatus = () => {
-    if (permission === 'granted') {
+    if (Notification.permission === 'granted') {
       return {
         icon: <CheckCircle className="w-5 h-5 text-green-500" />,
         text: "Notifications are enabled",
         color: "text-green-600",
         bgColor: "bg-green-50 border-green-200"
       };
-    } else if (permission === 'denied') {
+    } else if (Notification.permission === 'denied') {
       return {
         icon: <XCircle className="w-5 h-5 text-red-500" />,
         text: "Notifications are blocked",
@@ -79,7 +70,7 @@ export const NotificationPermissionModal = ({
 
   const status = getPermissionStatus();
 
-  if (!isSupported) {
+  if (!Notification.permission) {
     return (
       <Dialog open={open} onOpenChange={onClose}>
         <DialogContent className="sm:max-w-md">
@@ -163,7 +154,7 @@ export const NotificationPermissionModal = ({
                   </ul>
                 </div>
 
-                {permission === 'denied' && (
+                {Notification.permission === 'denied' && (
                   <Alert className="bg-yellow-50 border-yellow-200">
                     <Info className="h-4 w-4 text-yellow-500" />
                     <AlertDescription className="text-yellow-700">
@@ -181,10 +172,10 @@ export const NotificationPermissionModal = ({
             {showSuccess ? "Close" : "Maybe Later"}
           </Button>
           
-          {!isPermissionGranted && !showSuccess && permission !== 'denied' && (
+          {Notification.permission !== 'granted' && !showSuccess && (
             <Button 
               onClick={handleRequestPermission} 
-              disabled={isRequesting || isLoading}
+              disabled={isRequesting}
               className="gap-2"
             >
               {isRequesting ? (
@@ -205,7 +196,7 @@ export const NotificationPermissionModal = ({
             </Button>
           )}
 
-          {isPermissionGranted && !showSuccess && (
+          {Notification.permission === 'granted' && !showSuccess && (
             <Button onClick={onClose} className="gap-2">
               <CheckCircle className="w-4 h-4" />
               Already Enabled

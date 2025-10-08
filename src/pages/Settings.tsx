@@ -5,16 +5,17 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Separator } from "@/components/ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useAuth } from "@/contexts/AuthContext"
 import { useTheme } from "@/contexts/ThemeContext"
-import { Camera, Save, Bell, Shield, Palette, Download, Upload, Trash2, UserCircle } from "lucide-react"
-import { useCamera ,useToast} from "@/hooks"
-import { settingsService,userService,notificationService } from "@/api"
+import { Camera, Save, Bell, Shield, Palette, UserCircle, Image, ChevronDown } from "lucide-react"
+import { useCamera, useToast } from "@/hooks"
+import { settingsService, userService } from "@/api"
 import { UserSettings } from '@/types'
-import { base64ToFile ,requestNotificationPermission, subscribeUserToPush, pushSubscriptionToToken } from "@/lib"
+import { base64ToFile } from "@/lib"
 
 export const Settings = () => {
   const { user } = useAuth()
@@ -22,6 +23,7 @@ export const Settings = () => {
   const { openCamera, capturedImage, CameraDialog } = useCamera()
   const { toast } = useToast()
 
+  // State management
   const [profileData, setProfileData] = useState({
     name: user?.name || "",
     bio: user?.bio || "",
@@ -34,126 +36,145 @@ export const Settings = () => {
     showOnlineStatus: true,
   })
 
-  const [vapidPublicKey, setVapidPublicKey] = useState<string | null>(null);
+  const [isUpdating, setIsUpdating] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<string | null>(null)
 
+  // Load user settings on component mount
   useEffect(() => {
-    if (user?.id) {
-      const fetchSettings = async () => {
-        if (!user?.id) return
-        try {
-          const response = await settingsService.getSettings()
-          if (response.success && response.data) {
-            setSettings(response.data)
-            if (response.data.theme && response.data.theme !== theme) {
-              setTheme(response.data.theme)
-            }
-          }
-        } catch (error) {
-          toast({
-            title: "Error",
-            description: "Failed to fetch settings",
-            variant: "destructive",
-          })
+    const loadSettings = async () => {
+      if (!user?.id) return
+      try {
+        const response = await settingsService.getSettings()
+        if (response.success && response.data) {
+          setSettings(response.data)
         }
-      }
-      fetchSettings()
-    }
-  }, [user?.id])
-
-  useEffect(() => {
-    if (settings.theme !== theme) {
-      setSettings(prev => ({ ...prev, theme }))
-    }
-  }, [theme])
-
-
-
-  const handleProfileSave = async () => {
-    if (!user?.id) return
-    try {
-
-      setSettings((prev) => {
-        return { ...prev, user: { ...user, name: profileData.name, bio: profileData.bio } }
-      })
-      const response = await userService.updateProfile(profileData)
-
-      if (response.success) {
+      } catch (error) {
         toast({
-          title: "Profile Updated",
-          description: "Your profile has been successfully updated.",
+          title: "Error",
+          description: "Failed to load settings",
+          variant: "destructive",
         })
       }
-    } catch (error) {
-      console.error(error)
-      toast({
-        title: "Error",
-        description: "Failed to update profile",
-        variant: "destructive",
-      })
     }
-  }
+    
+    loadSettings()
+  }, [user?.id, toast])
+
+  // Handle avatar upload when image is captured or file is selected
   useEffect(() => {
     const handleAvatarUpload = async () => {
-      if (!user?.id || !capturedImage) return
+      if (!user?.id || (!capturedImage && !selectedFile)) return
+      
+      setIsUpdating(true)
       try {
-        const file = base64ToFile(capturedImage, 'profile.png')
+        let file: File
+        
+        if (capturedImage) {
+          file = base64ToFile(capturedImage, 'profile.png')
+        } else if (selectedFile) {
+          file = base64ToFile(selectedFile, 'profile.jpg')
+        } else {
+          return
+        }
+        
         const response = await userService.uploadAvatar(file)
         if (response.success && response.data) {
           toast({
             title: "Avatar Updated",
             description: "Your profile picture has been updated successfully.",
           })
+          // Clear the selected file after successful upload
+          setSelectedFile(null)
         }
-        setSettings((prev) => ({
-          ...prev,
-          user: {
-            ...prev.user,
-            avatar: response.data
-          }
-        }))
       } catch (error) {
         toast({
           title: "Error",
           description: "Failed to upload avatar",
           variant: "destructive",
         })
+      } finally {
+        setIsUpdating(false)
       }
     }
+    
     handleAvatarUpload()
-  }, [capturedImage, toast, user?.id])
+  }, [capturedImage, selectedFile, toast, user?.id])
 
-  const handleNotificationChange = async (key: string, value: boolean) => {
-    if (!user?.id) return
-    try {
-      const updatedSettings = {
-        ...settings,
-        [key]: value
+  // Handle file selection
+  const handleFileSelect = () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = 'image/*'
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (file) {
+        // Convert file to base64
+        const reader = new FileReader()
+        reader.onload = () => {
+          setSelectedFile(reader.result as string)
+        }
+        reader.readAsDataURL(file)
       }
-      const response = await settingsService.updateSettings(updatedSettings)
+    }
+    input.click()
+  }
 
+  // Handle profile updates
+  const handleProfileSave = async () => {
+    if (!user?.id || isUpdating) return
+    
+    setIsUpdating(true)
+    try {
+      await userService.updateProfile({
+        name: profileData.name,
+        bio: profileData.bio,
+      })
+      toast({
+        title: "Profile Updated",
+        description: "Your profile has been saved successfully.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to update profile",
+        variant: "destructive",
+      })
+    } finally {
+      setIsUpdating(false)
+    }
+  }
+
+  // Handle theme changes
+  const handleThemeChange = async (newTheme: "LIGHT" | "DARK" | "SYSTEM") => {
+    if (!user?.id) return
+    
+    try {
+      const updatedSettings = { ...settings, theme: newTheme }
+      const response = await settingsService.updateSettings(updatedSettings)
+      
       if (response.success) {
+        setTheme(newTheme)
         setSettings(updatedSettings)
         toast({
-          title: "Settings Updated",
-          description: "Your notification settings have been updated.",
+          title: "Theme Updated",
+          description: `Switched to ${newTheme.toLowerCase()} theme.`,
         })
       }
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to update notification settings",
+        description: "Failed to update theme",
         variant: "destructive",
       })
     }
   }
 
-  const handlePrivacyChange = async (key: string, value: boolean | 'public' | 'friends' | 'private') => {
+  // Handle privacy settings
+  const handlePrivacyChange = async (key: string, value: boolean) => {
     if (!user?.id) return
+    
     try {
-      const updatedSettings = {
-        ...settings,
-        [key]: value
-      }
+      const updatedSettings = { ...settings, [key]: value }
       const response = await settingsService.updateSettings(updatedSettings)
 
       if (response.success) {
@@ -172,186 +193,17 @@ export const Settings = () => {
     }
   }
 
-  const handleAppearanceChange = async (key: string, value: string | boolean) => {
-    if (!user?.id) return
-    try {
-      const updatedSettings = {
-        ...settings,
-        [key]: value
-      }
-      const response = await settingsService.updateSettings(updatedSettings)
-
-      if (response.success) {
-        setSettings(updatedSettings)
-        toast({
-          title: "Settings Updated",
-          description: "Your appearance settings have been updated.",
-        })
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update appearance settings",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const handleSecurityChange = async (key: string, value: boolean) => {
-    if (!user?.id) return
-    try {
-      const updatedSettings = {
-        ...settings,
-        [key]: value
-      }
-      const response = await settingsService.updateSettings(updatedSettings)
-
-      if (response.success) {
-        setSettings(updatedSettings)
-        toast({
-          title: "Settings Updated",
-          description: "Your security settings have been updated.",
-        })
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update security settings",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const handleThemeChange = async (newTheme: "LIGHT" | "DARK" | "SYSTEM") => {
-    if (!user?.id) return
-    try {
-      const updatedSettings = {
-        ...settings,
-        theme: newTheme
-      }
-      const response = await settingsService.updateSettings(updatedSettings)
-      if (response.success) {
-        setTheme(newTheme)
-        setSettings(updatedSettings)
-        toast({
-          title: "Theme Updated",
-          description: `Switched to ${newTheme.toLowerCase()} theme.`,
-        })
-      }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update theme",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const handleCameraClick = () => {
-    openCamera()
-  }
-
-  const handleDataExport = async () => {
-    try {
-      const response = await userService.getUserData()
-      console.log("Data exported is ", response.data)
-      toast({
-        title: "Data Export Started",
-        description: "Your data export will be ready shortly.",
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to export data",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const handleAccountDelete = async () => {
-    try {
-
-    const response=  await userService.deleteUser()
-      toast({
-        title: "Account Deletion",
-        description: response.message,
-        variant: "destructive",
-      })
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to process account deletion request",
-        variant: "destructive",
-      })
-    }
-  }
-
-  const handleEnableNotifications = async () => {
-    if (!('Notification' in window)) {
-      toast({ title: 'Not supported', description: 'Notifications are not supported in this browser.', variant: 'destructive' });
-      return;
-    }
-    const permission = await requestNotificationPermission();
-    if (permission === 'granted') {
-      try {
-        // Fetch VAPID public key if not already fetched
-        let key = vapidPublicKey;
-        if (!key) {
-          const response = await notificationService.getVapidPublicKey();
-          if (response.success && response.data) {
-            key = response.data;
-            setVapidPublicKey(key);
-          } else {
-            toast({ title: 'Error', description: 'Failed to fetch VAPID public key.', variant: 'destructive' });
-            return;
-          }
-        }
-        // Unsubscribe any existing push subscription before creating a new one
-        const registration = await navigator.serviceWorker.ready;
-        const existingSubscription = await registration.pushManager.getSubscription();
-        if (existingSubscription) {
-          await existingSubscription.unsubscribe();
-        }
-        const subscription = await subscribeUserToPush(key);
-        if (subscription) {
-          const subObj = subscription.toJSON ? subscription.toJSON() : subscription;
-          await notificationService.registerDeviceToken(subObj);
-          toast({ title: 'Notifications enabled', description: 'You will now receive notifications.' });
-        }
-      } catch (err) {
-        toast({ title: 'Error', description: 'Failed to register for notifications.', variant: 'destructive' });
-      }
-    } else {
-      toast({ title: 'Permission denied', description: 'You must allow notifications in your browser.' });
-    }
-  };
-
-  // Call this on logout or when disabling notifications
-  const handleDisableNotifications = async () => {
-    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-    const registration = await navigator.serviceWorker.ready;
-    const subscription = await registration.pushManager.getSubscription();
-    if (subscription) {
-      try {
-        const subObj = subscription.toJSON ? subscription.toJSON() : subscription;
-        await notificationService.unregisterDeviceToken(subObj);
-        await subscription.unsubscribe();
-        toast({ title: 'Notifications disabled', description: 'You will no longer receive notifications.' });
-      } catch (err) {
-        toast({ title: 'Error', description: 'Failed to unregister notifications.', variant: 'destructive' });
-      }
-    }
-  };
-
   return (
-    <div className="h-full flex flex-col">
-      <div className="text-center p-3 sm:p-6 border-b ">
-        <h1 className="text-xl sm:text-2xl font-bold">Settings</h1>
-        <p className="text-xs sm:text-sm text-muted-foreground">Manage your account and application preferences</p>
+    <div className="h-full flex flex-col bg-background">
+      {/* Header */}
+      <div className="text-center p-6 border-b border-border">
+        <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+        <p className="text-sm text-muted-foreground">Manage your account and preferences</p>
       </div>
 
       <ScrollArea className="flex-1">
-        <div className="p-2 sm:p-6 space-y-4 sm:space-y-6 max-w-4xl mx-auto">
+        <div className="p-6 space-y-6 max-w-2xl mx-auto">
+          
           {/* Profile Section */}
           <Card>
             <CardHeader>
@@ -361,51 +213,70 @@ export const Settings = () => {
               </CardTitle>
               <CardDescription>Update your personal information</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex flex-col sm:flex-row items-center sm:space-x-4 space-y-3 sm:space-y-0">
-                <div className="relative flex-shrink-0">
-                  <Avatar className="h-16 w-16 sm:h-20 sm:w-20">
-                    <AvatarImage src={capturedImage || user?.avatar} alt={user?.name} />
-                    <AvatarFallback>{user?.name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+            <CardContent className="space-y-6">
+              <div className="flex items-start gap-6">
+                <div className="relative">
+                  <Avatar className="h-20 w-20">
+                    <AvatarImage src={selectedFile || capturedImage || user?.avatar} alt={user?.name} />
+                    <AvatarFallback className="bg-muted">
+                      {user?.name?.substring(0, 2).toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
-                  <Button type="button"
-                    size="sm"
-                    variant="outline"
-                    className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0 cursor-pointer hover:bg-accent"
-                    onClick={handleCameraClick}
-                  >
-                    <Camera className="h-4 w-4" />
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full p-0"
+                        disabled={isUpdating}
+                      >
+                        <Camera className="h-3 w-3" />
+                        <ChevronDown className="h-2 w-2" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onClick={openCamera}>
+                        <Camera className="h-4 w-4 mr-2" />
+                        Take Photo
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={handleFileSelect}>
+                        <Image className="h-4 w-4 mr-2" />
+                        Select Photo
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
-                <div className="space-y-2 flex-1 w-full">
-                  <div>
+                
+                <div className="flex-1 space-y-4">
+                  <div className="space-y-2">
                     <Label htmlFor="name">Display Name</Label>
                     <Input
                       id="name"
                       value={profileData.name}
-                      onChange={(e) => {
-                        setProfileData(prev => ({ ...prev, name: e.target.value }))
-                      }}
-                      className="cursor-text text-sm py-2"
+                      onChange={(e) => setProfileData(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Enter your name"
                     />
                   </div>
-                  <div>
-                    <Label htmlFor="email">Bio</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="bio">Bio</Label>
                     <Input
                       id="bio"
                       value={profileData.bio}
-                      onChange={(e) => {
-                        setProfileData(prev => ({ ...prev, bio: e.target.value }))
-                      }}
-                      type="text"
-                      className="cursor-text text-sm py-2"
+                      onChange={(e) => setProfileData(prev => ({ ...prev, bio: e.target.value }))}
+                      placeholder="Tell us about yourself"
                     />
                   </div>
                 </div>
               </div>
-              <Button type="button" onClick={handleProfileSave} className="cursor-pointer w-full sm:w-auto">
+              
+              <Button 
+                onClick={handleProfileSave} 
+                disabled={isUpdating}
+                className="w-full sm:w-auto"
+              >
                 <Save className="h-4 w-4 mr-2" />
-                Save Changes
+                {isUpdating ? "Saving..." : "Save Changes"}
               </Button>
             </CardContent>
           </Card>
@@ -419,14 +290,14 @@ export const Settings = () => {
               </CardTitle>
               <CardDescription>Customize how the app looks and feels</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent>
               <div className="space-y-2">
                 <Label>Theme</Label>
                 <Select
                   value={theme}
                   onValueChange={(value: "LIGHT" | "DARK" | "SYSTEM") => handleThemeChange(value)}
                 >
-                  <SelectTrigger className="cursor-pointer">
+                  <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -435,6 +306,31 @@ export const Settings = () => {
                     <SelectItem value="SYSTEM">System</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Privacy & Security Section */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Privacy & Security
+              </CardTitle>
+              <CardDescription>Manage your privacy preferences</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <Label>Show Online Status</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Let others see when you're online
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.showOnlineStatus}
+                  onCheckedChange={(checked) => handlePrivacyChange('showOnlineStatus', checked)}
+                />
               </div>
             </CardContent>
           </Card>
@@ -448,93 +344,36 @@ export const Settings = () => {
               </CardTitle>
               <CardDescription>Control how you receive notifications</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Push Notifications</Label>
-                  <p className="text-sm text-muted-foreground">Receive notifications on this device</p>
-                </div>
-                <Switch
-                  checked={settings.notificationEnabled}
-                  onCheckedChange={(checked) => handleNotificationChange('notificationEnabled', checked)}
-                />
-              </div>
-
-            </CardContent>
-          </Card>
-
-          {/* Privacy Section */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Privacy & Security
-              </CardTitle>
-              <CardDescription>Manage your privacy preferences</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label>Show Online Status</Label>
-                  <p className="text-sm text-muted-foreground">Let others see when you're online</p>
-                </div>
-                <Switch
-                  checked={settings.showOnlineStatus}
-                  onCheckedChange={(checked) => handlePrivacyChange('showOnlineStatus', checked)}
-                />
-              </div>
-
-              <Separator />
-
-            </CardContent>
-          </Card>
-
-          {/* Data & Privacy */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Data & Privacy</CardTitle>
-              <CardDescription>Manage your data and account</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Button type="button"
-                variant="outline"
-                onClick={handleDataExport}
-                className="w-full cursor-pointer hover:bg-accent"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Export My Data
-              </Button>
-              <Button type="button"
-                variant="outline"
-                onClick={() => console.log("Import data clicked")}
-                className="w-full cursor-pointer hover:bg-accent"
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                Import Data
-              </Button>
-              <Separator />
-              <Button type="button"
-                variant="destructive"
-                onClick={handleAccountDelete}
-                className="w-full cursor-pointer"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Account
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Notifications</CardTitle>
-              <CardDescription>Enable or disable browser notifications for new messages.</CardDescription>
-            </CardHeader>
             <CardContent>
-              <Button onClick={handleEnableNotifications} variant="outline" className="flex items-center gap-2">
-                <Bell className="h-4 w-4" /> Enable Notifications
-              </Button>
+              <div className="space-y-4">
+                <div className="p-4 bg-muted/50 rounded-lg border border-border">
+                  <div className="flex items-center gap-3">
+                    <Bell className="h-5 w-5 text-muted-foreground" />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-foreground">
+                        Push Notifications
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Advanced notification settings will be available soon
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
+
+          {/* Advanced Features Coming Soon */}
+          <Card className="border-dashed border-2">
+            <CardHeader>
+              <CardTitle className="text-muted-foreground">Coming Soon</CardTitle>
+              <CardDescription>
+                Advanced features like data export, account management, and detailed notification controls
+                are currently in development.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
         </div>
       </ScrollArea>
 
