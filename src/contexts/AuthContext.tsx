@@ -13,7 +13,7 @@ interface AuthContextType {
   logout: () => void;
   refreshUser: () => Promise<void>;
 }
-
+ 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 function useAuth(): AuthContextType {
