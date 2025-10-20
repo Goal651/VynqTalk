@@ -10,7 +10,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         socketService.connect();
         return () => {
             socketService.disconnect();
-        };
+        }; 
     }, []);
 
     return (
