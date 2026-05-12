@@ -1,6 +1,6 @@
 // API Configuration Constants
 
-const SERVER_URL = 'https://vynqtalk-server-production.up.railway.app'
+const SERVER_URL = 'https://vynqtalk-server.onrender.com'
 
 export const API_CONFIG = {
   BASE_URL: import.meta.env.MODE === 'development' ?'http://localhost:8080' : SERVER_URL,
