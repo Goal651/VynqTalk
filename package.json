@@ -53,7 +53,7 @@
     "lucide-react": "^0.462.0",
     "next-themes": "^0.3.0",
     "react": "^18.3.1",
-    "react-day-picker": "^8.10.1",
+    "react-day-picker": "^10.0.0",
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.60.0",
     "react-resizable-panels": "^2.1.9",
@@ -91,7 +91,7 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.35.1",
-    "vite": "^5.4.19"
+    "vite": "^8.0.12"
   },
   "packageManager": "pnpm@10.12.4+sha256.cadfd9e6c9fcc2cb76fe7c0779a5250b632898aea5f53d833a73690c77a778d9"
 }
