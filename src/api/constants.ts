@@ -5,7 +5,7 @@ const SERVER_URL = 'https://vynqtalk-server.onrender.com'
 export const API_CONFIG = {
   BASE_URL: import.meta.env.MODE === 'development' ?'http://localhost:8080' : SERVER_URL,
   API_VERSION: 'v2',
-  TIMEOUT: 10000,
+  TIMEOUT: 60000,
 };
 
 export const API_ENDPOINTS = {
