@@ -185,7 +185,7 @@ const ChatViewWrapper = () => {
       }
     }
     fetchUsers()
-  }, [toast, usersContext])
+  }, [])
 
   return <ChatView isLoadingUsers={isLoadingUsers} />
 }
