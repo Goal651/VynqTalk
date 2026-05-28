@@ -21,10 +21,10 @@ interface MessageInputProps {
 
 // Helper to map file MIME type to MessageType
 function getMessageTypeForFile(file: File): MessageType {
-  if (file.type.startsWith("image/")) return "image";
-  if (file.type.startsWith("audio/")) return "audio";
-  if (file.type.startsWith("video/")) return "video";
-  return "file";
+  if (file.type.startsWith("image/")) return MessageType.IMAGE;
+  if (file.type.startsWith("audio/")) return MessageType.AUDIO;
+  if (file.type.startsWith("video/")) return MessageType.VIDEO;
+  return MessageType.FILE;
 }
 
 const LINK_PREVIEW_API_KEY = "3b3f4d51fc1a85aeab5c0e15b90913fa";
@@ -99,7 +99,7 @@ export const MessageInput = ({
     setIsUploading(true);
     // Send text message if present
     if (message.trim()) {
-      onSendMessage(message.trim(), 'text', null, replyTo);
+      onSendMessage(message.trim(), MessageType.TEXT, null, replyTo);
     }
 
     // Upload and send each file with progress and cancel support
@@ -225,7 +225,7 @@ export const MessageInput = ({
             {(() => {
               const r = replyTo;
               switch (r.type) {
-                case "image":
+                case MessageType.IMAGE:
                   return (
                     <img
                       src={r.content}
@@ -233,21 +233,21 @@ export const MessageInput = ({
                       className="h-8 w-8 object-cover rounded-md border ml-2"
                     />
                   );
-                case "video":
+                case MessageType.VIDEO:
                   return (
                     <span className="flex items-center gap-1 text-xs text-muted-foreground ml-2">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M4 6h12a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" /></svg>
                       {r.fileName || "Video"}
                     </span>
                   );
-                case "audio":
+                case MessageType.AUDIO:
                   return (
                     <span className="flex items-center gap-1 text-xs text-muted-foreground ml-2">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l-2 2H5a2 2 0 00-2 2v4a2 2 0 002 2h2l2 2zm7-2a2 2 0 100-4 2 2 0 000 4z" /></svg>
                       {r.fileName || "Audio"}
                     </span>
                   );
-                case "file":
+                case MessageType.FILE:
                   return (
                     <span className="flex items-center gap-1 text-xs text-muted-foreground ml-2">
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" /></svg>
@@ -299,7 +299,7 @@ export const MessageInput = ({
             const audioFile = new File([audioBlob], `audio-${Date.now()}.webm`, { type: 'audio/webm' });
             const response = await messageService.uploadMessage(audioFile, undefined, undefined, 60000);
             if (response.success && response.data) {
-              onSendMessage(response.data, 'audio', 'Voice message', replyTo);
+              onSendMessage(response.data, MessageType.AUDIO, 'Voice message', replyTo);
             }
             setIsUploading(false);
             setShowAudioRecorder(false);
@@ -420,7 +420,7 @@ export const MessageInput = ({
           onComplete={async (audioBlob) => {
             // Simulate upload and get URL (replace with real upload logic if needed)
             const audioUrl = URL.createObjectURL(audioBlob);
-            onSendMessage(audioUrl, "audio", "audio.webm", replyTo);
+            onSendMessage(audioUrl, MessageType.AUDIO, "audio.webm", replyTo);
             setShowAudioRecorder(false);
           }}
         />

@@ -25,12 +25,12 @@ export class GroupService {
     return await apiClient.uploadFile<string>(API_ENDPOINTS.GROUP.UPLOAD_AVATAR(id), file);
   }
 
-  async addMember(groupId: number, user: User): Promise<ApiResponse<Group>> {
-    return await apiClient.post<Group>(API_ENDPOINTS.GROUP_MEMBERS.ADD_MEMBER(groupId,user.id))
+  async addMember(groupId: number, userId: number): Promise<ApiResponse<Group>> {
+    return await apiClient.post<Group>(API_ENDPOINTS.GROUP.ADD_MEMBER(groupId,userId))
   }
 
   async removeMember(groupId: number, userId: number): Promise<ApiResponse<Group>> {
-    return await apiClient.delete<Group>(API_ENDPOINTS.GROUP_MEMBERS.REMOVE_MEMBER(groupId,userId))
+    return await apiClient.delete<Group>(API_ENDPOINTS.GROUP.REMOVE_MEMBER(groupId,userId))
   }
 
 

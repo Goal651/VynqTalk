@@ -47,6 +47,8 @@ export const API_ENDPOINTS = {
   GROUP: {
     LIST: '/group/all',
     CREATE: '/group',
+    REMOVE_MEMBER: (groupId: number, userId: number) => `/group/${groupId}/remove-member/${userId}`,
+    ADD_MEMBER: (groupId: number, userId: number) => `/group/${groupId}/add-member/${userId}`,
     UPLOAD_AVATAR: (id: number) => `/upload/group/${id}`,
     BY_ID: (id: number) => `/group/${id}`,
     UPDATE: (id: number) => `/group/${id}`,
